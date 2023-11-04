@@ -6,8 +6,9 @@ import scipy.io
 import numpy as np
 
 class PatientEEGData:    
-    def __init__(self, eeg_data: Dict[str, NDArray], sampling_frequency: int, utility_frequency: int, start_time: int, end_time: int) -> None:
+    def __init__(self, eeg_data: Dict[str, NDArray], num_points: int, sampling_frequency: int, utility_frequency: int, start_time: int, end_time: int) -> None:
         self.eeg_data = eeg_data
+        self.num_points = num_points
         self.sampling_frequency = sampling_frequency
         self.utility_frequency = utility_frequency
         self.start_time = start_time
@@ -17,6 +18,7 @@ class PatientEEGData:
     def load_eeg_data(cls, header_file: str, content_file: str) -> PatientEEGData:
         raw_eeg = scipy.io.loadmat(content_file)["val"]
         eeg_data = {}
+        num_points = 0
         sampling_frequncy = 0
         utility_frequency = 0
         start_time = 0
@@ -30,6 +32,7 @@ class PatientEEGData:
                 
                 if i == 0:
                     sampling_frequncy = int(line[2])
+                    num_points = int(line[3])
                     
                 elif file[i][0] == "#":
                     line = file[i].split(": ")
@@ -54,6 +57,7 @@ class PatientEEGData:
         
         return PatientEEGData(
             eeg_data=eeg_data,
+            num_points=num_points,
             sampling_frequency=sampling_frequncy,
             utility_frequency=utility_frequency,
             start_time=start_time,
@@ -63,11 +67,14 @@ class PatientEEGData:
     def get_eeg_data(self) -> Dict[str, NDArray]:
         return self.eeg_data
     
+    def get_num_points(self) -> int:
+        return self.num_points
+    
     def get_sampling_frequency(self) -> int:
-        return self.get_sampling_frequency
+        return self.sampling_frequency
     
     def get_utility_frequency(self) -> int:
-        return self.get_utility_frequency
+        return self.utility_frequency
     
     def get_start_time(self) -> int:
         return self.start_time
