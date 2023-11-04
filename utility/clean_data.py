@@ -1,11 +1,57 @@
+from __future__ import annotations
+from typing import Tuple
+from numpy.typing import NDArray
+from enum import Enum
+
 import scipy.io
 from dotenv import load_dotenv
 import os
 import matplotlib.pyplot as plt
-from clean_eeg_data import *
-from helper_code import load_recording_data, get_utility_frequency
+from utility.clean_eeg_data import *
+from default.helper_code import load_recording_data, get_utility_frequency
 import shutil
 from tqdm import tqdm
+
+class DataProcessing:
+    def __init__(self, data: NDArray, sampling_frequency: int, utility_frequency: int, is_preprocessed: bool = False) -> None:
+        self.data = data if is_preprocessed else self.preprocess_data(data, sampling_frequency, utility_frequency)
+        
+    
+    def preprocess_data(self, data: NDArray, sampling_frequency: int, utility_frequency: int) -> Tuple[NDArray, int]:
+        # Define the bandpass frequencies.
+        passband = [0.1, 30.0]
+
+        # Promote the data to double precision because these libraries expect double precision.
+        data = np.asarray(data, dtype=np.float64)
+
+        # If the utility frequency is between bandpass frequencies, then apply a notch filter.
+        if utility_frequency is not None and passband[0] <= utility_frequency <= passband[1]:
+            data = mne.filter.notch_filter(data, sampling_frequency, utility_frequency, n_jobs=4, verbose='error')
+
+        # Apply a bandpass filter.
+        data = mne.filter.filter_data(data, sampling_frequency, passband[0], passband[1], n_jobs=4, verbose='error')
+
+        # Resample the data.
+        if sampling_frequency % 2 == 0:
+            resampling_frequency = 128
+        else:
+            resampling_frequency = 125
+            
+        lcm = np.lcm(int(round(sampling_frequency)), int(round(resampling_frequency)))
+        up = int(round(lcm / sampling_frequency))
+        down = int(round(lcm / resampling_frequency))
+        resampling_frequency = sampling_frequency * up / down
+        data = scipy.signal.resample_poly(data, up, down, axis=1)
+
+        # Scale the data to the interval [-1, 1].
+        min_value = np.min(data)
+        max_value = np.max(data)
+        if min_value != max_value:
+            data = 2.0 / (max_value - min_value) * (data - 0.5 * (min_value + max_value))
+        else:
+            data = 0 * data
+
+        return data, resampling_frequency
 
 if __name__ == "__main__":
     load_dotenv()

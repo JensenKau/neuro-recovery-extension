@@ -8,7 +8,7 @@ Created on Thu Sep  7 13:20:44 2023
 from tqdm import tqdm
 import os
 import pandas as pd
-from helper_code import *
+from default.helper_code import *
 import mne
 
 # Find the folders with data files. (Copied from helper_code.py)

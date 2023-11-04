@@ -10,7 +10,7 @@
 # folder for saving your models' outputs.
 
 import numpy as np, scipy as sp, os, sys
-from helper_code import *
+from default.helper_code import *
 from team_code import load_challenge_models, run_challenge_models
 
 # Run model.

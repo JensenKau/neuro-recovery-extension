@@ -9,7 +9,7 @@
 #
 ################################################################################
 
-from helper_code import *
+from default.helper_code import *
 import numpy as np, os, sys
 import mne
 from sklearn.impute import SimpleImputer

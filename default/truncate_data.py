@@ -2,7 +2,7 @@
 
 # Load libraries.
 import os, os.path, sys, shutil, argparse
-from helper_code import *
+from default.helper_code import *
 
 # Parse arguments.
 def get_parser():
