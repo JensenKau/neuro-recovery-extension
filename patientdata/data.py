@@ -13,6 +13,13 @@ class PatientData:
         self.meta = meta
         self.connectivity = PatientConnectivityData.load_patient_connectivity(eeg)
         
+    @classmethod
+    def load_patient_data(cls, meta_file: str, header_file: str, eeg_file: str) -> PatientData:
+        return PatientData(
+            eeg=PatientEEGData.load_eeg_data(header_file, eeg_file),
+            meta=PatientMetaData.load_patient_meta_data(meta_file)
+        )
+        
     def get_patient_id(self) -> int:
         return self.meta.get_patient_id()
     
