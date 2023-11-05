@@ -98,6 +98,12 @@ class PatientConnectivityData:
         std_fc = np.std(temp_fcs, axis=0)
         
         return avg_fc, std_fc
+    
+    def get_avg_fc(self) -> NDArray:
+        return self.avg_fc
+    
+    def get_std_fc(self) -> NDArray:
+        return self.std_fc
 
     
 if __name__ == "__main__":

@@ -1,18 +1,9 @@
 from __future__ import annotations
-from enum import Enum
+
+from .data_enum import PatientOutcome, PatientSex
 
 class PatientMetaData:
-    class Sex(Enum):
-        MALE = 0
-        FEMALE = 1
-        NONE = 2
-        
-    class Outcome(Enum):
-        GOOD = 0
-        POOR = 1
-        NONE = 2
-    
-    def __init__(self, patient_id: int, hospital: str, age: int, sex: PatientMetaData.Sex, rosc: float, ohca: bool, shockable_rhythm: bool, ttm: int, outcome: PatientMetaData.Outcome, cpc: int) -> None:
+    def __init__(self, patient_id: int, hospital: str, age: int, sex: PatientSex, rosc: float, ohca: bool, shockable_rhythm: bool, ttm: int, outcome: PatientOutcome, cpc: int) -> None:
         self.patient_id = patient_id
         self.hospital = hospital
         self.age = age
@@ -31,12 +22,12 @@ class PatientMetaData:
             "Patient": lambda x: int(x),
             "Hospital": lambda x: x,
             "Age": lambda x: int(x),
-            "Sex": lambda x: PatientMetaData.Sex.MALE if x.lower() == "male" else PatientMetaData.Sex.FEMALE,
+            "Sex": lambda x: PatientSex.MALE if x.lower() == "male" else PatientSex.FEMALE,
             "ROSC": lambda x: float(x),
             "OHCA": lambda x: x.lower() == "true",
             "Shockable Rhythm": lambda x: x.lower() == "true",
             "TTM": lambda x: int(x),
-            "Outcome": lambda x: PatientMetaData.Outcome.GOOD if x.lower() == "good" else PatientMetaData.Outcome.POOR,
+            "Outcome": lambda x: PatientOutcome.GOOD if x.lower() == "good" else PatientOutcome.POOR,
             "CPC": lambda x: int(x)
         }
         
@@ -58,6 +49,35 @@ class PatientMetaData:
             cpc=output["CPC"]
         )
 
+    def get_patient_id(self) -> int:
+        return self.patient_id
+    
+    def get_hospital(self) -> str:
+        return self.hospital
+    
+    def get_age(self) -> int:
+        return self.age
+    
+    def get_sex(self) -> PatientSex:
+        return self.sex
+    
+    def get_rosc(self) -> float:
+        return self.rosc
+    
+    def get_ohca(self) -> bool:
+        return self.ohca
+    
+    def get_shockable_rhythm(self) -> bool:
+        return self.shockable_rhythm
+    
+    def get_ttm(self) -> int:
+        return self.ttm
+    
+    def get_outcome(self) -> PatientOutcome:
+        return self.outcome
+    
+    def get_cpc(self) -> int:
+        return self.cpc
 
 if __name__ == "__main__":
     pass
