@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict
+from typing import Dict, List
 from numpy.typing import NDArray
 
 from .eeg_data import PatientEEGData
@@ -73,6 +73,22 @@ class PatientData:
     
     def get_std_fc(self) -> NDArray:
         return self.connectivity.get_std_fc()
+    
+    def get_meta_data(self) -> List[int | bool | float | PatientOutcome | PatientSex]:
+        return [
+            self.get_patient_id(),
+            self.get_hospital(),
+            self.get_age(),
+            self.get_sex(),
+            self.get_rosc(),
+            self.get_ohca(),
+            self.get_shockable_rhythm(),
+            self.get_ttm(),
+            self.get_outcome(),
+            self.get_cpc(),
+            self.get_start_time(),
+            self.get_end_time()
+        ]
     
 
 if __name__ == "__main__":
