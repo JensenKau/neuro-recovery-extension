@@ -17,7 +17,10 @@ class PatientMetaData:
         
     @classmethod
     def load_patient_meta_data(cls, filename: str) -> PatientMetaData:
-        output = {}
+        output = {
+            "Outcome": PatientOutcome.NONE,
+            "CPC": None
+        }
         parsers = {
             "Patient": lambda x: int(x),
             "Hospital": lambda x: x,

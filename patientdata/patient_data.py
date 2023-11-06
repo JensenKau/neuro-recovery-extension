@@ -74,7 +74,7 @@ class PatientData:
     def get_std_fc(self) -> NDArray:
         return self.connectivity.get_std_fc()
     
-    def get_meta_data(self) -> List[int | bool | float | PatientOutcome | PatientSex]:
+    def get_meta_data(self) -> Dict[str, int | bool | float | PatientOutcome | PatientSex]:
         return {
             "patient": self.get_patient_id(),
             "age": self.get_age(),

@@ -14,11 +14,11 @@ class BaseMLModel(ABC):
         super().__init__()
 
     @abstractmethod
-    def train_model(self, dataset: List[Tuple[NDArray, NDArray, List[int | bool | float | PatientOutcome | PatientSex]]]) -> None:
+    def train_model(self, dataset: List[Tuple[NDArray, NDArray, Dict[int | bool | float | PatientOutcome | PatientSex]]]) -> None:
         pass
     
     @abstractmethod
-    def predict_result(self, data: Tuple[NDArray, NDArray, List[int | bool | float | PatientOutcome | PatientSex]]) -> None:
+    def predict_result(self, avg_fc: NDArray, std_fc: NDArray, meta: Dict[str, int | bool | float | PatientOutcome | PatientSex]) -> PatientOutcome:
         pass
     
     @abstractmethod
