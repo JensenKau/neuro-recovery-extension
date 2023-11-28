@@ -1,6 +1,8 @@
 from __future__ import annotations
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from numpy.typing import NDArray
+
+import math
 
 from .eeg_data import PatientEEGData
 from .meta_data import PatientMetaData
@@ -89,6 +91,34 @@ class PatientData:
             "end time": self.get_end_time()
         }
     
+    def get_numberised_data(self) -> Tuple[List[List[float]], List[List[float]], List[float], List[float]]:
+        meta = [
+            self.get_age(),
+            0 if self.get_sex() == PatientSex.MALE else 1,
+            self.get_rosc(),
+            1 if self.get_ohca() else 0,
+            1 if self.get_shockable_rhythm() else 0,
+            self.get_ttm(),
+            self.get_start_time(),
+            self.get_end_time()
+        ]
+        
+        res = [
+            1 if self.get_outcome() == PatientOutcome.GOOD else 0,
+            self.get_cpc()
+        ]
+        
+        for i in range(len(meta)):
+            if math.isnan(meta[i]):
+                meta[i] = 0
+            meta[i] = float(meta[i])
+            
+        for i in range(len(res)):
+            if math.isnan(res[i]):
+                res[i] = 0
+            res[i] = float(res[i])
+            
+        return self.get_avg_fc(), self.get_std_fc(), meta, res
 
 if __name__ == "__main__":
     pass

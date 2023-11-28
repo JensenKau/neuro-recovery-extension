@@ -1,13 +1,13 @@
 from __future__ import annotations
-from typing import List, Tuple, Dict
+from typing import Any, List, Tuple
 from numpy.typing import NDArray
 
 import dill
 import numpy as np
 from sklearn.svm import SVC
-import sklearn.metrics as metrics
+
+from patientdata.patient_data import PatientData
 from .base_mlmodel import BaseMLModel
-from patientdata.data_enum import PatientOutcome, PatientSex
 
 class SVMModel(BaseMLModel):
     def __init__(self) -> None:
@@ -25,7 +25,30 @@ class SVMModel(BaseMLModel):
         return output
     
     
+    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
+        self.model.fit(dataset_x, dataset_y)
     
+    
+    def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
+        return self.model.predict(dataset_x)
+    
+    
+    def create_model_copy(self) -> BaseMLModel:
+        return SVC(**self.model.get_params())
+    
+    
+    def reshape_input(self, dataset: List[PatientData]) -> Tuple[List[Any], List[Any]]:
+        dataset_x = [None] * len(dataset)
+        dataset_y = [None] * len(dataset)
+        
+        for i in range(len(dataset)):
+            avg_fc, std_fc, meta, res = dataset[i].get_numberised_data()
+            avg_fc = self.vectorize_fc(avg_fc)
+            std_fc = self.vectorize_fc(std_fc)
+            dataset_x[i] = avg_fc + std_fc
+            dataset_y[i] = res[0]
+        
+        return dataset_x, dataset_y
     
     
     def save_model(self, filename: str) -> None:

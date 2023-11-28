@@ -20,16 +20,16 @@ class BaseMLModel(ABC):
         dataset_x, dataset_y = self.reshape_input(dataset)
         self.train_model_aux(dataset_x, dataset_y)
         
-    def predict_result(self, dataset: List[PatientData]) -> List[PatientOutcome]:
+    def predict_result(self, dataset: List[PatientData]) -> List[float]:
         dataset_x, _ = self.reshape_input(dataset)
-        self.predict_result_aux(dataset_x)
+        return self.predict_result_aux(dataset_x)
     
     @abstractmethod
     def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
         pass
     
     @abstractmethod
-    def predict_result_aux(self, dataset_x: List[Any]) -> List[PatientOutcome]:
+    def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
         pass
     
     @abstractmethod
