@@ -82,13 +82,15 @@ class PatientConnectivityData:
         index = 0
         temp_fcs = []
         
+        print(len(eeg_data[0]))
+        
         warnings.filterwarnings("ignore")
         
         while index < len(eeg_data[0]):
             start = index
-            end = min(start + window_size, len(eeg_data[0]))
+            end = int(min(start + window_size, len(eeg_data[0])))
             
-            temp_fcs.append(ConnectivityMeasure(kind="correlation").fit_transform(np.array([eeg_data[:, start:end]]))[0])
+            temp_fcs.append(ConnectivityMeasure(kind="correlation").fit_transform(np.array([eeg_data[0:len(eeg_data), start:end]]))[0])
             
             index += shift_size
             

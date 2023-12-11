@@ -24,12 +24,12 @@ class PatientMetaData:
         parsers = {
             "Patient": lambda x: int(x),
             "Hospital": lambda x: x,
-            "Age": lambda x: int(x),
+            "Age": lambda x: float(x),
             "Sex": lambda x: PatientSex.MALE if x.lower() == "male" else PatientSex.FEMALE,
             "ROSC": lambda x: float(x),
             "OHCA": lambda x: x.lower() == "true",
             "Shockable Rhythm": lambda x: x.lower() == "true",
-            "TTM": lambda x: int(x),
+            "TTM": lambda x: float(x),
             "Outcome": lambda x: PatientOutcome.GOOD if x.lower() == "good" else PatientOutcome.POOR,
             "CPC": lambda x: int(x)
         }
