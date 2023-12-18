@@ -9,6 +9,7 @@ import scipy
 import mne
 from nilearn.connectome import ConnectivityMeasure
 import warnings
+import math
 
 class PatientConnectivityData:
     BRAIN_REGION = ["Fp1", "Fp2", "F7", "F8", "F3", "F4", "T3", "T4", "C3", "C4", "T5", "T6", "P3", "P4", "O1", "O2", "Fz", "Cz", "Pz", "Fpz", "Oz", "F9"]
@@ -80,20 +81,22 @@ class PatientConnectivityData:
         window_size = sample_size * sampling_frequency
         shift_size = int(window_size * 0.1)
         index = 0
-        temp_fcs = []
-        
-        print(len(eeg_data[0]))
-        
+        pointer = 0
+        temp_fcs = [None] * int(math.ceil(len(eeg_data[0]) / shift_size))
+                
         warnings.filterwarnings("ignore")
         
         while index < len(eeg_data[0]):
             start = index
             end = int(min(start + window_size, len(eeg_data[0])))
             
-            temp_fcs.append(ConnectivityMeasure(kind="correlation").fit_transform(np.array([eeg_data[0:len(eeg_data), start:end]]))[0])
+            print(start, end, pointer)
+            
+            temp_fcs[pointer] = ConnectivityMeasure(kind="correlation").fit_transform(np.array([eeg_data[:, start:end]]))[0]
             
             index += shift_size
-            
+            pointer += 1
+                        
         warnings.filterwarnings("default")
         
         avg_fc = np.mean(temp_fcs, axis=0)

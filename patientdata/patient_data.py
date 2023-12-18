@@ -11,7 +11,7 @@ from .data_enum import PatientOutcome, PatientSex
 
 class PatientData:
     def __init__(self, eeg: PatientEEGData, meta: PatientMetaData) -> None:
-        self.eeg = eeg
+        # self.eeg = eeg
         self.meta = meta
         self.connectivity = PatientConnectivityData.load_patient_connectivity(eeg)
         
