@@ -15,6 +15,8 @@ class PatientData:
         self.meta = meta
         self.connectivity = PatientConnectivityData.load_patient_connectivity(eeg)
         
+        self.eeg.delete_eeg_data()
+        
     @classmethod
     def load_patient_data(cls, meta_file: str, header_file: str, eeg_file: str) -> PatientData:
         return PatientData(

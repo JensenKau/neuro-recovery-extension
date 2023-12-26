@@ -63,6 +63,9 @@ class PatientEEGData:
             start_time=start_time,
             end_time=end_time
         )
+        
+    def delete_eeg_data(self) -> None:
+        self.eeg_data = None
 
     def get_eeg_data(self) -> Dict[str, NDArray]:
         return self.eeg_data
