@@ -58,3 +58,5 @@ if __name__ == "__main__":
     print("Saving Data...")
     patient_dataset.save_dataset("balanced_connectivity.pkl")
     print("Complete!!!")
+    
+    # PatientDataset.load_processed_dataset("balanced_connectivity.pkl").get_dataset()
