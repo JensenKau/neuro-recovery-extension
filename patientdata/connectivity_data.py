@@ -81,52 +81,25 @@ class PatientConnectivityData:
         window_size = sample_size * sampling_frequency
         shift_size = int(window_size * 0.1)
         index = 0
-        count = 0
+        pointer = 0
         measure = ConnectivityMeasure(kind="correlation")
-        avg_fc = np.zeros((len(eeg_data), len(eeg_data)), dtype=np.float64)
-        std_fc = np.zeros((len(eeg_data), len(eeg_data)), dtype=np.float64)
+        temp_fcs = [None] * int(math.ceil(len(eeg_data[0]) / shift_size))
                 
         warnings.filterwarnings("ignore")
         
         while index < len(eeg_data[0]):
             start = index
             end = int(min(start + window_size, len(eeg_data[0])))
-            
-            avg_fc += measure.fit_transform(np.array([eeg_data[:, start:end]]))[0]
-            
+                        
+            temp_fcs[pointer] = measure.fit_transform(np.array([eeg_data[:, start:end]]).swapaxes(1, 2))[0]
+                        
             index += shift_size
-            count += 1
-            
-            print(start, end, count)
-            
-        for i in range(len(avg_fc)):
-            for j in range(len(avg_fc[i])):
-                avg_fc[i][j] /= count
-                
-        index = 0
-        count = 0
-        
-        while index < len(eeg_data[0]):
-            start = index
-            end = int(min(start + window_size, len(eeg_data[0])))
-            
-            current_fc = measure.fit_transform(np.array([eeg_data[:, start:end]]))[0]
-            
-            for i in range(len(std_fc)):
-                for j in range(len(std_fc[0])):
-                    std_fc[i][j] += (current_fc[i][j] - avg_fc[i][j]) ** 2
-            
-            index += shift_size
-            count += 1
-            
-        for i in range(len(std_fc)):
-            for j in range(len(std_fc[0])):
-                std_fc[i][j] = math.sqrt(std_fc[i][j] / count)
+            pointer += 1
                         
         warnings.filterwarnings("default")
         
-        print(avg_fc)
-        print(std_fc)
+        avg_fc = np.mean(temp_fcs, axis=0)
+        std_fc = np.std(temp_fcs, axis=0)
         
         return avg_fc, std_fc
     

@@ -3,6 +3,7 @@ from typing import Tuple, List
 
 import os
 import re
+from tqdm import tqdm
 
 from patientdata.patient_data import PatientData
 from patientdata.patient_dataset import PatientDataset
@@ -45,11 +46,15 @@ if __name__ == "__main__":
     patient_datas = [None] * len(patients)
     patient_dataset = None
     
-    for i in range(len(patients)):
+    for i in tqdm(range(len(patients))):
         folder = f"data/training/training/{patients[i]}"
         meta_file = f"{folder}/{LoadTrainingUtility.get_txt_file(folder)}"
         data_filename = f"{folder}/{LoadTrainingUtility.get_12hr_file(folder)}"
         
-        patient_data = PatientData.load_patient_data(meta_file, f"{data_filename}.hea", f"{data_filename}.mat")
-        
-        break
+        patient_datas[i] = PatientData.load_patient_data(meta_file, f"{data_filename}.hea", f"{data_filename}.mat")
+            
+    patient_dataset = PatientDataset(patient_datas)
+    
+    print("Saving Data...")
+    patient_dataset.save_dataset("balanced_connectivity.pkl")
+    print("Complete!!!")
