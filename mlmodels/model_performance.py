@@ -26,6 +26,9 @@ class ModelPerformance:
     def get_roc(self) -> float:
         return self.roc
     
+    def __str__(self) -> str:
+        return f"Acc: {self.acc}\t Pre: {self.pre}\t Rec: {self.rec}\t F1: {self.f1}\t ROC: {self.roc}"
+    
     @classmethod
     def generate_performance(cls, y_true: List[Any], y_pred: List[Any]) -> ModelPerformance:
         return ModelPerformance(

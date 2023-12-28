@@ -50,17 +50,9 @@ class PatientDataset:
             dill.dump(self.dataset, dill_file)
             
             
-    def get_dataset(self) -> List[Tuple[NDArray, NDArray, List[int | bool | float | PatientOutcome | PatientSex]]]:
-        output = [None] * len(self.dataset)
+    def get_dataset(self) -> List[PatientData]: 
+        return self.dataset
         
-        for i in range(len(self.dataset)):
-            output[i] = (
-                self.dataset[i].get_avg_fc(), 
-                self.dataset[i].get_std_fc(), 
-                self.dataset[i].get_meta_data()
-            )
-        
-        return output
 
 if __name__ == "__main__":
     pass

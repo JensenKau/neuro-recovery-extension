@@ -83,15 +83,18 @@ class PatientConnectivityData:
         index = 0
         pointer = 0
         measure = ConnectivityMeasure(kind="correlation")
-        temp_fcs = [None] * int(math.ceil(len(eeg_data[0]) / shift_size))
+        temp_fcs = [np.zeros((len(eeg_data), len(eeg_data)), dtype=np.float64)] * int(math.ceil(len(eeg_data[0]) / shift_size))
                 
         warnings.filterwarnings("ignore")
         
         while index < len(eeg_data[0]):
             start = index
             end = int(min(start + window_size, len(eeg_data[0])))
-                        
-            temp_fcs[pointer] = measure.fit_transform(np.array([eeg_data[:, start:end]]).swapaxes(1, 2))[0]
+            
+            current_fc = measure.fit_transform(np.array([eeg_data[:, start:end]]).swapaxes(1, 2))[0]
+            
+            if not np.isnan(current_fc).any():
+                temp_fcs[pointer] = current_fc
                         
             index += shift_size
             pointer += 1

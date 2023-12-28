@@ -34,7 +34,9 @@ class SVMModel(BaseMLModel):
     
     
     def create_model_copy(self) -> BaseMLModel:
-        return SVC(**self.model.get_params())
+        model = SVMModel()
+        model.initialize_model(**self.model.get_params())
+        return model
     
     
     def reshape_input(self, dataset: List[PatientData]) -> Tuple[List[Any], List[Any]]:
