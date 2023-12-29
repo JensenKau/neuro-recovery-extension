@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import List, Any, Tuple
 
+import numpy as np
 import torch
-from torch import nn
-from torch import Tensor
+from torch import nn, Tensor
 
 from mlmodels import BaseMLModel
 from patientdata import PatientData
@@ -45,11 +45,32 @@ class CnnSimple(BaseMLModel):
         
         
     def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
-        pass
+        loss_fn = nn.CrossEntropyLoss()
+        optimizer = torch.optim.Adam(self.model.parameters())
+        
+        self.model.train()
+        
+        for epoch in range(100):
+            y_pred = self.model(dataset_x)
+            loss = loss_fn(y_pred, dataset_y)
+            
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
     
    
     def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
-        pass
+        output = [None] * len(dataset_x)
+        
+        self.model.eval()
+        
+        with torch.inference_mode():
+            res = self.model(torch.tensor(dataset_x))
+            
+            for i in range(len(res)):
+                output[i] = np.argmax(res[i])
+            
+        return output
     
    
     def save_model(self, filename: str) -> None:
@@ -59,7 +80,6 @@ class CnnSimple(BaseMLModel):
     def load_model(self, filename: str) -> None:
         self.model = CnnSimple.InternalModel()
         self.model.load_state_dict(torch.load(filename))
-        self.model.eval()
     
    
     def initialize_model(self, **kwargs) -> None:
@@ -78,10 +98,10 @@ class CnnSimple(BaseMLModel):
         
         for i in range(len(dataset)):
             avg_fc, std_fc, meta, res = dataset[i].get_numberised_data()
-            avg_fc = torch.tensor(avg_fc)
-            std_fc = torch.tensor(std_fc)
-            dataset_x[i] = torch.tensor([avg_fc, std_fc])
-            dataset_y[i] = res[0]
+            dataset_x[i] = torch.from_numpy(np.array([avg_fc, std_fc]))
+            dataset_y[i] = [0.0, 0.0]
+            dataset_y[i][res[0]] = 1.0
+            dataset_y[i] = torch.tensor(dataset_y[i])
         
         return dataset_x, dataset_y
 

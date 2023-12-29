@@ -93,7 +93,7 @@ class PatientData:
             "end time": self.get_end_time()
         }
     
-    def get_numberised_data(self) -> Tuple[List[List[float]], List[List[float]], List[float], List[float]]:
+    def get_numberised_data(self) -> Tuple[NDArray, NDArray, List[float], List[float]]:
         meta = [
             self.get_age(),
             0 if self.get_sex() == PatientSex.MALE else 1,
