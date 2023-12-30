@@ -41,11 +41,8 @@ class CnnSimple(BaseMLModel):
         self.model = None
         self.params = None
         
-        
-    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
-        loss_fn = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(self.model.parameters())
-        
+    
+    def dataset_x_tensor(self, dataset_x: List[Any]) -> Tuple[Tensor, Tensor]:
         avg = [None] * len(dataset_x)
         std = [None] * len(dataset_x)
         
@@ -55,6 +52,14 @@ class CnnSimple(BaseMLModel):
         avg = torch.stack(avg)
         std = torch.stack(std)
         
+        return avg, std
+        
+        
+    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
+        loss_fn = nn.CrossEntropyLoss()
+        optimizer = torch.optim.Adam(self.model.parameters())
+        
+        avg, std = self.dataset_x_tensor(dataset_x)
         dataset_y = torch.stack(dataset_y)
         
         self.model.train()
@@ -70,14 +75,7 @@ class CnnSimple(BaseMLModel):
    
     def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
         output = [None] * len(dataset_x)
-        avg = [None] * len(dataset_x)
-        std = [None] * len(dataset_x)
-        
-        for i in range(len(dataset_x)):
-            avg[i], std[i] = dataset_x[i]
-            
-        avg = torch.stack(avg)
-        std = torch.stack(std)
+        avg, std = self.dataset_x_tensor(dataset_x)
                 
         self.model.eval()
         
