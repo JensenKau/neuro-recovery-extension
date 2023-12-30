@@ -66,9 +66,7 @@ class CnnSimple(BaseMLModel):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            
-            break
-    
+                
    
     def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
         output = [None] * len(dataset_x)
