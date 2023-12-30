@@ -21,18 +21,16 @@ class CnnSimple(BaseMLModel):
             )
             
             self.joined_stack = nn.Sequential(
-                nn.Linear(500, 300), # NOTE: 500 is just placeholder number
-                nn.Linear(300, 100),
-                nn.Linear(100, 50),
-                nn.Linear(50, 2),
-                nn.Softmax()
+                nn.Linear(8000, 500), 
+                nn.Linear(500, 2),
+                nn.Softmax(0)
             )
             
-        def forward(self, x: Tensor) -> Tensor:
-            avg_out = self.avg_stack(x[0])
-            std_out = self.std_stack(x[1])
+        def forward(self, avg: Tensor, std: Tensor) -> Tensor:
+            avg_out = self.avg_stack(torch.unsqueeze(avg, 1))
+            std_out = self.std_stack(torch.unsqueeze(std, 1))
             
-            joined_out = torch.cat((torch.flatten(avg_out), torch.flatten(std_out)))
+            joined_out = torch.cat((torch.flatten(avg_out, 1), torch.flatten(std_out, 1)), 1)
             joined_out = self.joined_stack(joined_out)
             
             return joined_out
@@ -48,27 +46,48 @@ class CnnSimple(BaseMLModel):
         loss_fn = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(self.model.parameters())
         
+        avg = [None] * len(dataset_x)
+        std = [None] * len(dataset_x)
+        
+        for i in range(len(dataset_x)):
+            avg[i], std[i] = dataset_x[i]
+            
+        avg = torch.stack(avg)
+        std = torch.stack(std)
+        
+        dataset_y = torch.stack(dataset_y)
+        
         self.model.train()
         
         for epoch in range(100):
-            y_pred = self.model(dataset_x)
+            y_pred = self.model(avg.to(torch.float32), std.to(torch.float32))
             loss = loss_fn(y_pred, dataset_y)
             
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            
+            break
     
    
     def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
         output = [None] * len(dataset_x)
+        avg = [None] * len(dataset_x)
+        std = [None] * len(dataset_x)
         
+        for i in range(len(dataset_x)):
+            avg[i], std[i] = dataset_x[i]
+            
+        avg = torch.stack(avg)
+        std = torch.stack(std)
+                
         self.model.eval()
         
         with torch.inference_mode():
-            res = self.model(torch.tensor(dataset_x))
+            res = self.model(avg.to(torch.float32), std.to(torch.float32))
             
             for i in range(len(res)):
-                output[i] = np.argmax(res[i])
+                output[i] = np.argmax(res[i]).tolist()
             
         return output
     
@@ -98,9 +117,9 @@ class CnnSimple(BaseMLModel):
         
         for i in range(len(dataset)):
             avg_fc, std_fc, meta, res = dataset[i].get_numberised_data()
-            dataset_x[i] = torch.from_numpy(np.array([avg_fc, std_fc]))
+            dataset_x[i] = (torch.from_numpy(avg_fc), torch.from_numpy(std_fc))
             dataset_y[i] = [0.0, 0.0]
-            dataset_y[i][res[0]] = 1.0
+            dataset_y[i][int(res[0])] = 1.0
             dataset_y[i] = torch.tensor(dataset_y[i])
         
         return dataset_x, dataset_y
