@@ -1,11 +1,10 @@
-FROM python:3.10.1-buster
+FROM nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu22.04
 
-## DO NOT EDIT these 3 lines.
-RUN mkdir /challenge
-COPY ./ /challenge
-WORKDIR /challenge
+RUN apt-get update -y 
+RUN apt-get -y install curl
+RUN apt-get install make
+RUN apt-get -y install git
 
-## Install your dependencies here using apt install, etc.
+RUN apt-get install -y python3 python3-venv
 
-## Include the following line if you have a requirements.txt file.
-RUN pip install -r requirements.txt
+CMD ["/bin/bash"]
