@@ -5,6 +5,6 @@ RUN apt-get -y install curl
 RUN apt-get install make
 RUN apt-get -y install git
 
-RUN apt-get install -y python3 python3-venv
+RUN apt-get install -y python3 python3-venv python3-pip
 
 CMD ["/bin/bash"]
