@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Any
 
+import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from patientdata.data_enum import PatientOutcome
 from patientdata.patient_data import PatientData
@@ -51,6 +52,10 @@ class BaseMLModel(ABC):
     @abstractmethod
     def reshape_input(self, dataset: List[PatientData]) -> Tuple[List[Any], List[Any]]:
         pass
+    
+    @abstractmethod
+    def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:
+        pass
 
 
     def get_best_model(self, models: List[BaseMLModel], performances: List[ModelPerformance]) -> BaseMLModel:
@@ -74,12 +79,22 @@ class BaseMLModel(ABC):
             roc=sum(map(lambda x: x.get_roc(), performances)) / len(performances)
         )
 
+    def replace_data(self, dataset_x: List[Any], dataset_y: List[Any]) -> Tuple[List[int], List[int]]:
+        output_x = [0] * len(dataset_x)
+        output_y = self.dataset_y_classification_num(dataset_y)
+        
+        for i in range(len(output_x)):
+            output_x[i] = i
+        
+        return output_x, output_y
+
 
     def get_data_split(self, dataset_x: List[Any], dataset_y: List[Any]) -> List[DatasetSplit]:
+        replaced_x, replaced_y = self.replace_data(dataset_x, dataset_y)
         skf1 = StratifiedKFold(n_splits=BaseMLModel.NUM_SPLIT, shuffle=True, random_state=BaseMLModel.SEED1)
         output = []
-        
-        for train_val, test in skf1.split(dataset_x, dataset_y):
+                
+        for train_val, test in skf1.split(replaced_x, replaced_y):
             skf2 = StratifiedKFold(n_splits=BaseMLModel.NUM_SPLIT, shuffle=True, random_state=BaseMLModel.SEED2)
             curr_split = DatasetSplit()
             test_x = [None] * len(test)
@@ -90,13 +105,13 @@ class BaseMLModel(ABC):
             for i in range(len(test)):
                 test_x[i] = dataset_x[test[i]]
                 test_y[i] = dataset_y[test[i]]
-            
+                            
             curr_split.set_test_set((test_x, test_y))
                 
             for i in range(len(train_val)):
-                train_val_x[i] = dataset_x[train_val[i]]
-                train_val_y[i] = dataset_y[train_val[i]]
-            
+                train_val_x[i] = replaced_x[train_val[i]]
+                train_val_y[i] = replaced_y[train_val[i]]
+                                            
             for train, val in skf2.split(train_val_x, train_val_y):
                 train_x = [None] * len(train)
                 train_y = [None] * len(train)
@@ -104,12 +119,12 @@ class BaseMLModel(ABC):
                 val_y = [None] * len(val)
                 
                 for i in range(len(val)):
-                    val_x[i] = train_val_x[val[i]]
-                    val_y[i] = train_val_y[val[i]]
+                    val_x[i] = dataset_x[train_val_x[val[i]]]
+                    val_y[i] = dataset_y[train_val_x[val[i]]]
                     
                 for i in range(len(train)):
-                    train_x[i] = train_val_x[train[i]]
-                    train_y[i] = train_val_y[train[i]]
+                    train_x[i] = dataset_x[train_val_x[train[i]]]
+                    train_y[i] = dataset_y[train_val_x[train[i]]]
                     
                 curr_split.add_validation_set((val_x, val_y))
                 curr_split.add_train_set((train_x, train_y))
@@ -139,11 +154,11 @@ class BaseMLModel(ABC):
                 models[j] = current_model
                 current_model.train_model_aux(train_x, train_y)
                 pred_y = current_model.predict_result_aux(val_x)
-                performances[j] = ModelPerformance.generate_performance(val_y, pred_y)
+                performances[j] = ModelPerformance.generate_performance(self.dataset_y_classification_num(val_y), pred_y)
             
             outer_models[i] = self.get_best_model(models, performances)
             pred_y = outer_models[i].predict_result_aux(test_x)
-            outer_performances[i] = ModelPerformance.generate_performance(test_y, pred_y)
+            outer_performances[i] = ModelPerformance.generate_performance(self.dataset_y_classification_num(test_y), pred_y)
             
         return self.get_avg_performance(outer_performances)
                             

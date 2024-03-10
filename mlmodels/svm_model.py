@@ -67,5 +67,9 @@ class SVMModel(BaseMLModel):
         self.model = SVC(**kwargs)
 
 
+    def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:
+        return dataset_y
+
+
 if __name__ == "__main__":
     pass

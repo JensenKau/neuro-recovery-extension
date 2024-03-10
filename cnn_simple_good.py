@@ -7,6 +7,7 @@ import logging
 import sys
 
 from mlmodels.cnn_simple import CnnSimple
+from mlmodels.svm_model import SVMModel
 from patientdata import PatientData, PatientDataset
 
 if __name__ == "__main__":
@@ -15,7 +16,11 @@ if __name__ == "__main__":
 
     cnn.initialize_model()
     
-    res = cnn.predict_result(patient_dataset.get_dataset())
-
+    res = cnn.k_fold(patient_dataset.get_dataset())
+    
     print(res)
-    print(len(res))
+    
+    # res = cnn.predict_result(patient_dataset.get_dataset())
+
+    # print(res)
+    # print(len(res))

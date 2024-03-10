@@ -119,6 +119,11 @@ class CnnSimple(BaseMLModel):
             dataset_y[i] = torch.tensor(dataset_y[i])
         
         return dataset_x, dataset_y
-
+    
+    
+    def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:
+        return np.argmax(list(map(lambda x: x.numpy(), dataset_y)), 1).tolist()
+        
+        
 if __name__ == "__main__":
     pass
