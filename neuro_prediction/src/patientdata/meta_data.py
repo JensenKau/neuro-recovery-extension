@@ -14,7 +14,8 @@ class PatientMetaData:
         self.ttm = ttm
         self.outcome = outcome
         self.cpc = cpc
-        
+    
+    
     @classmethod
     def load_patient_meta_data(cls, filename: str) -> PatientMetaData:
         output = {
@@ -52,35 +53,48 @@ class PatientMetaData:
             cpc=output["CPC"]
         )
 
+
     def get_patient_id(self) -> int:
         return self.patient_id
+
     
     def get_hospital(self) -> str:
         return self.hospital
+
     
     def get_age(self) -> int:
         return self.age
+
     
     def get_sex(self) -> PatientSex:
         return self.sex
+
     
     def get_rosc(self) -> float:
         return self.rosc
+
     
     def get_ohca(self) -> bool:
         return self.ohca
+
     
     def get_shockable_rhythm(self) -> bool:
         return self.shockable_rhythm
+
     
     def get_ttm(self) -> int:
         return self.ttm
+
     
     def get_outcome(self) -> PatientOutcome:
         return self.outcome
+
     
     def get_cpc(self) -> int:
         return self.cpc
+
+
+
 
 if __name__ == "__main__":
     pass

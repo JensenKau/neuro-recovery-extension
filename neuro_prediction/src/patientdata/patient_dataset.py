@@ -10,7 +10,8 @@ from .data_enum import PatientOutcome, PatientSex
 class PatientDataset:
     def __init__(self, dataset: List[PatientData]) -> None:
         self.dataset = dataset
-    
+
+
     @classmethod
     def load_raw_dataset(cls, root_folder: str) -> PatientDataset:
         dataset = []
