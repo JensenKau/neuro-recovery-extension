@@ -6,12 +6,13 @@ import optuna
 import logging
 import sys
 
+from mlmodels.cnn_simple_static import CnnSimpleStatic
 from mlmodels.cnn_simple import CnnSimple
 from mlmodels.svm_model import SVMModel
 from patientdata import PatientData, PatientDataset
 
 if __name__ == "__main__":
-    cnn = CnnSimple()
+    cnn = CnnSimpleStatic()
     patient_dataset = PatientDataset.load_processed_dataset("balanced_connectivity.pkl")
 
     cnn.initialize_model()
