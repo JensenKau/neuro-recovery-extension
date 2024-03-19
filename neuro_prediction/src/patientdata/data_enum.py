@@ -2,11 +2,11 @@ from __future__ import annotations
 from enum import Enum
 
 class PatientSex(Enum):
-    MALE = 0
-    FEMALE = 1
-    NONE = 2
+    MALE = 1
+    FEMALE = 2
+    NONE = 0
         
 class PatientOutcome(Enum):
-    GOOD = 0
-    POOR = 1
-    NONE = 2
+    GOOD = 1
+    POOR = 2
+    NONE = 0

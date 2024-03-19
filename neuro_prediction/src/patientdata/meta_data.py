@@ -26,12 +26,12 @@ class PatientMetaData:
             "Patient": lambda x: int(x),
             "Hospital": lambda x: x,
             "Age": lambda x: float(x),
-            "Sex": lambda x: PatientSex.MALE if x.lower() == "male" else PatientSex.FEMALE,
+            "Sex": lambda x: PatientSex.NONE if x.lower() == "nan" else (PatientSex.MALE if x.lower() == "male" else PatientSex.FEMALE),
             "ROSC": lambda x: float(x),
-            "OHCA": lambda x: x.lower() == "true",
-            "Shockable Rhythm": lambda x: x.lower() == "true",
+            "OHCA": lambda x: float(x) if x.lower() == "nan" else x.lower() == "true",
+            "Shockable Rhythm": lambda x: float(x) if x.lower() == "nan" else x.lower() == "true",
             "TTM": lambda x: float(x),
-            "Outcome": lambda x: PatientOutcome.GOOD if x.lower() == "good" else PatientOutcome.POOR,
+            "Outcome": lambda x: PatientOutcome.NONE if x.lower() == "nan" else (PatientOutcome.GOOD if x.lower() == "good" else PatientOutcome.POOR),
             "CPC": lambda x: int(x)
         }
         

@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 from numpy.typing import NDArray
 
 import math
+from enum import Enum
 
 from .eeg_data import PatientEEGData
 from .meta_data import PatientMetaData
@@ -121,52 +122,16 @@ class PatientData:
         return self.get_avg_fc(), self.get_std_fc(), self.get_static_fc()
 
 
-    #TODO: not everything here is in numbers by default
     def get_numberised_meta_data(self) -> Dict[str, float]:
         output = self.get_meta_data()
-        output["patient"] = float(output["patient"])
-        output["age"] = float(output["age"])
-        output["sex"] = 0 if output["sex"] == PatientSex.MALE else 1
-        output["rosc"] = 1 if output["rosc"] else 0
-        output["ohca"] = 1 if output["ohca"] else 0
-        output["shockable rhythm"] = 1 if output["shockable rhythm"] else 0
-        output["ttm"] = float(output["ttm"])
-        output["outcome"] = float(output["outcome"])
-        output["cpc"] = float(output["cpc"])
-        output["start time"] = float(output["start time"])
-        output["end time"] = float(output["end time"])
+        for key in output.keys():
+            if isinstance(output[key], Enum):
+                output[key] = output[key].value
+            elif math.isnan(output[key]):
+                output[key] = 0
+            else:
+                output[key] = float(output[key])
         return output
-
-    
-    
-    def get_numberised_data(self) -> Tuple[NDArray, NDArray, List[float], List[float]]:
-        meta = [
-            self.get_age(),
-            0 if self.get_sex() == PatientSex.MALE else 1,
-            self.get_rosc(),
-            1 if self.get_ohca() else 0,
-            1 if self.get_shockable_rhythm() else 0,
-            self.get_ttm(),
-            self.get_start_time(),
-            self.get_end_time()
-        ]
-        
-        res = [
-            1 if self.get_outcome() == PatientOutcome.GOOD else 0,
-            self.get_cpc()
-        ]
-        
-        for i in range(len(meta)):
-            if math.isnan(meta[i]):
-                meta[i] = 0
-            meta[i] = float(meta[i])
-            
-        for i in range(len(res)):
-            if math.isnan(res[i]):
-                res[i] = 0
-            res[i] = float(res[i])
-            
-        return self.get_avg_fc(), self.get_std_fc(), meta, res
 
 
 

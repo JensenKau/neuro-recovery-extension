@@ -43,20 +43,20 @@ if __name__ == "__main__":
         '0897', '0904', '0913', '0920', '0925', '0929', '0935', '0944', '0952', '0980'
     ]
 
-    patient_datas = [None] * len(patients)
-    patient_dataset = None
+    # patient_datas = [None] * len(patients)
+    # patient_dataset = None
     
-    for i in tqdm(range(len(patients))):
-        folder = f"data/training/training/{patients[i]}"
-        meta_file = f"{folder}/{LoadTrainingUtility.get_txt_file(folder)}"
-        data_filename = f"{folder}/{LoadTrainingUtility.get_12hr_file(folder)}"
+    # for i in tqdm(range(len(patients))):
+    #     folder = f"../../data/training/training/{patients[i]}"
+    #     meta_file = f"{folder}/{LoadTrainingUtility.get_txt_file(folder)}"
+    #     data_filename = f"{folder}/{LoadTrainingUtility.get_12hr_file(folder)}"
         
-        patient_datas[i] = PatientData.load_patient_data(meta_file, f"{data_filename}.hea", f"{data_filename}.mat")
+    #     patient_datas[i] = PatientData.load_patient_data(meta_file, f"{data_filename}.hea", f"{data_filename}.mat")
             
-    patient_dataset = PatientDataset(patient_datas)
+    # patient_dataset = PatientDataset(patient_datas)
     
-    print("Saving Data...")
-    patient_dataset.save_dataset("balanced_connectivity.pkl")
-    print("Complete!!!")
+    # print("Saving Data...")
+    # patient_dataset.save_dataset("balanced_connectivity.pkl")
+    # print("Complete!!!")
     
-    # PatientDataset.load_processed_dataset("balanced_connectivity.pkl").get_dataset()
+    res = PatientDataset.load_processed_dataset("balanced_connectivity.pkl").get_dataset()
