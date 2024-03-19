@@ -112,10 +112,11 @@ class CnnSimple(BaseMLModel):
         dataset_y = [None] * len(dataset)
         
         for i in range(len(dataset)):
-            avg_fc, std_fc, meta, res = dataset[i].get_numberised_data()
+            avg_fc, std_fc, static_fc = dataset[i].get_fcs()
+            res = dataset[i].get_numberised_meta_data()["outcome"]
             dataset_x[i] = (torch.from_numpy(avg_fc), torch.from_numpy(std_fc))
             dataset_y[i] = [0.0, 0.0]
-            dataset_y[i][int(res[0])] = 1.0
+            dataset_y[i][int(res - 1)] = 1.0
             dataset_y[i] = torch.tensor(dataset_y[i])
         
         return dataset_x, dataset_y

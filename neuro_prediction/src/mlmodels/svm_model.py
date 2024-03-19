@@ -44,11 +44,11 @@ class SVMModel(BaseMLModel):
         dataset_y = [None] * len(dataset)
         
         for i in range(len(dataset)):
-            avg_fc, std_fc, meta, res = dataset[i].get_numberised_data()
+            avg_fc, std_fc, static_fc = dataset[i].get_fcs()
             avg_fc = self.vectorize_fc(avg_fc)
             std_fc = self.vectorize_fc(std_fc)
             dataset_x[i] = avg_fc + std_fc
-            dataset_y[i] = res[0]
+            dataset_y[i] = dataset[i].get_numberised_meta_data()["outcome"]
         
         return dataset_x, dataset_y
     

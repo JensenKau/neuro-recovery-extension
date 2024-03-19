@@ -14,44 +14,55 @@ class BaseMLModel(ABC):
     SEED2 = 456
     NUM_SPLIT = 5
     
+    
     def __init__(self) -> None:
         super().__init__()
+
 
     def train_model(self, dataset: List[PatientData]) -> None:
         dataset_x, dataset_y = self.reshape_input(dataset)
         self.train_model_aux(dataset_x, dataset_y)
+
         
     def predict_result(self, dataset: List[PatientData]) -> List[float]:
         dataset_x, _ = self.reshape_input(dataset)
         return self.predict_result_aux(dataset_x)
+
     
     @abstractmethod
     def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
         pass
+
     
     @abstractmethod
     def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
         pass
+
     
     @abstractmethod
     def save_model(self, filename: str) -> None:
         pass
+
     
     @abstractmethod
     def load_model(self, filename: str) -> None:
         pass
+
     
     @abstractmethod
     def initialize_model(self, **kwargs) -> None:
         pass
+
     
     @abstractmethod
     def create_model_copy(self) -> BaseMLModel:
         pass
+
     
     @abstractmethod
     def reshape_input(self, dataset: List[PatientData]) -> Tuple[List[Any], List[Any]]:
         pass
+
     
     @abstractmethod
     def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:

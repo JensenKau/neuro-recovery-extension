@@ -20,7 +20,7 @@ if __name__ == "__main__":
     
     print(res)
     
-    res = cnn.predict_result(patient_dataset.get_dataset())
+    # res = cnn.predict_result(patient_dataset.get_dataset())
 
     # print(res)
     # print(len(res))
