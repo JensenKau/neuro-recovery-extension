@@ -5,6 +5,7 @@ from enum import Enum
 import os
 import csv
 
+import optuna
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
@@ -24,10 +25,11 @@ class BaseMLModel(ABC):
         NONE = 2
     
     
-    def __init__(self) -> None:
+    def __init__(self, model_name: str) -> None:
         super().__init__()
         self.is_save_k_fold = self.SAVE_MODE.NONE
         self.save_folder = None
+        self.model_name = model_name
 
 
     def train_model(self, dataset: List[PatientData]) -> None:
@@ -82,6 +84,11 @@ class BaseMLModel(ABC):
     
     @abstractmethod
     def get_save_file_extension(self) -> str:
+        pass
+    
+    
+    @abstractmethod
+    def objective(self, trial: optuna.trial.Trial) -> float:
         pass
 
 
@@ -237,6 +244,16 @@ class BaseMLModel(ABC):
     def set_save_k_fold(self, is_save_k_fold: BaseMLModel.SAVE_MODE, save_folder: str = None) -> None:
         self.is_save_k_fold = is_save_k_fold
         self.save_folder = save_folder if save_folder is not None else self.save_folder
+        
+        
+    def tune_paramters(self, iteration: int) -> None:
+        study = optuna.create_study(
+            study_name=self.model_name,
+            storage=f"sqlite:///{self.model_name}.db",
+            direction="maximize", 
+            load_if_exists=True
+        )
+        study.optimize(self.objective, n_trials=iteration)
                             
             
 
