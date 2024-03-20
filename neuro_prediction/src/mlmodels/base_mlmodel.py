@@ -1,9 +1,13 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Any
+from enum import Enum
+import os
+import csv
 
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
+
 from patientdata.data_enum import PatientOutcome
 from patientdata.patient_data import PatientData
 from .model_performance import ModelPerformance
@@ -14,9 +18,16 @@ class BaseMLModel(ABC):
     SEED2 = 456
     NUM_SPLIT = 5
     
+    class SAVE_MODE(Enum):
+        BEST = 0
+        ALL = 1
+        NONE = 2
+    
     
     def __init__(self) -> None:
         super().__init__()
+        self.is_save_k_fold = self.SAVE_MODE.NONE
+        self.save_folder = None
 
 
     def train_model(self, dataset: List[PatientData]) -> None:
@@ -67,6 +78,11 @@ class BaseMLModel(ABC):
     @abstractmethod
     def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:
         pass
+    
+    
+    @abstractmethod
+    def get_save_file_extension(self) -> str:
+        pass
 
 
     def get_best_model(self, models: List[BaseMLModel], performances: List[ModelPerformance]) -> BaseMLModel:
@@ -89,6 +105,7 @@ class BaseMLModel(ABC):
             f1=sum(map(lambda x: x.get_f1(), performances)) / len(performances),
             roc=sum(map(lambda x: x.get_roc(), performances)) / len(performances)
         )
+
 
     def replace_data(self, dataset_x: List[Any], dataset_y: List[Any]) -> Tuple[List[int], List[int]]:
         output_x = [0] * len(dataset_x)
@@ -150,6 +167,7 @@ class BaseMLModel(ABC):
         data_split = self.get_data_split(dataset_x, dataset_y)
         outer_models = [None] * len(data_split)
         outer_performances = [None] * len(data_split)
+        output = None
         
         for i in range(len(data_split)):
             test_x, test_y = data_split[i].get_test_set()
@@ -171,7 +189,54 @@ class BaseMLModel(ABC):
             pred_y = outer_models[i].predict_result_aux(test_x)
             outer_performances[i] = ModelPerformance.generate_performance(self.dataset_y_classification_num(test_y), pred_y)
             
-        return self.get_avg_performance(outer_performances)
+        output = self.get_avg_performance(outer_performances)
+            
+        self.save_k_fold(outer_models, outer_performances)
+            
+        return output
+    
+    
+    def save_k_fold(self, models: List[BaseMLModel], performances: List[ModelPerformance]) -> None:
+        if self.is_save_k_fold != self.SAVE_MODE.NONE:
+            csv_header = ["Acc", "Pre", "Rec", "F1", "ROC"]
+            csv_content = []
+            os.makedirs(self.save_folder, exist_ok=True)
+            
+            if self.is_save_k_fold == self.SAVE_MODE.BEST:
+                acc_arr = [0] * len(performances)
+                index = 0
+                current_row = []
+                best_performance = None
+                for i in range(len(performances)):
+                    acc_arr[i] = performances[i].get_acc()
+                    
+                index = np.argmax(acc_arr)
+                best_performance = performances[index].get_performance()
+                models[index].save_model(f"{self.save_folder}/model_{index}.{self.get_save_file_extension()}")
+                for header in csv_header:
+                    current_row.append(str(best_performance[header]))
+                csv_content.append(current_row)
+                
+            elif self.is_save_k_fold == self.SAVE_MODE.ALL:
+                for i in range(len(models)):
+                    current_row = []
+                    best_performance = performances[i].get_performance()
+                    for header in csv_header:
+                        current_row.append(str(best_performance[header]))
+                    models[i].save_model(f"{self.save_folder}/model_{i}.{self.get_save_file_extension()}")
+                    csv_content.append(current_row)
+                    
+            with open(f"{self.save_folder}/performance.csv", "w", encoding="utf-8") as file:
+                csv_writer = csv.writer(file)
+                csv_writer.writerow(csv_header)
+                csv_writer.writerows(csv_content)
+                
+
+    
+    
+    def set_save_k_fold(self, is_save_k_fold: BaseMLModel.SAVE_MODE, save_folder: str = None) -> None:
+        self.is_save_k_fold = is_save_k_fold
+        self.save_folder = save_folder if save_folder is not None else self.save_folder
                             
             
 

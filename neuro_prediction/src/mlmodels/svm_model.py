@@ -71,5 +71,9 @@ class SVMModel(BaseMLModel):
         return dataset_y
 
 
+    def get_save_file_extension(self) -> str:
+        return "pkl"
+
+
 if __name__ == "__main__":
     pass

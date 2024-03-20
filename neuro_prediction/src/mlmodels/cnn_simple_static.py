@@ -102,6 +102,10 @@ class CnnSimpleStatic(BaseMLModel):
         return np.argmax(list(map(lambda x: x.numpy(), dataset_y)), 1).tolist()
     
     
+    def get_save_file_extension(self) -> str:
+        return "pt"
+    
+    
 
 
 if __name__ == "__main__":

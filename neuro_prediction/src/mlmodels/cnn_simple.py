@@ -124,6 +124,10 @@ class CnnSimple(BaseMLModel):
     
     def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:
         return np.argmax(list(map(lambda x: x.numpy(), dataset_y)), 1).tolist()
+    
+    
+    def get_save_file_extension(self) -> str:
+        return "pt"
         
         
 if __name__ == "__main__":

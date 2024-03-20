@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Any
+from typing import List, Any, Dict
 
 import sklearn.metrics as metrics
 
@@ -25,6 +25,15 @@ class ModelPerformance:
     
     def get_roc(self) -> float:
         return self.roc
+    
+    def get_performance(self) -> Dict[str, float]:
+        return {
+            "Acc": self.acc,
+            "Pre": self.pre,
+            "Rec": self.rec,
+            "F1": self.f1,
+            "ROC": self.roc
+        }
     
     def __str__(self) -> str:
         return f"Acc: {self.acc}\t Pre: {self.pre}\t Rec: {self.rec}\t F1: {self.f1}\t ROC: {self.roc}"
