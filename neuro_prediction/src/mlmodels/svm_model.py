@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any, List, Tuple
-from numpy.typing import NDArray
 
+from numpy.typing import NDArray
 import dill
 import numpy as np
 from sklearn.svm import SVC
@@ -29,8 +29,15 @@ class SVMModel(BaseMLModel):
         self.model.fit(dataset_x, dataset_y)
     
     
-    def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
-        return self.model.predict(dataset_x)
+    def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
+        preds = self.model.predict_proba(dataset_x)
+        best_indices = np.argmax(preds, axis=1)
+        output = [None] * len(dataset_x)
+        
+        for i in range(len(preds)):
+            output[i] = (best_indices[i], preds[i][best_indices[i]])
+        
+        return output
     
     
     def create_model_copy(self) -> BaseMLModel:
@@ -49,6 +56,7 @@ class SVMModel(BaseMLModel):
             std_fc = self.vectorize_fc(std_fc)
             dataset_x[i] = avg_fc + std_fc
             dataset_y[i] = dataset[i].get_numberised_meta_data()["outcome"]
+            dataset_y[i] = dataset_y[i] - 1 if dataset_y[i] is not None else None
         
         return dataset_x, dataset_y
     
@@ -64,6 +72,7 @@ class SVMModel(BaseMLModel):
     
     
     def initialize_model(self, **kwargs) -> None:
+        kwargs["probability"] = True
         self.model = SVC(**kwargs)
 
 

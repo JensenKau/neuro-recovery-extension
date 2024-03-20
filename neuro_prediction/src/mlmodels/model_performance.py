@@ -42,9 +42,9 @@ class ModelPerformance:
     def generate_performance(cls, y_true: List[Any], y_pred: List[Any]) -> ModelPerformance:
         return ModelPerformance(
             acc=metrics.accuracy_score(y_true, y_pred),
-            pre=metrics.precision_score(y_true, y_pred, average="binary"),
-            rec=metrics.recall_score(y_true, y_pred, average="binary"),
-            f1=metrics.f1_score(y_true, y_pred, average="binary"),
+            pre=metrics.precision_score(y_true, y_pred, average="binary", zero_division=0.0),
+            rec=metrics.recall_score(y_true, y_pred, average="binary", zero_division=0.0),
+            f1=metrics.f1_score(y_true, y_pred, average="binary", zero_division=0.0),
             roc=metrics.roc_auc_score(y_true, y_pred)
         )
 

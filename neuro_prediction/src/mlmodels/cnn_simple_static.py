@@ -17,7 +17,7 @@ class CnnSimpleStatic(BaseMLModel):
                 nn.Conv2d(1, 10, 3),
                 nn.Flatten(),
                 nn.Linear(4000, 2),
-                nn.Softmax(0)
+                nn.Softmax(1)
             )
             
         
@@ -51,7 +51,7 @@ class CnnSimpleStatic(BaseMLModel):
         
     
     
-    def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
+    def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
         output = [None] * len(dataset_x)
         static_fc = torch.stack(dataset_x)
         
@@ -59,7 +59,8 @@ class CnnSimpleStatic(BaseMLModel):
         with torch.inference_mode():
             res = self.model(static_fc.to(torch.float32))
             for i in range(len(res)):
-                output[i] = np.argmax(res[i]).tolist()
+                current_res = np.argmax(res[i]).tolist()
+                output[i] = (current_res, res[i][current_res])
         
         return output
     
@@ -91,9 +92,10 @@ class CnnSimpleStatic(BaseMLModel):
             avg_fc, std_fc, static_fc = dataset[i].get_fcs()
             res = dataset[i].get_numberised_meta_data()["outcome"]
             dataset_x[i] = torch.from_numpy(static_fc)
-            dataset_y[i] = [0.0, 0.0]
-            dataset_y[i][int(res - 1)] = 1.0
-            dataset_y[i] = torch.tensor(dataset_y[i])
+            if res is not None:
+                dataset_y[i] = [0.0, 0.0]
+                dataset_y[i][int(res - 1)] = 1.0
+                dataset_y[i] = torch.tensor(dataset_y[i])
                     
         return dataset_x, dataset_y
     

@@ -23,7 +23,7 @@ class CnnSimple(BaseMLModel):
             self.joined_stack = nn.Sequential(
                 nn.Linear(8000, 500), 
                 nn.Linear(500, 2),
-                nn.Softmax(0)
+                nn.Softmax(1)
             )
             
         def forward(self, avg: Tensor, std: Tensor) -> Tensor:
@@ -73,7 +73,7 @@ class CnnSimple(BaseMLModel):
             optimizer.step()
                 
    
-    def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
+    def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
         output = [None] * len(dataset_x)
         avg, std = self.dataset_x_tensor(dataset_x)
                 
@@ -81,10 +81,10 @@ class CnnSimple(BaseMLModel):
         
         with torch.inference_mode():
             res = self.model(avg.to(torch.float32), std.to(torch.float32))
-            
             for i in range(len(res)):
-                output[i] = np.argmax(res[i]).tolist()
-            
+                current_res = np.argmax(res[i]).tolist()
+                output[i] = (current_res, res[i][current_res])
+                
         return output
     
    
@@ -115,9 +115,10 @@ class CnnSimple(BaseMLModel):
             avg_fc, std_fc, static_fc = dataset[i].get_fcs()
             res = dataset[i].get_numberised_meta_data()["outcome"]
             dataset_x[i] = (torch.from_numpy(avg_fc), torch.from_numpy(std_fc))
-            dataset_y[i] = [0.0, 0.0]
-            dataset_y[i][int(res - 1)] = 1.0
-            dataset_y[i] = torch.tensor(dataset_y[i])
+            if res is not None:
+                dataset_y[i] = [0.0, 0.0]
+                dataset_y[i][int(res - 1)] = 1.0
+                dataset_y[i] = torch.tensor(dataset_y[i])
         
         return dataset_x, dataset_y
     

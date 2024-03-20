@@ -17,7 +17,7 @@ if __name__ == "__main__":
     patient_dataset = PatientDataset.load_processed_dataset("balanced_connectivity.pkl")
 
     cnn.initialize_model()
-    cnn.set_save_k_fold(BaseMLModel.SAVE_MODE.BEST, "../../test_save")
+    # cnn.set_save_k_fold(BaseMLModel.SAVE_MODE.BEST, "../../test_save")
     
     res = cnn.k_fold(patient_dataset.get_dataset())
     

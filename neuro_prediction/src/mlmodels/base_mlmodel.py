@@ -35,7 +35,7 @@ class BaseMLModel(ABC):
         self.train_model_aux(dataset_x, dataset_y)
 
         
-    def predict_result(self, dataset: List[PatientData]) -> List[float]:
+    def predict_result(self, dataset: List[PatientData]) -> List[Tuple[float, float]]:
         dataset_x, _ = self.reshape_input(dataset)
         return self.predict_result_aux(dataset_x)
 
@@ -46,7 +46,7 @@ class BaseMLModel(ABC):
 
     
     @abstractmethod
-    def predict_result_aux(self, dataset_x: List[Any]) -> List[float]:
+    def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
         pass
 
     
@@ -182,11 +182,11 @@ class BaseMLModel(ABC):
                 val_x, val_y = val_sets[j]
                 models[j] = current_model
                 current_model.train_model_aux(train_x, train_y)
-                pred_y = current_model.predict_result_aux(val_x)
+                pred_y = list(map(lambda x: x[0], current_model.predict_result_aux(val_x)))
                 performances[j] = ModelPerformance.generate_performance(self.dataset_y_classification_num(val_y), pred_y)
             
             outer_models[i] = self.get_best_model(models, performances)
-            pred_y = outer_models[i].predict_result_aux(test_x)
+            pred_y = list(map(lambda x: x[0], outer_models[i].predict_result_aux(test_x)))
             outer_performances[i] = ModelPerformance.generate_performance(self.dataset_y_classification_num(test_y), pred_y)
             
         output = self.get_avg_performance(outer_performances)
