@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import List, Any, Tuple
 
 import numpy as np
+from optuna import Trial
 import torch
 from torch import nn, Tensor
 
@@ -37,7 +38,7 @@ class CnnSimple(BaseMLModel):
         
     
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__("cnn_simple")
         self.model = None
         self.params = None
         
@@ -129,6 +130,9 @@ class CnnSimple(BaseMLModel):
     
     def get_save_file_extension(self) -> str:
         return "pt"
+    
+    def objective(self, trial: Trial) -> float:
+        return None
         
         
 if __name__ == "__main__":

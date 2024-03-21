@@ -11,7 +11,7 @@ from .base_mlmodel import BaseMLModel
 
 class SVMModel(BaseMLModel):
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__("svm")
         self.model = None
         
         
