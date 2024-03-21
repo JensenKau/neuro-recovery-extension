@@ -4,6 +4,7 @@ from typing import Any, List, Tuple
 from numpy.typing import NDArray
 import dill
 import numpy as np
+from optuna import Trial
 from sklearn.svm import SVC
 
 from patientdata.patient_data import PatientData
@@ -82,6 +83,20 @@ class SVMModel(BaseMLModel):
 
     def get_save_file_extension(self) -> str:
         return "pkl"
+    
+    
+    def objective(self, trial: Trial, dataset: List[PatientData]) -> float:
+        c = trial.suggest_float("C", 0.0001, 1000)
+        kernel = trial.suggest_categorical("kernel", ["linear", "poly", "rbf", "sigmoid"])
+        degree = trial.suggest_int("degree", 1, 100)
+        gamma = trial.suggest_categorical("gamma", ["scale", "auto"])
+        
+        model_copy = SVMModel()
+        model_copy.initialize_model(**{"C": c, "kernel": kernel, "degree": degree, "gamma": gamma})
+        
+        performance = self.k_fold(dataset)
+        
+        return performance.get_acc()
 
 
 if __name__ == "__main__":

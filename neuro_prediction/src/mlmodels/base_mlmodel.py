@@ -9,7 +9,6 @@ import optuna
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
-from patientdata.data_enum import PatientOutcome
 from patientdata.patient_data import PatientData
 from .model_performance import ModelPerformance
 from .dataset_split import DatasetSplit
@@ -88,7 +87,7 @@ class BaseMLModel(ABC):
     
     
     @abstractmethod
-    def objective(self, trial: optuna.trial.Trial) -> float:
+    def objective(self, trial: optuna.trial.Trial, dataset: List[PatientData]) -> float:
         pass
 
 
@@ -246,14 +245,14 @@ class BaseMLModel(ABC):
         self.save_folder = save_folder if save_folder is not None else self.save_folder
         
         
-    def tune_paramters(self, iteration: int) -> None:
+    def tune_paramters(self, iteration: int, dataset: List[PatientData]) -> None:
         study = optuna.create_study(
             study_name=self.model_name,
-            storage=f"sqlite:///{self.model_name}.db",
+            storage=f"sqlite:///../../{self.model_name}.db",
             direction="maximize", 
             load_if_exists=True
         )
-        study.optimize(self.objective, n_trials=iteration)
+        study.optimize(lambda x: self.objective(x, dataset), n_trials=iteration)
                             
             
 
