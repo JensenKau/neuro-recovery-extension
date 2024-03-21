@@ -7,9 +7,10 @@ import torch
 from torch import nn, Tensor
 
 from mlmodels import BaseMLModel
+from .pytorch_model import PytorchModel
 from patientdata import PatientData
 
-class CnnSimple(BaseMLModel):
+class CnnSimple(PytorchModel):
     class InternalModel(nn.Module):
         def __init__(self) -> None:
             super().__init__()
@@ -38,7 +39,7 @@ class CnnSimple(BaseMLModel):
         
     
     def __init__(self) -> None:
-        super().__init__("cnn_simple")
+        super().__init__("cnn_simple", self.InternalModel)
         self.model = None
         self.params = None
         
@@ -55,81 +56,16 @@ class CnnSimple(BaseMLModel):
         
         return avg, std
         
-        
-    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
-        loss_fn = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(self.model.parameters())
-        
-        avg, std = self.dataset_x_tensor(dataset_x)
-        dataset_y = torch.stack(dataset_y)
-        
-        self.model.train()
-        
-        for epoch in range(100):
-            y_pred = self.model(avg.to(torch.float32), std.to(torch.float32))
-            loss = loss_fn(y_pred, dataset_y)
-            
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-                
-   
-    def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
-        output = [None] * len(dataset_x)
-        avg, std = self.dataset_x_tensor(dataset_x)
-                
-        self.model.eval()
-        
-        with torch.inference_mode():
-            res = self.model(avg.to(torch.float32), std.to(torch.float32))
-            for i in range(len(res)):
-                current_res = np.argmax(res[i]).tolist()
-                output[i] = (current_res, res[i][current_res])
-                
-        return output
-    
-   
-    def save_model(self, filename: str) -> None:
-        torch.save(self.model.state_dict(), filename)
-    
-   
-    def load_model(self, filename: str) -> None:
-        self.model = self.InternalModel()
-        self.model.load_state_dict(torch.load(filename))
-    
-   
-    def initialize_model(self, **kwargs) -> None:
-        self.model = self.InternalModel()
-            
-   
-    def create_model_copy(self) -> BaseMLModel:
-        model_copy = CnnSimple()
-        model_copy.initialize_model()
-        return model_copy
-    
-   
-    def reshape_input(self, dataset: List[PatientData]) -> Tuple[List[Any], List[Any]]:
-        dataset_x = [None] * len(dataset)
-        dataset_y = [None] * len(dataset)
-        
-        for i in range(len(dataset)):
-            avg_fc, std_fc, static_fc = dataset[i].get_fcs()
-            res = dataset[i].get_numberised_meta_data()["outcome"]
-            dataset_x[i] = (torch.from_numpy(avg_fc), torch.from_numpy(std_fc))
-            if res is not None:
-                dataset_y[i] = [0.0, 0.0]
-                dataset_y[i][int(res - 1)] = 1.0
-                dataset_y[i] = torch.tensor(dataset_y[i])
+    def extract_data(self, dataset_x: List[Any], dataset_y: List[Any]) -> Tuple[Tuple[Tensor] | Tensor]:
+        dataset_x = (
+            torch.stack(list(map(lambda x: x[0], dataset_x))).to(torch.float32),
+            torch.stack(list(map(lambda x: x[1], dataset_x))).to(torch.float32)
+        )
+        if dataset_y is not None:
+            dataset_y = torch.stack(list(map(lambda x: x[0], dataset_y))).to(torch.float32)
         
         return dataset_x, dataset_y
     
-    
-    def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:
-        return np.argmax(list(map(lambda x: x.numpy(), dataset_y)), 1).tolist()
-    
-    
-    def get_save_file_extension(self) -> str:
-        return "pt"
     
     def objective(self, trial: Trial) -> float:
         return None
