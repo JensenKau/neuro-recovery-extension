@@ -6,16 +6,17 @@ import torch
 from torch import nn, Tensor
 import numpy as np
 
-from base_mlmodel import BaseMLModel
+from .base_mlmodel import BaseMLModel
 from patientdata import PatientData
 
 
 class PytorchModel(BaseMLModel):
-    def __init__(self, model_name: str, model_class: Callable) -> None:
+    def __init__(self, model_name: str, model_class: Callable, use_cpc: bool = False) -> None:
         super().__init__(f"pytorch_{model_name}")
         self.model_class = model_class
         self.model = None
         self.param = None
+        self.use_cpc = use_cpc
         
         
     @abstractmethod
@@ -28,7 +29,7 @@ class PytorchModel(BaseMLModel):
         optimizer = torch.optim.Adam(self.model.parameters())
         
         dataset_x, dataset_y = self.extract_data(dataset_x, dataset_y)
-        
+                
         self.model.train()
         for epoch in range(100):
             y_pred = self.model(*dataset_x)
@@ -44,7 +45,7 @@ class PytorchModel(BaseMLModel):
         
         self.model.eval()
         with torch.inference_mode():
-            res = self.model(dataset_x)
+            res = self.model(*dataset_x)
             for i in range(len(res)):
                 current_res = np.argmax(res[i]).tolist()
                 output[i] = (current_res, res[i][current_res])
@@ -77,6 +78,7 @@ class PytorchModel(BaseMLModel):
         
         for i in range(len(dataset)):
             dataset_x[i] = dataset[i].get_fcs()
+            dataset_x[i] = (torch.tensor(dataset_x[i][0]), torch.tensor(dataset_x[i][1]), torch.tensor(dataset_x[i][2]))
             meta = dataset[i].get_numberised_meta_data()
             outcome = meta["outcome"]
             cpc = meta["cpc"]
@@ -95,7 +97,9 @@ class PytorchModel(BaseMLModel):
     
     
     def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:
-        return np.argmax(list(map(lambda x: x.numpy(), dataset_y)), 1).tolist()
+        if self.use_cpc:
+            return np.argmax(list(map(lambda x: x[1].numpy(), dataset_y)), 1).tolist()
+        return np.argmax(list(map(lambda x: x[0].numpy(), dataset_y)), 1).tolist()
     
     
     def get_save_file_extension(self) -> str:

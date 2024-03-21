@@ -1,15 +1,15 @@
 from __future__ import annotations
 from typing import Any, List, Tuple
 
-from patientdata.patient_data import PatientData
-from .base_mlmodel import BaseMLModel
-
+from optuna import Trial
 import torch
 from torch import nn, Tensor
 import numpy as np
 
+from .pytorch_model import PytorchModel
 
-class CnnSimpleStatic(BaseMLModel):
+
+class CnnSimpleStatic(PytorchModel):
     class InternalModel(nn.Module):
         def __init__(self) -> None:
             super().__init__()
@@ -28,87 +28,24 @@ class CnnSimpleStatic(BaseMLModel):
     
     
     def __init__(self) -> None:
-        super().__init__()
+        super().__init__("cnn_simple_static", self.InternalModel)
         self.model = None
         self.param = None
         
         
-    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
-        loss_fn = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(self.model.parameters())
+    def extract_data(self, dataset_x: List[Any], dataset_y: List[Any]) -> Tuple[Tuple[Tensor, ...], Tensor]:
+        dataset_x = torch.stack(list(map(lambda x: x[2], dataset_x))).to(torch.float32)
+        if dataset_y is not None:
+            dataset_y = torch.stack(list(map(lambda x: x[0], dataset_y))).to(torch.float32)
         
-        static_fc = torch.stack(dataset_x)
-        dataset_y = torch.stack(dataset_y)
-        
-        self.model.train()
-        for epoch in range(100):
-            y_pred = self.model(static_fc.to(torch.float32))
-            loss = loss_fn(y_pred, dataset_y)
-            
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-        
+        return (dataset_x,), dataset_y
     
     
-    def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
-        output = [None] * len(dataset_x)
-        static_fc = torch.stack(dataset_x)
-        
-        self.model.eval()
-        with torch.inference_mode():
-            res = self.model(static_fc.to(torch.float32))
-            for i in range(len(res)):
-                current_res = np.argmax(res[i]).tolist()
-                output[i] = (current_res, res[i][current_res])
-        
-        return output
+    def objective(self, trial: Trial) -> float:
+        return super().objective(trial)
     
     
-    def save_model(self, filename: str) -> None:
-        torch.save(self.model.state_dict(), filename)
     
-    
-    def load_model(self, filename: str) -> None:
-        self.model = self.InternalModel()
-        self.model.load_state_dict(torch.load(filename))
-    
-    
-    def initialize_model(self, **kwargs) -> None:
-        self.model = self.InternalModel()
-    
-    
-    def create_model_copy(self) -> BaseMLModel:
-        model_copy = CnnSimpleStatic()
-        model_copy.initialize_model()
-        return model_copy
-    
-    
-    def reshape_input(self, dataset: List[PatientData]) -> Tuple[List[Any], List[Any]]:
-        dataset_x = [None] * len(dataset)
-        dataset_y = [None] * len(dataset)
-        
-        for i in range(len(dataset)):
-            avg_fc, std_fc, static_fc = dataset[i].get_fcs()
-            res = dataset[i].get_numberised_meta_data()["outcome"]
-            dataset_x[i] = torch.from_numpy(static_fc)
-            if res is not None:
-                dataset_y[i] = [0.0, 0.0]
-                dataset_y[i][int(res - 1)] = 1.0
-                dataset_y[i] = torch.tensor(dataset_y[i])
-                    
-        return dataset_x, dataset_y
-    
-    
-    def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:
-        return np.argmax(list(map(lambda x: x.numpy(), dataset_y)), 1).tolist()
-    
-    
-    def get_save_file_extension(self) -> str:
-        return "pt"
-    
-    
-
 
 if __name__ == "__main__":
     pass
