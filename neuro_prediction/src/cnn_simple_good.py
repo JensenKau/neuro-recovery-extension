@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
-import random
-import optuna
-import logging
-import sys
+import torch
 
 from mlmodels.base_mlmodel import BaseMLModel
 from mlmodels.cnn_simple_static import CnnSimpleStatic
@@ -13,11 +10,11 @@ from mlmodels.svm_model import SVMModel
 from patientdata import PatientData, PatientDataset
 
 if __name__ == "__main__":
-    cnn = CnnSimple()
+    cnn = CnnSimpleStatic()
     patient_dataset = PatientDataset.load_processed_dataset("balanced_connectivity.pkl")
 
     cnn.initialize_model()
-    cnn.set_save_k_fold(BaseMLModel.SAVE_MODE.ALL, "../../test_save")
+    # cnn.set_save_k_fold(BaseMLModel.SAVE_MODE.ALL, "../../trained_models/test_save2")
     
     res = cnn.k_fold(patient_dataset.get_dataset())
     
@@ -29,3 +26,6 @@ if __name__ == "__main__":
     # print(len(res))
     
     # cnn.tune_paramters(50, patient_dataset.get_dataset())
+    
+    # print(torch.cuda.get_device_name())
+    # print(torch.cuda.device())

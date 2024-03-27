@@ -11,8 +11,12 @@ from patientdata import PatientData
 
 
 class PytorchModel(BaseMLModel):
-    def __init__(self, model_name: str, model_class: Callable, use_cpc: bool = False) -> None:
+    INITIALIZE_SEED = 123
+    USE_GPU = torch.cuda.is_available()
+    
+    def __init__(self, model_name: str, model_class: Callable, use_cpc: bool = False, use_gpu: bool = True) -> None:
         super().__init__(f"pytorch_{model_name}")
+        self.use_gpu = use_gpu and self.USE_GPU
         self.model_class = model_class
         self.model = None
         self.param = None
@@ -25,32 +29,35 @@ class PytorchModel(BaseMLModel):
         
         
     def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
-        loss_fn = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(self.model.parameters())
-        
-        dataset_x, dataset_y = self.extract_data(dataset_x, dataset_y)
-                
-        self.model.train()
-        for epoch in range(100):
-            y_pred = self.model(*dataset_x)
-            loss = loss_fn(y_pred, dataset_y)
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+        with torch.device("cuda:0"):
+            loss_fn = nn.CrossEntropyLoss()
+            optimizer = torch.optim.Adam(self.model.parameters())
+            
+            dataset_x, dataset_y = self.extract_data(dataset_x, dataset_y)
+                    
+            self.model.train()
+            for epoch in range(100):
+                y_pred = self.model(*dataset_x)
+                loss = loss_fn(y_pred, dataset_y)
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
             
             
     def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
-        output = [None] * len(dataset_x)
-        dataset_x, _ = self.extract_data(dataset_x, None)
-        
-        self.model.eval()
-        with torch.inference_mode():
-            res = self.model(*dataset_x)
-            for i in range(len(res)):
-                current_res = np.argmax(res[i]).tolist()
-                output[i] = (current_res, res[i][current_res])
-        
-        return output
+        with torch.device("cuda:0"):
+            output = [None] * len(dataset_x)
+            dataset_x, _ = self.extract_data(dataset_x, None)
+            
+            self.model.eval()
+            with torch.inference_mode():
+                res = self.model(*dataset_x)
+                res = res.cpu()
+                for i in range(len(res)):
+                    current_res = np.argmax(res[i]).tolist()
+                    output[i] = (current_res, res[i][current_res])
+            
+            return output
     
     
     def save_model(self, filename: str) -> None:
@@ -59,11 +66,19 @@ class PytorchModel(BaseMLModel):
     
     def load_model(self, filename: str) -> None:
         self.model = self.model_class()
+        if self.use_gpu:
+            self.model.cuda()
+        
         self.model.load_state_dict(torch.load(filename))
     
     
     def initialize_model(self, **kwargs) -> None:
+        torch.manual_seed(self.INITIALIZE_SEED)
+        torch.cuda.manual_seed_all(self.INITIALIZE_SEED)
+        
         self.model = self.model_class()
+        if self.use_gpu:
+            self.model.cuda()
         
         
     def create_model_copy(self) -> BaseMLModel:
