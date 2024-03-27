@@ -105,11 +105,21 @@ class BaseMLModel(ABC):
     
     def get_avg_performance(self, performances: List[ModelPerformance]) -> ModelPerformance:
         return ModelPerformance(
-            acc=sum(map(lambda x: x.get_acc(), performances)) / len(performances),
-            pre=sum(map(lambda x: x.get_pre(), performances)) / len(performances),
-            rec=sum(map(lambda x: x.get_rec(), performances)) / len(performances),
-            f1=sum(map(lambda x: x.get_f1(), performances)) / len(performances),
-            roc=sum(map(lambda x: x.get_roc(), performances)) / len(performances)
+            acc=float(np.mean(list(map(lambda x: x.get_acc(), performances)), axis=0)),
+            pre=float(np.mean(list(map(lambda x: x.get_pre(), performances)), axis=0)),
+            rec=float(np.mean(list(map(lambda x: x.get_rec(), performances)), axis=0)),
+            f1=float(np.mean(list(map(lambda x: x.get_f1(), performances)), axis=0)),
+            roc=float(np.mean(list(map(lambda x: x.get_roc(), performances)), axis=0))
+        )
+        
+    
+    def get_stddev_performance(self, performances: List[ModelPerformance]) -> ModelPerformance:
+        return ModelPerformance(
+            acc=float(np.std(list(map(lambda x: x.get_acc(), performances)), axis=0)),
+            pre=float(np.std(list(map(lambda x: x.get_pre(), performances)), axis=0)),
+            rec=float(np.std(list(map(lambda x: x.get_rec(), performances)), axis=0)),
+            f1=float(np.std(list(map(lambda x: x.get_f1(), performances)), axis=0)),
+            roc=float(np.std(list(map(lambda x: x.get_roc(), performances)), axis=0))
         )
 
 
@@ -173,7 +183,8 @@ class BaseMLModel(ABC):
         data_split = self.get_data_split(dataset_x, dataset_y)
         outer_models = [None] * len(data_split)
         outer_performances = [None] * len(data_split)
-        output = None
+        avg = None
+        std = None
         
         for i in range(len(data_split)):
             test_x, test_y = data_split[i].get_test_set()
@@ -195,18 +206,19 @@ class BaseMLModel(ABC):
             pred_y = list(map(lambda x: x[0], outer_models[i].predict_result_aux(test_x)))
             outer_performances[i] = ModelPerformance.generate_performance(self.dataset_y_classification_num(test_y), pred_y)
             
-        output = self.get_avg_performance(outer_performances)
+        avg = self.get_avg_performance(outer_performances)
+        std = self.get_stddev_performance(outer_performances)
             
-        self.save_k_fold(outer_models, outer_performances)
+        self.save_k_fold(self.save_folder, outer_models, outer_performances, avg, std)
             
-        return output
+        return avg
     
     
-    def save_k_fold(self, models: List[BaseMLModel], performances: List[ModelPerformance]) -> None:
+    def save_k_fold(self, folder: str, models: List[BaseMLModel], performances: List[ModelPerformance], avg: ModelPerformance, std: ModelPerformance) -> None:
         if self.is_save_k_fold != self.SAVE_MODE.NONE:
             csv_header = ["Acc", "Pre", "Rec", "F1", "ROC"]
             csv_content = []
-            os.makedirs(self.save_folder, exist_ok=True)
+            os.makedirs(folder, exist_ok=True)
             
             if self.is_save_k_fold == self.SAVE_MODE.BEST:
                 acc_arr = [0] * len(performances)
@@ -218,7 +230,7 @@ class BaseMLModel(ABC):
                     
                 index = np.argmax(acc_arr)
                 best_performance = performances[index].get_performance()
-                models[index].save_model(f"{self.save_folder}/model_{index}.{self.get_save_file_extension()}")
+                models[index].save_model(f"{folder}/model_{index}.{self.get_save_file_extension()}")
                 for header in csv_header:
                     current_row.append(str(best_performance[header]))
                 csv_content.append(current_row)
@@ -229,13 +241,14 @@ class BaseMLModel(ABC):
                     best_performance = performances[i].get_performance()
                     for header in csv_header:
                         current_row.append(str(best_performance[header]))
-                    models[i].save_model(f"{self.save_folder}/model_{i}.{self.get_save_file_extension()}")
+                    models[i].save_model(f"{folder}/model_{i}.{self.get_save_file_extension()}")
                     csv_content.append(current_row)
                     
-            with open(f"{self.save_folder}/performance.csv", "w", encoding="utf-8") as file:
+            with open(f"{folder}/performance.csv", "w", encoding="utf-8") as file:
                 csv_writer = csv.writer(file)
                 csv_writer.writerow(csv_header)
                 csv_writer.writerows(csv_content)
+                csv_writer.writerow([avg, std])
                 
 
     
