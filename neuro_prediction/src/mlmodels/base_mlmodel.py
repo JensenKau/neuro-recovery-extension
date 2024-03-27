@@ -253,7 +253,10 @@ class BaseMLModel(ABC):
             load_if_exists=True
         )
         study.optimize(lambda x: self.objective(x, dataset), n_trials=iteration)
-                            
+
+
+    def save_best_trial(self, study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
+        pass
             
 
 if __name__ == "__main__":

@@ -13,19 +13,19 @@ from mlmodels.svm_model import SVMModel
 from patientdata import PatientData, PatientDataset
 
 if __name__ == "__main__":
-    cnn = SVMModel()
+    cnn = CnnSimple()
     patient_dataset = PatientDataset.load_processed_dataset("balanced_connectivity.pkl")
 
     cnn.initialize_model()
-    # cnn.set_save_k_fold(BaseMLModel.SAVE_MODE.BEST, "../../test_save")
+    cnn.set_save_k_fold(BaseMLModel.SAVE_MODE.ALL, "../../test_save")
     
-    # res = cnn.k_fold(patient_dataset.get_dataset())
+    res = cnn.k_fold(patient_dataset.get_dataset())
     
-    # print(res)
+    print(res)
     
     # res = cnn.predict_result(patient_dataset.get_dataset())
 
     # print(res)
     # print(len(res))
     
-    cnn.tune_paramters(50, patient_dataset.get_dataset())
+    # cnn.tune_paramters(50, patient_dataset.get_dataset())
