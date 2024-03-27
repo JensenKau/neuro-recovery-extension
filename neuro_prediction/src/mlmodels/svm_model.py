@@ -94,9 +94,9 @@ class SVMModel(BaseMLModel):
         model_copy = SVMModel()
         model_copy.initialize_model(**{"C": c, "kernel": kernel, "degree": degree, "gamma": gamma})
         
-        performance = self.k_fold(dataset)
+        self.k_fold(dataset)
         
-        return performance.get_acc()
+        return self.k_fold_avg.get_acc()
 
 
 if __name__ == "__main__":

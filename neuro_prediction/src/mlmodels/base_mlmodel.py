@@ -1,6 +1,6 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Dict
 from enum import Enum
 import os
 import csv
@@ -26,9 +26,12 @@ class BaseMLModel(ABC):
     
     def __init__(self, model_name: str) -> None:
         super().__init__()
-        self.is_save_k_fold = self.SAVE_MODE.NONE
-        self.save_folder = None
         self.model_name = model_name
+        
+        self.k_fold_models = None
+        self.k_fold_perfs = None
+        self.k_fold_avg = None
+        self.k_fold_std = None
 
 
     def train_model(self, dataset: List[PatientData]) -> None:
@@ -89,18 +92,6 @@ class BaseMLModel(ABC):
     @abstractmethod
     def objective(self, trial: optuna.trial.Trial, dataset: List[PatientData]) -> float:
         pass
-
-
-    def get_best_model(self, models: List[BaseMLModel], performances: List[ModelPerformance]) -> BaseMLModel:
-        index = 0
-        max_acc = 0
-        
-        for i in range(len(performances)):
-            if performances[i].get_acc() > max_acc:
-                max_acc = performances[i].get_acc()
-                index = i
-                
-        return models[index]
     
     
     def get_avg_performance(self, performances: List[ModelPerformance]) -> ModelPerformance:
@@ -178,13 +169,11 @@ class BaseMLModel(ABC):
         return output
     
     
-    def k_fold(self, dataset: List[PatientData]) -> ModelPerformance:
+    def k_fold(self, dataset: List[PatientData]) -> None:
         dataset_x, dataset_y = self.reshape_input(dataset)
         data_split = self.get_data_split(dataset_x, dataset_y)
         outer_models = [None] * len(data_split)
         outer_performances = [None] * len(data_split)
-        avg = None
-        std = None
         
         for i in range(len(data_split)):
             test_x, test_y = data_split[i].get_test_set()
@@ -202,60 +191,56 @@ class BaseMLModel(ABC):
                 pred_y = list(map(lambda x: x[0], current_model.predict_result_aux(val_x)))
                 performances[j] = ModelPerformance.generate_performance(self.dataset_y_classification_num(val_y), pred_y)
             
-            outer_models[i] = self.get_best_model(models, performances)
+            outer_models[i] = models[np.argmax(list(map(lambda x: x.get_acc(), performances)))]
             pred_y = list(map(lambda x: x[0], outer_models[i].predict_result_aux(test_x)))
             outer_performances[i] = ModelPerformance.generate_performance(self.dataset_y_classification_num(test_y), pred_y)
             
-        avg = self.get_avg_performance(outer_performances)
-        std = self.get_stddev_performance(outer_performances)
-            
-        self.save_k_fold(self.save_folder, outer_models, outer_performances, avg, std)
-            
-        return avg
+        self.k_fold_models = outer_models
+        self.k_fold_perfs = outer_performances
+        self.k_fold_avg = self.get_avg_performance(outer_performances)
+        self.k_fold_std = self.get_stddev_performance(outer_performances)
+        
     
+    def get_k_fold_performances(self) -> Dict[str, List[BaseMLModel] | List[ModelPerformance] | ModelPerformance]:
+        return {
+            "models": self.k_fold_models,
+            "performances": self.k_fold_perfs,
+            "avg": self.k_fold_avg,
+            "std": self.k_fold_std
+        }
+                            
     
-    def save_k_fold(self, folder: str, models: List[BaseMLModel], performances: List[ModelPerformance], avg: ModelPerformance, std: ModelPerformance) -> None:
-        if self.is_save_k_fold != self.SAVE_MODE.NONE:
+    def save_k_fold(self, folder: str, save_mode: SAVE_MODE = SAVE_MODE.ALL) -> None:
+        if save_mode != self.SAVE_MODE.NONE:
             csv_header = ["Acc", "Pre", "Rec", "F1", "ROC"]
             csv_content = []
             os.makedirs(folder, exist_ok=True)
             
-            if self.is_save_k_fold == self.SAVE_MODE.BEST:
-                acc_arr = [0] * len(performances)
-                index = 0
-                current_row = []
-                best_performance = None
-                for i in range(len(performances)):
-                    acc_arr[i] = performances[i].get_acc()
-                    
+            if save_mode == self.SAVE_MODE.BEST:
+                acc_arr = list(map(lambda x: x.get_acc(), self.k_fold_perfs))
                 index = np.argmax(acc_arr)
-                best_performance = performances[index].get_performance()
-                models[index].save_model(f"{folder}/model_{index}.{self.get_save_file_extension()}")
-                for header in csv_header:
-                    current_row.append(str(best_performance[header]))
+                best_performance = self.k_fold_perfs[index].get_performance()
+                current_row = list(map(lambda x: str(best_performance[x]), csv_header))
+                self.k_fold_models[index].save_model(f"{folder}/model_{index}.{self.get_save_file_extension()}")
                 csv_content.append(current_row)
                 
-            elif self.is_save_k_fold == self.SAVE_MODE.ALL:
-                for i in range(len(models)):
-                    current_row = []
-                    best_performance = performances[i].get_performance()
-                    for header in csv_header:
-                        current_row.append(str(best_performance[header]))
-                    models[i].save_model(f"{folder}/model_{i}.{self.get_save_file_extension()}")
+            elif save_mode == self.SAVE_MODE.ALL:
+                for i in range(len(self.k_fold_models)):
+                    curr_performance = self.k_fold_perfs[i].get_performance()
+                    current_row = list(map(lambda x: str(curr_performance[x]), csv_header))
+                    self.k_fold_models[i].save_model(f"{folder}/model_{i}.{self.get_save_file_extension()}")
                     csv_content.append(current_row)
                     
             with open(f"{folder}/performance.csv", "w", encoding="utf-8") as file:
-                csv_writer = csv.writer(file)
+                csv_writer = csv.writer(file)                
+                avg_row = self.k_fold_avg.get_performance()
+                std_row = self.k_fold_std.get_performance()
                 csv_writer.writerow(csv_header)
                 csv_writer.writerows(csv_content)
-                csv_writer.writerow([avg, std])
-                
-
-    
-    
-    def set_save_k_fold(self, is_save_k_fold: BaseMLModel.SAVE_MODE, save_folder: str = None) -> None:
-        self.is_save_k_fold = is_save_k_fold
-        self.save_folder = save_folder if save_folder is not None else self.save_folder
+                csv_writer.writerows([
+                    list(map(lambda x: str(avg_row[x]), csv_header)), 
+                    list(map(lambda x: str(std_row[x]), csv_header))
+                ]) 
         
         
     def tune_paramters(self, iteration: int, dataset: List[PatientData]) -> None:
