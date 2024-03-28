@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, List, Tuple
 
 from optuna import Trial
+import optuna
 import torch
 from torch import nn, Tensor
 import numpy as np

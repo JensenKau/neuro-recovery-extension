@@ -250,7 +250,7 @@ class BaseMLModel(ABC):
             study_name=self.model_name,
             storage=f"sqlite:///../../{self.model_name}.db",
             direction="maximize", 
-            load_if_exists=True
+            load_if_exists=True,
         )
         
         def model_objective(trial: optuna.trial.Trial) -> float:
