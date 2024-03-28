@@ -85,7 +85,7 @@ class SVMModel(BaseMLModel):
         return "pkl"
     
     
-    def objective(self, trial: Trial, dataset: List[PatientData]) -> float:
+    def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
         c = trial.suggest_float("C", 0.0001, 1000)
         kernel = trial.suggest_categorical("kernel", ["linear", "poly", "rbf", "sigmoid"])
         degree = trial.suggest_int("degree", 1, 100)
@@ -94,9 +94,9 @@ class SVMModel(BaseMLModel):
         model_copy = SVMModel()
         model_copy.initialize_model(**{"C": c, "kernel": kernel, "degree": degree, "gamma": gamma})
         
-        self.k_fold(dataset)
+        model_copy.k_fold(dataset)
         
-        return self.k_fold_avg.get_acc()
+        return model_copy
 
 
 if __name__ == "__main__":

@@ -32,6 +32,8 @@ class BaseMLModel(ABC):
         self.k_fold_perfs = None
         self.k_fold_avg = None
         self.k_fold_std = None
+        
+        self.optuna_model_copy = None
 
 
     def train_model(self, dataset: List[PatientData]) -> None:
@@ -90,7 +92,7 @@ class BaseMLModel(ABC):
     
     
     @abstractmethod
-    def objective(self, trial: optuna.trial.Trial, dataset: List[PatientData]) -> float:
+    def objective(self, trial: optuna.trial.Trial, dataset: List[PatientData]) -> BaseMLModel:
         pass
     
     
@@ -250,11 +252,20 @@ class BaseMLModel(ABC):
             direction="maximize", 
             load_if_exists=True
         )
-        study.optimize(lambda x: self.objective(x, dataset), n_trials=iteration)
-
-
-    def save_best_trial(self, study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
-        pass
+        
+        def model_objective(trial: optuna.trial.Trial) -> float:
+            self.optuna_model_copy = self.objective(trial, dataset)
+            return self.optuna_model_copy.get_k_fold_performances()["avg"].get_acc()
+        
+        def save_best_trial(study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
+            if study.best_trial.number == trial.number:
+                self.optuna_model_copy.save_k_fold(f"../../trained_models/{self.optuna_model_copy.model_name}")  
+        
+        study.optimize(
+            func=model_objective, 
+            n_trials=iteration,
+            callbacks=[save_best_trial]
+        )
             
 
 if __name__ == "__main__":

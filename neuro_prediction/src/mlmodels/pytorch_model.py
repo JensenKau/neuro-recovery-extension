@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import List, Any, Tuple, Callable
 from abc import ABC, abstractmethod
+import json
 
 import torch
 from torch import nn, Tensor
@@ -19,8 +20,9 @@ class PytorchModel(BaseMLModel):
         self.use_gpu = use_gpu and self.USE_GPU
         self.model_class = model_class
         self.model = None
-        self.param = None
+        self.parameters = None
         self.use_cpc = use_cpc
+        self.epoch = 100
         
         
     @abstractmethod
@@ -36,7 +38,7 @@ class PytorchModel(BaseMLModel):
             dataset_x, dataset_y = self.extract_data(dataset_x, dataset_y)
                     
             self.model.train()
-            for epoch in range(100):
+            for epoch in range(self.epoch):
                 y_pred = self.model(*dataset_x)
                 loss = loss_fn(y_pred, dataset_y)
                 optimizer.zero_grad()
@@ -62,10 +64,21 @@ class PytorchModel(BaseMLModel):
     
     def save_model(self, filename: str) -> None:
         torch.save(self.model.state_dict(), filename)
+        with open(filename.replace(".pt", ".json"), "w", encoding="utf-8") as file:
+            json.dump(self.parameters, file)
     
     
     def load_model(self, filename: str) -> None:
-        self.model = self.model_class()
+        with open(filename.replace(".pt", ".json"), "r", encoding="utf-8") as file:
+            self.parameters = dict(json.load(file))
+        
+        if "epoch" in self.parameters:
+            self.epoch = self.parameters["epoch"]
+        
+        param_copy = self.parameters.copy()
+        del param_copy["epoch"]
+        
+        self.model = self.model_class(**param_copy)
         if self.use_gpu:
             self.model.cuda()
         
@@ -76,14 +89,21 @@ class PytorchModel(BaseMLModel):
         torch.manual_seed(self.INITIALIZE_SEED)
         torch.cuda.manual_seed_all(self.INITIALIZE_SEED)
         
-        self.model = self.model_class()
+        self.parameters = kwargs
+        if "epoch" in kwargs:
+            self.epoch = kwargs["epoch"]
+            
+        param_copy = self.parameters.copy()
+        del param_copy["epoch"]
+        
+        self.model = self.model_class(**param_copy)
         if self.use_gpu:
             self.model.cuda()
         
         
     def create_model_copy(self) -> BaseMLModel:
         model_copy = self.__class__()
-        model_copy.initialize_model()
+        model_copy.initialize_model(**self.parameters)
         return model_copy
     
         

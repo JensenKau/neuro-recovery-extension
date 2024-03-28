@@ -71,7 +71,7 @@ class CnnSimple(PytorchModel):
         return dataset_x, dataset_y
     
     
-    def objective(self, trial: Trial) -> float:
+    def objective(self, trial: Trial) -> BaseMLModel:
         return None
         
         
