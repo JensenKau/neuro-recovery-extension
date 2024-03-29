@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, List, Tuple
 
 from optuna import Trial
+import optuna
 import torch
 from torch import nn, Tensor
 import numpy as np
@@ -58,6 +59,12 @@ class CnnSimpleStatic(PytorchModel):
         epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300])
         output_chn = trial.suggest_int("output_chn", 2, 10)
         kernel = trial.suggest_int("kernel", 2, 10)
+        
+        for t in trial.study.trials:
+            if t.state != optuna.trial.TrialState.COMPLETE:
+                continue
+            if t.params == trial.params:
+                raise optuna.TrialPruned('Duplicate parameter set')
         
         model_copy = CnnSimpleStatic()
         model_copy.initialize_model(**{"epoch": epoch, "output_chn": output_chn, "kernel": kernel})

@@ -15,29 +15,50 @@ class CnnSimple(PytorchModel):
     class InternalModel(nn.Module):
         def __init__(
             self,
-            output_chn1: int = 10,
-            kernel1: int = 3,
-            output_chn2: int = 10,
-            kernel2: int = 3
+            output_chn1_1: int = 10,
+            kernel1_1: int = 3,
+            relu1_1: bool = False,
+            pool1_1: int = 0,
+            output_chn1_2: int = 10,
+            kernel1_2: int = 3,
+            relu1_2: bool = False,
+            pool1_2: int = 0,
+            output_chn2_1: int = 10,
+            kernel2_1: int = 3,
+            relu2_1: bool = False,
+            pool2_1: int = 0,
+            output_chn2_2: int = 10,
+            kernel2_2: int = 3,
+            relu2_2: bool = False,
+            pool2_2: int = 0,
+            linear_layer: int = 2
         ) -> None:
             super().__init__()
             dimension1 = 22 - (kernel1 - 1)
             diemnsion2 = 22 - (kernel2 - 1)
             linear_size = (dimension1 * dimension1 * output_chn1) + (diemnsion2 * diemnsion2 * output_chn2)
             
-            self.avg_stack = nn.Sequential(
+            inter_linear1 = 2000
+            inter_linear2 = 500
+            
+            avg_layers = [
                 nn.Conv2d(1, output_chn1, kernel1)
-            )
+            ]
             
-            self.std_stack = nn.Sequential(
+            std_layers = [
                 nn.Conv2d(1, output_chn2, kernel2)
-            )
+            ]
             
-            self.joined_stack = nn.Sequential(
+            joined_layers = [
                 nn.Linear(linear_size, 500), 
                 nn.Linear(500, 2),
                 nn.Softmax(1)
-            )
+            ]
+            
+            self.avg_stack = nn.Sequential(*list(filter(lambda x: x is not None, avg_layers)))
+            self.std_stack = nn.Sequential(*list(filter(lambda x: x is not None, std_layers)))
+            self.joined_stack = nn.Sequential(*list(filter(lambda x: x is not None, joined_layers)))
+            
             
         def forward(self, avg: Tensor, std: Tensor) -> Tensor:
             avg_out = self.avg_stack(torch.unsqueeze(avg, 1))

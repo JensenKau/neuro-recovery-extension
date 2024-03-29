@@ -31,7 +31,7 @@ class PytorchModel(BaseMLModel):
         
         
     def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
-        with torch.device("cuda:0"):
+        with torch.device("cuda:0" if self.use_gpu else "cpu"):
             loss_fn = nn.CrossEntropyLoss()
             optimizer = torch.optim.Adam(self.model.parameters())
             
@@ -47,7 +47,7 @@ class PytorchModel(BaseMLModel):
             
             
     def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
-        with torch.device("cuda:0"):
+        with torch.device("cuda:0" if self.use_gpu else "cpu"):
             output = [None] * len(dataset_x)
             dataset_x, _ = self.extract_data(dataset_x, None)
             
@@ -76,7 +76,8 @@ class PytorchModel(BaseMLModel):
             self.epoch = self.parameters["epoch"]
         
         param_copy = self.parameters.copy()
-        del param_copy["epoch"]
+        if "epoch" in param_copy:
+            del param_copy["epoch"]
         
         self.model = self.model_class(**param_copy)
         if self.use_gpu:
@@ -94,7 +95,8 @@ class PytorchModel(BaseMLModel):
             self.epoch = kwargs["epoch"]
             
         param_copy = self.parameters.copy()
-        del param_copy["epoch"]
+        if "epoch" in param_copy:
+            del param_copy["epoch"]
         
         self.model = self.model_class(**param_copy)
         if self.use_gpu:

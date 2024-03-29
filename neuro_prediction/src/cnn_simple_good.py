@@ -6,13 +6,16 @@ import torch
 from mlmodels.base_mlmodel import BaseMLModel
 from mlmodels.cnn_simple_static import CnnSimpleStatic
 from mlmodels.cnn_simple_static2 import CnnSimpleStatic2
+from mlmodels.cnn_simple_static2_2 import CnnSimpleStatic2_2
 from mlmodels.cnn_simple import CnnSimple
 from mlmodels.svm_model import SVMModel
 from patientdata import PatientData, PatientDataset
 
 if __name__ == "__main__":
-    cnn = CnnSimpleStatic2()
+    cnn = CnnSimple()
     patient_dataset = PatientDataset.load_processed_dataset("balanced_connectivity.pkl")
+    
+    # cnn.initialize_model()
 
     # cnn.initialize_model()
     
