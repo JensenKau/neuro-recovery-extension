@@ -8,11 +8,12 @@ from mlmodels.cnn_simple_static import CnnSimpleStatic
 from mlmodels.cnn_simple_static2 import CnnSimpleStatic2
 from mlmodels.cnn_simple_static2_2 import CnnSimpleStatic2_2
 from mlmodels.cnn_simple import CnnSimple
+from mlmodels.cnn_simple2 import CnnSimple2
 from mlmodels.svm_model import SVMModel
 from patientdata import PatientData, PatientDataset
 
 if __name__ == "__main__":
-    cnn = CnnSimple()
+    cnn = CnnSimple2()
     patient_dataset = PatientDataset.load_processed_dataset("balanced_connectivity.pkl")
     
     # cnn.initialize_model()
@@ -29,7 +30,7 @@ if __name__ == "__main__":
     # print(res)
     # print(len(res))
     
-    cnn.tune_paramters(100, patient_dataset.get_dataset())
+    cnn.tune_paramters(200, patient_dataset.get_dataset())
     
     # print(torch.cuda.get_device_name())
     # print(torch.cuda.device())

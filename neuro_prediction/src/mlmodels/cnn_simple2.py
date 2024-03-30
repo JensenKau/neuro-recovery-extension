@@ -11,49 +11,60 @@ from mlmodels import BaseMLModel
 from .pytorch_model import PytorchModel
 from patientdata import PatientData
 
-class CnnSimple(PytorchModel):
+class CnnSimple2(PytorchModel):
     class InternalModel(nn.Module):
         def __init__(
             self,
-            output_chn1_1: int = 10,
+            output_chn1_1: int = 5,
             kernel1_1: int = 3,
             relu1_1: bool = False,
-            pool1_1: int = 0,
-            output_chn1_2: int = 10,
+            output_chn1_2: int = 5,
             kernel1_2: int = 3,
             relu1_2: bool = False,
-            pool1_2: int = 0,
-            output_chn2_1: int = 10,
+            pool1_1: int = 0,
+            output_chn2_1: int = 5,
             kernel2_1: int = 3,
             relu2_1: bool = False,
-            pool2_1: int = 0,
-            output_chn2_2: int = 10,
+            output_chn2_2: int = 5,
             kernel2_2: int = 3,
             relu2_2: bool = False,
-            pool2_2: int = 0,
+            pool2_1: int = 0,
             linear_layer: int = 2
         ) -> None:
             super().__init__()
-            dimension1 = 22 - (kernel1 - 1)
-            diemnsion2 = 22 - (kernel2 - 1)
-            linear_size = (dimension1 * dimension1 * output_chn1) + (diemnsion2 * diemnsion2 * output_chn2)
+
+            dimension1_1 = 22 - (kernel1_1 - 1)
+            dimension1_2 = dimension1_1 - (kernel1_2 - 1)
+            dimension1_3 = dimension1_2 if pool1_1 == 0 else int(((dimension1_2 - (pool1_1 - 1) - 1) / pool1_1) + 1)
             
-            inter_linear1 = 2000
-            inter_linear2 = 500
+            dimension2_1 = 22 - (kernel2_1 - 1)
+            dimension2_2 = dimension2_1 - (kernel2_2 - 1)
+            dimension2_3 = dimension2_2 if pool2_1 == 0 else int(((dimension2_2 - (pool2_1 - 1) - 1) / pool2_1) + 1)
+            
+            linear_size = (dimension1_3 * dimension1_3 * output_chn1_2) + (dimension2_3 * dimension2_3 * output_chn2_2)
             
             avg_layers = [
-                nn.Conv2d(1, output_chn1, kernel1)
+                nn.Conv2d(1, output_chn1_1, kernel1_1),
+                nn.ReLU() if relu1_1 else None,
+                nn.Conv2d(output_chn1_1, output_chn1_2, kernel1_2),
+                nn.ReLU() if relu1_2 else None,
+                nn.MaxPool2d(pool1_1) if pool1_1 > 0 else None
             ]
             
             std_layers = [
-                nn.Conv2d(1, output_chn2, kernel2)
+                nn.Conv2d(1, output_chn2_1, kernel2_1),
+                nn.ReLU() if relu2_1 else None,
+                nn.Conv2d(output_chn2_1, output_chn2_2, kernel2_2),
+                nn.ReLU() if relu2_2 else None,
+                nn.MaxPool2d(pool2_1) if pool2_1 > 0 else None
             ]
             
-            joined_layers = [
-                nn.Linear(linear_size, 500), 
-                nn.Linear(500, 2),
-                nn.Softmax(1)
-            ]
+            joined_layers = {
+                1: [nn.Linear(linear_size, 2)],
+                2: [nn.Linear(linear_size, 500), nn.Linear(500, 2)],
+                3: [nn.Linear(linear_size, 2000), nn.Linear(2000, 500), nn.Linear(500, 2)]
+            }[linear_layer]
+            joined_layers.append(nn.Softmax(1))
             
             self.avg_stack = nn.Sequential(*list(filter(lambda x: x is not None, avg_layers)))
             self.std_stack = nn.Sequential(*list(filter(lambda x: x is not None, std_layers)))
@@ -71,7 +82,7 @@ class CnnSimple(PytorchModel):
         
     
     def __init__(self) -> None:
-        super().__init__("cnn_simple", self.InternalModel)
+        super().__init__("cnn_simple_2", self.InternalModel)
         self.model = None
         self.params = None
         
@@ -105,10 +116,26 @@ class CnnSimple(PytorchModel):
     
     def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
         epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300])
-        output_chn1 = trial.suggest_int("output_chn1", 2, 15)
-        kernel1 = trial.suggest_int("kernel1", 2, 5)
-        output_chn2 = trial.suggest_int("output_chn2", 2, 15)
-        kernel2 = trial.suggest_int("kernel2", 2, 5)
+        
+        output_chn1_1 = trial.suggest_int("output_chn1_1", 2, 10)
+        kernel1_1 = trial.suggest_int("kernel1_1", 2, 5)
+        relu1_1 = trial.suggest_categorical("relu1_1", [True, False])
+        
+        output_chn1_2 = trial.suggest_int("output_chn1_2", 2, 15)
+        kernel1_2 = trial.suggest_int("kernel1_2", 2, 5)
+        relu1_2 = trial.suggest_categorical("relu1_2", [True, False])
+        pool1_1 = trial.suggest_int("pool1_1", 0, 5)
+        
+        output_chn2_1 = trial.suggest_int("output_chn2_1", 2, 10)
+        kernel2_1 = trial.suggest_int("kernel2_1", 2, 5)
+        relu2_1 = trial.suggest_categorical("relu2_1", [True, False])
+        
+        output_chn2_2 = trial.suggest_int("output_chn2_2", 2, 15)
+        kernel2_2 = trial.suggest_int("kernel2_2", 2, 5)
+        relu2_2 = trial.suggest_categorical("relu2_2", [True, False])
+        pool2_1 = trial.suggest_int("pool2_1", 0, 5)
+        
+        linear_layer = trial.suggest_int("linear_layer", 1, 3)
         
         for t in trial.study.trials:
             if t.state != optuna.trial.TrialState.COMPLETE:
@@ -116,16 +143,8 @@ class CnnSimple(PytorchModel):
             if t.params == trial.params:
                 raise optuna.TrialPruned('Duplicate parameter set')
     
-        model_copy = CnnSimple()
-        model_copy.initialize_model(
-            **{
-                "epoch": epoch,
-                "output_chn1": output_chn1,
-                "kernel1": kernel1,
-                "output_chn2": output_chn2,
-                "kernel2": kernel2,
-            }
-        )
+        model_copy = CnnSimple2()
+        model_copy.initialize_model(**trial.params)
         
         model_copy.k_fold(dataset)
         
