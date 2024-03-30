@@ -7,8 +7,8 @@ import torch
 from torch import nn, Tensor
 import numpy as np
 
-from .base_mlmodel import BaseMLModel
-from patientdata import PatientData
+from src.mlmodels.base_mlmodel import BaseMLModel
+from src.patientdata.patient_data import PatientData
 
 
 class PytorchModel(BaseMLModel):

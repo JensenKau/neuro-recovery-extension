@@ -7,9 +7,9 @@ import optuna
 import torch
 from torch import nn, Tensor
 
-from mlmodels import BaseMLModel
-from .pytorch_model import PytorchModel
-from patientdata import PatientData
+from src.mlmodels import BaseMLModel
+from src.mlmodels.pytorch_models.pytorch_model import PytorchModel
+from src.patientdata.patient_data import PatientData
 
 class CnnSimple2(PytorchModel):
     class InternalModel(nn.Module):

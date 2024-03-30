@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Tuple
 from numpy.typing import NDArray
 
-from .eeg_data import PatientEEGData
+from src.patientdata.eeg_data import PatientEEGData
 
 import numpy as np
 import scipy
