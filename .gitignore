@@ -17,3 +17,6 @@ trained_models/
 
 # db file
 *.db
+
+# environments
+.env
