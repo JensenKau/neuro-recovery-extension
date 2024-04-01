@@ -7,8 +7,8 @@ import numpy as np
 from optuna import Trial
 from sklearn.svm import SVC
 
-from patientdata.patient_data import PatientData
-from .base_mlmodel import BaseMLModel
+from src.patientdata.patient_data import PatientData
+from src.mlmodels.base_mlmodel import BaseMLModel
 
 class SVMModel(BaseMLModel):
     def __init__(self) -> None:

@@ -9,9 +9,9 @@ import optuna
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
-from patientdata.patient_data import PatientData
-from .model_performance import ModelPerformance
-from .dataset_split import DatasetSplit
+from src.patientdata.patient_data import PatientData
+from src.mlmodels.model_performance import ModelPerformance
+from src.mlmodels.dataset_split import DatasetSplit
 
 class BaseMLModel(ABC):
     SEED1 = 123
@@ -248,7 +248,7 @@ class BaseMLModel(ABC):
     def tune_paramters(self, iteration: int, dataset: List[PatientData]) -> None:
         study = optuna.create_study(
             study_name=self.model_name,
-            storage=f"sqlite:///../../{self.model_name}.db",
+            storage=f"sqlite:////root/neuro-recovery-prediction/training_db/{self.model_name}.db",
             direction="maximize", 
             load_if_exists=True,
         )
@@ -259,7 +259,7 @@ class BaseMLModel(ABC):
         
         def save_best_trial(study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
             if study.best_trial.number == trial.number:
-                self.optuna_model_copy.save_k_fold(f"../../trained_models/{self.optuna_model_copy.model_name}")  
+                self.optuna_model_copy.save_k_fold(f"/root/neuro-recovery-prediction/trained_models/{self.optuna_model_copy.model_name}")  
         
         study.optimize(
             func=model_objective, 

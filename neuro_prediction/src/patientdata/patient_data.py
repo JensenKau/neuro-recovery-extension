@@ -5,10 +5,10 @@ from numpy.typing import NDArray
 import math
 from enum import Enum
 
-from .eeg_data import PatientEEGData
-from .meta_data import PatientMetaData
-from .connectivity_data import PatientConnectivityData
-from .data_enum import PatientOutcome, PatientSex
+from src.patientdata.eeg_data import PatientEEGData
+from src.patientdata.meta_data import PatientMetaData
+from src.patientdata.connectivity_data import PatientConnectivityData
+from src.patientdata.data_enum import PatientOutcome, PatientSex
 
 class PatientData:
     def __init__(self, eeg: PatientEEGData, meta: PatientMetaData) -> None:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .data_enum import PatientOutcome, PatientSex
+from src.patientdata.data_enum import PatientOutcome, PatientSex
 
 class PatientMetaData:
     def __init__(self, patient_id: int, hospital: str, age: int, sex: PatientSex, rosc: float, ohca: bool, shockable_rhythm: bool, ttm: int, outcome: PatientOutcome, cpc: int) -> None:

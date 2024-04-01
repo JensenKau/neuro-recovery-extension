@@ -4,8 +4,7 @@ from numpy.typing import NDArray
 
 import os
 import dill
-from .patient_data import PatientData
-from .data_enum import PatientOutcome, PatientSex
+from src.patientdata.patient_data import PatientData
 
 class PatientDataset:
     def __init__(self, dataset: List[PatientData]) -> None:

@@ -3,6 +3,7 @@ data/
 
 #Training folder
 trained_models/
+training_db/
 
 # Extra Things to Remove
 .dotnet/
