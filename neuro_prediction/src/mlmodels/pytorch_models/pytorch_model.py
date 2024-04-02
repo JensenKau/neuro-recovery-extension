@@ -101,6 +101,10 @@ class PytorchModel(BaseMLModel):
         self.model = self.model_class(**param_copy)
         if self.use_gpu:
             self.model.cuda()
+            
+            
+    def delete_model(self) -> None:
+        self.model = None
         
         
     def create_model_copy(self) -> BaseMLModel:

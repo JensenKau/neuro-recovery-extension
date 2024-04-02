@@ -1,6 +1,10 @@
 # Data folder
 data/
 
+# Temp folder
+temp/
+tmp/
+
 #Training folder
 trained_models/
 training_db/
