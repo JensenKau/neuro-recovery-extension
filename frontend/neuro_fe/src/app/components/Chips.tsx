@@ -24,7 +24,7 @@ const Chips = ({ items, icon: Icon, clicked }: Props) => {
         </p>
       )}
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginLeft: '40px'}}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginLeft: '40px', marginRight: '20px'}}>
         {items.map((item, index) => (
           <Chip
             key={index}
@@ -33,6 +33,7 @@ const Chips = ({ items, icon: Icon, clicked }: Props) => {
             onClick={clicked}
             sx={{
               height: "55px",
+              width: "250px",
               fontSize: "1.2rem",
               padding: "0 50px",
               backgroundColor: "#bae6fd",
