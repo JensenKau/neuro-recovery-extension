@@ -1,20 +1,25 @@
 "use client";
-import React from "react";
+import React, {ComponentType} from "react";
 import { useState } from "react";
-import AddIcon from "@mui/icons-material/Add";
 import Folder from "@mui/icons-material/Folder";
-import AddPatient from "./Add";
 import Chips from "./Chips";
+import {FormProps} from "./PatientForm"
 
-const MyItems = () => {
-  const [patientNames, setPatientNames] = useState<string[]>([]);
-  const addItem = () => {
-    setPatientNames(patientNames.concat(["New Patient"]));
+interface Props{
+  children: string;
+  initialItems: string[];
+  FormButtonComponent?: ComponentType<FormProps>;
+  FormButtonProps?: FormProps;
+}
+
+const MyItems = ({children, initialItems, FormButtonComponent, FormButtonProps}: Props) => {
+  const [items, setItems] = useState<string[]>(initialItems);
+  const handleFormSubmit = (email: string) => {
+    setItems(currentItems => [...currentItems, email]);
   };
-  console.log(patientNames);
 
   return (
-    <>
+    <div style={{marginBottom: "65px"}}>
       <div
         style={{
           marginLeft: "45px",
@@ -23,14 +28,12 @@ const MyItems = () => {
           justifyContent: "space-between",
         }}
       >
-        <span style={{ color: "blue", fontSize: "30px" }}>My Patients</span>
-        <AddPatient icon={AddIcon} clicked={addItem}>
-          Add Patient
-        </AddPatient>
+        <span style={{ color: "blue", fontSize: "30px" }}>{children}</span>
+        {FormButtonComponent === undefined || FormButtonProps === undefined? <span></span>: <FormButtonComponent {...FormButtonProps} onSubmit={handleFormSubmit}/>}
       </div>
-
-      <Chips items={patientNames} icon={Folder} />
-    </>
+      
+      <Chips items={items} icon={Folder} />
+    </div>
   );
 };
 
