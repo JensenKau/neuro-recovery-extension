@@ -12,77 +12,69 @@ from src.mlmodels.base_mlmodel import BaseMLModel
 from src.mlmodels.pytorch_models.pytorch_model import PytorchModel
 from src.patientdata.patient_data import PatientData
 
-class CnnHybrid2(PytorchModel):
+class CnnHybrid1_2(PytorchModel):
     class InternalModel(nn.Module):
         def __init__(
             self,
             output_chn1_1: int = 5,
             kernel1_1: int = 3,
             relu1_1: bool = False,
-            output_chn1_2: int = 5,
-            kernel1_2: int = 3,
-            relu1_2: bool = False,
             pool1_1: int = 0,
             output_chn2_1: int = 5,
             kernel2_1: int = 3,
             relu2_1: bool = False,
-            output_chn2_2: int = 5,
-            kernel2_2: int = 3,
-            relu2_2: bool = False,
             pool2_1: int = 0,
             output_chn3_1: int = 5,
             kernel3_1: int = 5,
             relu3_1: int = False,
-            output_chn3_2: int = 5,
-            kernel3_2: int = 5,
-            relu3_2: bool = False,
             pool3_1: int = 5,
             linear_layer: int = 2
         ) -> None:
             super().__init__()
 
-            dimension1 = 22 - (kernel1_1 - 1)
-            dimension1 = dimension1 - (kernel1_2 - 1)
-            dimension1 = math.floor(((dimension1 - (pool1_1 - 1) - 1) / pool1_1) + 1)
+            linear1 = 22 - (kernel1_1 - 1)
+            linear1 = math.floor(((linear1 - pool1_1) / pool1_1) + 1)
+            linear1 = 22 * output_chn1_1 * linear1
             
-            dimension2 = 22 - (kernel2_1 - 1)
-            dimension2 = dimension2 - (kernel2_2 - 1)
-            dimension2 = math.floor(((dimension2 - (pool2_1 - 1) - 1) / pool2_1) + 1)
+            linear2 = 22 - (kernel2_1 - 1)
+            linear2 = math.floor(((linear2 - pool2_1) / pool2_1) + 1)
+            linear2 = 22 * output_chn2_1 * linear2
             
-            dimension3 = 22 - (kernel3_1 - 1)
-            dimension3 = dimension3 - (kernel3_2 - 1)
-            dimension3 = math.floor(((dimension3 - (pool3_1 - 1) - 1) / pool3_1) + 1)
-            
-            linear_size = (dimension1 ** 2 * output_chn1_2) + (dimension2 ** 2 * output_chn2_2) + (dimension3 ** 2 * output_chn3_2)
+            linear3 = 22 - (kernel3_1 - 1)
+            linear3 = math.floor(((linear3 - pool3_1) / pool3_1) + 1)
+            linear3 = 22 * output_chn3_1 * linear3
             
             avg_layers = [
-                nn.Conv2d(1, output_chn1_1, kernel1_1),
+                nn.Conv2d(1, output_chn1_1, (1, kernel1_1)),
                 nn.ReLU() if relu1_1 else None,
-                nn.Conv2d(output_chn1_1, output_chn1_2, kernel1_2),
-                nn.ReLU() if relu1_2 else None,
-                nn.MaxPool2d(pool1_1) if pool1_1 > 1 else None
+                nn.BatchNorm2d(output_chn1_1),
+                nn.AvgPool2d((1, pool1_1)) if pool1_1 > 1 else None,
+                nn.Flatten(),
+                nn.Linear(linear1, 1500)
             ]
             
             std_layers = [
-                nn.Conv2d(1, output_chn2_1, kernel2_1),
+                nn.Conv2d(1, output_chn2_1, (1, kernel2_1)),
                 nn.ReLU() if relu2_1 else None,
-                nn.Conv2d(output_chn2_1, output_chn2_2, kernel2_2),
-                nn.ReLU() if relu2_2 else None,
-                nn.MaxPool2d(pool2_1) if pool2_1 > 1 else None
+                nn.BatchNorm2d(output_chn2_1),
+                nn.AvgPool2d((1, pool2_1)) if pool2_1 > 1 else None,
+                nn.Flatten(),
+                nn.Linear(linear2, 1500),
             ]
             
             static_layers = [
-                nn.Conv2d(1, output_chn3_1, kernel3_1),
+                nn.Conv2d(1, output_chn3_1, (1, kernel3_1)),
                 nn.ReLU() if relu3_1 else None,
-                nn.Conv2d(output_chn3_1, output_chn3_2, kernel3_2),
-                nn.ReLU() if relu3_2 else None,
-                nn.MaxPool2d(pool3_1) if pool3_1 > 1 else None
+                nn.BatchNorm2d(output_chn3_1),
+                nn.AvgPool2d((1, pool3_1)) if pool3_1 > 1 else None,
+                nn.Flatten(),
+                nn.Linear(linear3, 1500)
             ]
             
-            joined_layers = [nn.BatchNorm1d(1), nn.Flatten()] + {
-                1: [nn.Linear(linear_size, 2)],
-                2: [nn.Linear(linear_size, 500), nn.Linear(500, 2)],
-                3: [nn.Linear(linear_size, 2000), nn.Linear(2000, 500), nn.Linear(500, 2)]
+            joined_layers = {
+                1: [nn.Linear(4500, 2)],
+                2: [nn.Linear(4500, 500), nn.Linear(500, 2)],
+                3: [nn.Linear(4500, 2000), nn.Linear(2000, 500), nn.Linear(500, 2)]
             }[linear_layer]
             joined_layers.append(nn.Softmax(1))
             
@@ -97,14 +89,14 @@ class CnnHybrid2(PytorchModel):
             std_out = self.std_stack(torch.unsqueeze(std, 1))
             static_out = self.static_stack(torch.unsqueeze(static, 1))
             
-            joined_out = torch.cat((torch.flatten(avg_out, 1), torch.flatten(std_out, 1), torch.flatten(static_out, 1)), 1).unsqueeze(1)
+            joined_out = torch.cat((avg_out, std_out, static_out), 1)
             joined_out = self.joined_stack(joined_out)
             
             return joined_out
         
     
     def __init__(self) -> None:
-        super().__init__("cnn_hybrid_2", self.InternalModel)
+        super().__init__("cnn_hybrid_1_2", self.InternalModel)
         self.model = None
         self.params = None
         
@@ -138,33 +130,21 @@ class CnnHybrid2(PytorchModel):
     
     
     def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
-        epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300, 350, 400, 450, 500])
+        epoch = trial.suggest_int("epoch", 100, 500)
         
-        output_chn1_1 = trial.suggest_int("output_chn1_1", 2, 10)
-        kernel1_1 = trial.suggest_int("kernel1_1", 2, 5)
+        output_chn1_1 = trial.suggest_int("output_chn1_1", 2, 20)
+        kernel1_1 = trial.suggest_int("kernel1_1", 1, 5)
         relu1_1 = trial.suggest_categorical("relu1_1", [True, False])
-        
-        output_chn1_2 = trial.suggest_int("output_chn1_2", 2, 20)
-        kernel1_2 = trial.suggest_int("kernel1_2", 2, 5)
-        relu1_2 = trial.suggest_categorical("relu1_2", [True, False])
         pool1_1 = trial.suggest_int("pool1_1", 1, 5)
         
-        output_chn2_1 = trial.suggest_int("output_chn2_1", 2, 10)
-        kernel2_1 = trial.suggest_int("kernel2_1", 2, 5)
+        output_chn2_1 = trial.suggest_int("output_chn2_1", 2, 20)
+        kernel2_1 = trial.suggest_int("kernel2_1", 1, 5)
         relu2_1 = trial.suggest_categorical("relu2_1", [True, False])
-        
-        output_chn2_2 = trial.suggest_int("output_chn2_2", 2, 20)
-        kernel2_2 = trial.suggest_int("kernel2_2", 2, 5)
-        relu2_2 = trial.suggest_categorical("relu2_2", [True, False])
         pool2_1 = trial.suggest_int("pool2_1", 1, 5)
         
-        output_chn3_1 = trial.suggest_int("output_chn3_1", 2, 10)
-        kernel3_1 = trial.suggest_int("kernel3_1", 2, 5)
+        output_chn3_1 = trial.suggest_int("output_chn3_1", 2, 20)
+        kernel3_1 = trial.suggest_int("kernel3_1", 1, 5)
         relu3_1 = trial.suggest_categorical("relu3_1", [True, False])
-        
-        output_chn3_2 = trial.suggest_int("output_chn3_2", 2, 20)
-        kernel3_2 = trial.suggest_int("kernel3_2", 2, 5)
-        relu3_2 = trial.suggest_categorical("relu3_2", [True, False])
         pool3_1 = trial.suggest_int("pool3_1", 1, 5)
         
         linear_layer = trial.suggest_int("linear_layer", 1, 3)
@@ -175,7 +155,7 @@ class CnnHybrid2(PytorchModel):
             if t.params == trial.params:
                 raise optuna.TrialPruned('Duplicate parameter set')
     
-        model_copy = CnnHybrid2()
+        model_copy = CnnHybrid1_2()
         model_copy.initialize_model(**trial.params)
         
         model_copy.k_fold(dataset)
