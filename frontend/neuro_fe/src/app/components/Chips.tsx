@@ -12,19 +12,10 @@ const Chips = ({ items, icon: Icon, clicked }: Props) => {
   return (
     <>
       {items.length === 0 && (
-        <p
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          No item found
-        </p>
+        <p className="flex justify-center items-center w-full">No item found</p>
       )}
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginLeft: '40px', marginRight: '20px'}}>
+      <div className="flex flex-wrap gap-2.5 ml-10 mr-5">
         {items.map((item, index) => (
           <Chip
             key={index}

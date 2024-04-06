@@ -7,14 +7,9 @@ interface Props {
 const WelcomeMessage = ({ name }: Props) => {
   return (
     <div
-      style={{
-        marginTop: "10px",
-        marginBottom: "30px",
-        marginLeft: "40px",
-        fontSize: "40px",
-      }}
+    className="ml-10 mb-10 text-5xl"
     >
-      Welcome Back, <span style={{ color: "blue" }}>{name}</span>
+      Welcome Back, <span className="text-blue-600">{name}</span>
     </div>
   );
 };

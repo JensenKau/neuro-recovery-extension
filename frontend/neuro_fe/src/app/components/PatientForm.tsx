@@ -100,12 +100,7 @@ export default function Form({
             fullWidth
             variant="outlined"
           />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className="flex justify-between">
             <TextField
               autoFocus
               required
@@ -148,12 +143,7 @@ export default function Form({
             inputProps={{ step: 0.01, min: 0 }}
             fullWidth
           />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+          <div className="flex justify-between">
             <FormControl sx={{ flex: 1, marginTop: "8px" }}>
               <InputLabel id="ohca">OHCA</InputLabel>
               <Select
