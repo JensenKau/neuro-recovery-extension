@@ -1,16 +1,12 @@
 from __future__ import annotations
-from typing import Any, List, Tuple, Dict
+from typing import Any, List, Dict
 import math
 
 from optuna import Trial
-import optuna
 import torch
 from torch import nn, Tensor
-import numpy as np
 
-from src.patientdata.patient_data import PatientData
 from src.mlmodels.pytorch_models.static.static_model import StaticModel
-from src.mlmodels.base_mlmodel import BaseMLModel
 
 
 class CnnStaticFlex3_Dense(StaticModel):
@@ -63,7 +59,7 @@ class CnnStaticFlex3_Dense(StaticModel):
         super().__init__("cnn_static_flex_3_dense", self.InternalModel)
     
     
-    def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
+    def objective(self, trial: Trial) -> Dict[str, Any]:
         epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300, 350, 400, 450, 500])
         cnn_layers = trial.suggest_int("cnn_layers", 1, 3)
         linear_layers = trial.suggest_int("linear_layers", 1, 5)
@@ -86,22 +82,11 @@ class CnnStaticFlex3_Dense(StaticModel):
                 "dropout": dropout
             }
         
-        for t in trial.study.trials:
-            if t.state != optuna.trial.TrialState.COMPLETE:
-                continue
-            if t.params == trial.params:
-                raise optuna.TrialPruned('Duplicate parameter set')
-    
-        model_copy = CnnStaticFlex3_Dense()
-        model_copy.initialize_model(**{
+        return {
             "epoch": epoch,
             "cnn_conf": cnn_conf,
             "linear_conf": linear_conf
-        })
-        
-        model_copy.k_fold(dataset)
-        
-        return model_copy
+        }
     
     
 

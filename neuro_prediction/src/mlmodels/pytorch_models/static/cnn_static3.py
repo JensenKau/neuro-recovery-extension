@@ -1,16 +1,12 @@
 from __future__ import annotations
-from typing import Any, List, Tuple
+from typing import Dict, Any
 import math
 
 from optuna import Trial
-import optuna
 import torch
 from torch import nn, Tensor
-import numpy as np
 
-from src.patientdata.patient_data import PatientData
 from src.mlmodels.pytorch_models.static.static_model import StaticModel
-from src.mlmodels.base_mlmodel import BaseMLModel
 
 
 class CnnStatic3(StaticModel):
@@ -73,7 +69,7 @@ class CnnStatic3(StaticModel):
         super().__init__("cnn_static3", self.InternalModel)
     
     
-    def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
+    def objective(self, trial: Trial) -> Dict[str, Any]:
         epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300])
         out_chn1 = trial.suggest_int("out_chn1", 2, 10)
         kernel1 = trial.suggest_int("kernel1", 2, 5)
@@ -90,18 +86,7 @@ class CnnStatic3(StaticModel):
         pooling = trial.suggest_int("pooling", 1, 5)
         linear_layers = trial.suggest_int("linear_layers", 1, 3)
         
-        for t in trial.study.trials:
-            if t.state != optuna.trial.TrialState.COMPLETE:
-                continue
-            if t.params == trial.params:
-                raise optuna.TrialPruned('Duplicate parameter set')
-    
-        model_copy = CnnStatic3()
-        model_copy.initialize_model(**trial.params)
-        
-        model_copy.k_fold(dataset)
-        
-        return model_copy
+        return trial.params
     
     
 

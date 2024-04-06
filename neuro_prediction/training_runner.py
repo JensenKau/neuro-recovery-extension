@@ -23,8 +23,3 @@ if __name__ == "__main__":
     
     # cnn.tune_paramters(500, patient_dataset.get_dataset())
     # cnn.clear_tmp_folder()
-    
-    # ten1 = torch.randn((1, 2, 4, 4))
-    # ten2 = torch.randn((1, 3, 2, 2))
-    
-    # print(torch.cat((ten1, ten2), 1).shape)

@@ -1,15 +1,11 @@
 from __future__ import annotations
-from typing import List, Any, Tuple
+from typing import Any, Dict
 
-import numpy as np
 from optuna import Trial
-import optuna
 import torch
 from torch import nn, Tensor
 
-from src.mlmodels import BaseMLModel
 from src.mlmodels.pytorch_models.dynamic.dynamic_model import DynamicModel
-from src.patientdata.patient_data import PatientData
 
 class CnnSimple(DynamicModel):
     class InternalModel(nn.Module):
@@ -53,33 +49,14 @@ class CnnSimple(DynamicModel):
         super().__init__("cnn_simple", self.InternalModel)
     
     
-    def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
+    def objective(self, trial: Trial) -> Dict[str, Any]:
         epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300])
         output_chn1 = trial.suggest_int("output_chn1", 2, 15)
         kernel1 = trial.suggest_int("kernel1", 2, 5)
         output_chn2 = trial.suggest_int("output_chn2", 2, 15)
         kernel2 = trial.suggest_int("kernel2", 2, 5)
         
-        for t in trial.study.trials:
-            if t.state != optuna.trial.TrialState.COMPLETE:
-                continue
-            if t.params == trial.params:
-                raise optuna.TrialPruned('Duplicate parameter set')
-    
-        model_copy = CnnSimple()
-        model_copy.initialize_model(
-            **{
-                "epoch": epoch,
-                "output_chn1": output_chn1,
-                "kernel1": kernel1,
-                "output_chn2": output_chn2,
-                "kernel2": kernel2,
-            }
-        )
-        
-        model_copy.k_fold(dataset)
-        
-        return model_copy
+        return trial.params
         
         
 if __name__ == "__main__":

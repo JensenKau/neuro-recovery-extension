@@ -1,16 +1,12 @@
 from __future__ import annotations
-from typing import List, Any, Tuple
+from typing import Any, Dict
 import math
 
-import numpy as np
 from optuna import Trial
-import optuna
 import torch
 from torch import nn, Tensor
 
-from src.mlmodels.base_mlmodel import BaseMLModel
 from src.mlmodels.pytorch_models.hybrid.hybrid_model import HybridModel
-from src.patientdata.patient_data import PatientData
 
 class CnnHybrid(HybridModel):
     class InternalModel(nn.Module):
@@ -89,7 +85,7 @@ class CnnHybrid(HybridModel):
         super().__init__("cnn_hybrid", self.InternalModel)
     
     
-    def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
+    def objective(self, trial: Trial) -> Dict[str, Any]:
         epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300])
         
         output_chn1_1 = trial.suggest_int("output_chn1_1", 2, 20)
@@ -109,18 +105,7 @@ class CnnHybrid(HybridModel):
         
         linear_layer = trial.suggest_int("linear_layer", 1, 3)
         
-        for t in trial.study.trials:
-            if t.state != optuna.trial.TrialState.COMPLETE:
-                continue
-            if t.params == trial.params:
-                raise optuna.TrialPruned('Duplicate parameter set')
-    
-        model_copy = CnnHybrid()
-        model_copy.initialize_model(**trial.params)
-        
-        model_copy.k_fold(dataset)
-        
-        return model_copy
+        return trial.params
         
         
 if __name__ == "__main__":

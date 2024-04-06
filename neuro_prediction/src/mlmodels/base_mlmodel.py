@@ -93,7 +93,7 @@ class BaseMLModel(ABC):
     
     
     @abstractmethod
-    def objective(self, trial: optuna.trial.Trial, dataset: List[PatientData]) -> BaseMLModel:
+    def objective(self, trial: optuna.trial.Trial) -> Dict[str, Any]:
         pass
     
     
@@ -281,7 +281,16 @@ class BaseMLModel(ABC):
         )
         
         def model_objective(trial: optuna.trial.Trial) -> float:
-            self.optuna_model_copy = self.objective(trial, dataset)
+            formatted_params = self.objective(trial)
+            
+            for t in trial.study.trials:
+                if t.state == optuna.trial.TrialState.COMPLETE and t.params == trial.params:
+                    raise optuna.TrialPruned('Duplicate parameter set')
+                
+            self.optuna_model_copy = self.__class__()
+            self.optuna_model_copy.initialize_model(**formatted_params)
+            self.optuna_model_copy.k_fold(dataset)   
+            
             return self.optuna_model_copy.get_k_fold_performances()["avg"].get_acc()
         
         def save_best_trial(study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
@@ -296,8 +305,10 @@ class BaseMLModel(ABC):
             func=model_objective, 
             n_trials=iteration,
             callbacks=[save_best_trial]
-        )
+        )        
             
+
+
 
 if __name__ == "__main__":
     pass
