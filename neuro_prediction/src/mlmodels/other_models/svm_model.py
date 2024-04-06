@@ -26,7 +26,7 @@ class SVMModel(BaseMLModel):
         return output
     
     
-    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
+    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any], validation_x: List[Any] = None, validation_y: List[Any] = None) -> None:
         self.model.fit(dataset_x, dataset_y)
     
     

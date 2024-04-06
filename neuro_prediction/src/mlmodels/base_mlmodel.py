@@ -37,9 +37,15 @@ class BaseMLModel(ABC):
         self.optuna_model_copy = None
 
 
-    def train_model(self, dataset: List[PatientData]) -> None:
+    def train_model(self, dataset: List[PatientData], validation: List[PatientData] = None) -> None:
         dataset_x, dataset_y = self.reshape_input(dataset)
-        self.train_model_aux(dataset_x, dataset_y)
+        validation_x = None
+        validation_y = None
+        
+        if validation is not None:
+            validation_x, validation_y = self.reshape_input(validation)
+        
+        self.train_model_aux(dataset_x, dataset_y, validation_x, validation_y)
 
         
     def predict_result(self, dataset: List[PatientData]) -> List[Tuple[float, float]]:
@@ -48,7 +54,7 @@ class BaseMLModel(ABC):
 
     
     @abstractmethod
-    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
+    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any], validation_x: List[Any] = None, validation_y: List[Any] = None) -> None:
         pass
 
     
@@ -209,7 +215,7 @@ class BaseMLModel(ABC):
                 train_x, train_y = train_sets[j]
                 val_x, val_y = val_sets[j]
                 models[j] = current_model
-                current_model.train_model_aux(train_x, train_y)
+                current_model.train_model_aux(train_x, train_y, val_x, val_y)
                 pred_y = list(map(lambda x: x[0], current_model.predict_result_aux(val_x)))
                 performances[j] = ModelPerformance.generate_performance(self.dataset_y_classification_num(val_y), pred_y)
                 current_model.uninitialize_model()

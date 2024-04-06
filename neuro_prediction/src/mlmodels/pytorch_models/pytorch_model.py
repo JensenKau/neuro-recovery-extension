@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List, Any, Tuple, Callable
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import json
 
 import torch
@@ -15,14 +15,35 @@ class PytorchModel(BaseMLModel):
     INITIALIZE_SEED = 123
     USE_GPU = torch.cuda.is_available()
     
-    def __init__(self, model_name: str, model_class: Callable, use_cpc: bool = False, use_gpu: bool = True) -> None:
+    
+    class EarlyStopper:
+        def __init__(self, patience: int = 1, min_delta: int = 0) -> None:
+            self.patience = patience
+            self.min_delta = min_delta
+            self.counter = 0
+            self.min_validation_loss = float('inf')
+
+        def early_stop(self, validation_loss: float) -> bool:
+            if validation_loss < self.min_validation_loss:
+                self.min_validation_loss = validation_loss
+                self.counter = 0
+            elif validation_loss > (self.min_validation_loss + self.min_delta):
+                self.counter += 1
+                if self.counter >= self.patience:
+                    return True
+            return False
+    
+    
+    
+    
+    def __init__(self, model_name: str, model_class: Callable[..., nn.Module], use_cpc: bool = False, use_gpu: bool = True) -> None:
         super().__init__(f"pytorch_{model_name}")
         self.use_gpu = use_gpu and self.USE_GPU
         self.model_class = model_class
         self.model = None
         self.parameters = None
         self.use_cpc = use_cpc
-        self.epoch = 100
+        self.epoch = 1000
         
         
     @abstractmethod
@@ -30,21 +51,39 @@ class PytorchModel(BaseMLModel):
         pass
         
         
-    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
+    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any], validation_x: List[Any] = None, validation_y: List[Any] = None) -> None:
         with torch.device("cuda:0" if self.use_gpu else "cpu"):
             loss_fn = nn.CrossEntropyLoss()
-            optimizer = torch.optim.Adam(self.model.parameters())
+            optimizer = torch.optim.Adam(self.model.parameters(), 1e-4)
+            stopper = self.EarlyStopper(3)
             
             dataset_x, dataset_y = self.extract_data(dataset_x, dataset_y)
+            
+            if validation_x is not None and validation_y is not None:
+                validation_x, validation_y = self.extract_data(validation_x, validation_y)
+                
+            self.model.eval()
+            with torch.inference_mode():
+                y_pred = self.model(*validation_x)
+                loss = loss_fn(y_pred, validation_y)
+                stopper.early_stop(loss.item())
                     
-            self.model.train()
             for epoch in range(self.epoch):
+                self.model.train()
+                
                 y_pred = self.model(*dataset_x)
                 loss = loss_fn(y_pred, dataset_y)
-                print(loss)
+                
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
+                
+                self.model.eval()
+                with torch.inference_mode():
+                    y_pred = self.model(*validation_x)
+                    loss = loss_fn(y_pred, validation_y)
+                    if stopper.early_stop(loss.item()):
+                        break
             
             
     def predict_result_aux(self, dataset_x: List[Any]) -> List[Tuple[float, float]]:
@@ -73,12 +112,7 @@ class PytorchModel(BaseMLModel):
         with open(filename.replace(".pt", ".json"), "r", encoding="utf-8") as file:
             self.parameters = dict(json.load(file))
         
-        if "epoch" in self.parameters:
-            self.epoch = self.parameters["epoch"]
-        
         param_copy = self.parameters.copy()
-        if "epoch" in param_copy:
-            del param_copy["epoch"]
         
         self.model = self.model_class(**param_copy)
         if self.use_gpu:
@@ -92,12 +126,8 @@ class PytorchModel(BaseMLModel):
         torch.cuda.manual_seed_all(self.INITIALIZE_SEED)
         
         self.parameters = kwargs
-        if "epoch" in kwargs:
-            self.epoch = kwargs["epoch"]
             
         param_copy = self.parameters.copy()
-        if "epoch" in param_copy:
-            del param_copy["epoch"]
         
         self.model = self.model_class(**param_copy)
         if self.use_gpu:

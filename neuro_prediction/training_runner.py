@@ -15,11 +15,11 @@ if __name__ == "__main__":
     cnn = CnnSimpleStatic()
     patient_dataset = PatientDataset.load_processed_dataset("src/balanced_connectivity.pkl")
     
-    
+    # cnn.initialize_model()
     # cnn.k_fold(patient_dataset.get_dataset())
     # # cnn.save_k_fold("../../trained_models/test_save2", BaseMLModel.SAVE_MODE.ALL)
     
     # print(cnn.get_k_fold_performances()["avg"])
     
-    # cnn.tune_paramters(500, patient_dataset.get_dataset())
-    # cnn.clear_tmp_folder()
+    cnn.tune_paramters(100, patient_dataset.get_dataset())
+    cnn.clear_tmp_folder()

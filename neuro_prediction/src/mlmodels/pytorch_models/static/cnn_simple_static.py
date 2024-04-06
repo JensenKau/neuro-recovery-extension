@@ -38,9 +38,8 @@ class CnnSimpleStatic(StaticModel):
     
     
     def objective(self, trial: Trial) -> Dict[str, Any]:
-        epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300])
         output_chn = trial.suggest_int("output_chn", 2, 10)
-        kernel = trial.suggest_int("kernel", 2, 10)
+        kernel = trial.suggest_int("kernel", 1, 10)
         
         return trial.params
     
