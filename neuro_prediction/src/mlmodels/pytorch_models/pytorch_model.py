@@ -41,6 +41,7 @@ class PytorchModel(BaseMLModel):
             for epoch in range(self.epoch):
                 y_pred = self.model(*dataset_x)
                 loss = loss_fn(y_pred, dataset_y)
+                print(loss)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()

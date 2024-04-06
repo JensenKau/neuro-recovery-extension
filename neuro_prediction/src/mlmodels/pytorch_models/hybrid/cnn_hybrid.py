@@ -9,10 +9,10 @@ import torch
 from torch import nn, Tensor
 
 from src.mlmodels.base_mlmodel import BaseMLModel
-from src.mlmodels.pytorch_models.pytorch_model import PytorchModel
+from src.mlmodels.pytorch_models.hybrid.hybrid_model import HybridModel
 from src.patientdata.patient_data import PatientData
 
-class CnnHybrid(PytorchModel):
+class CnnHybrid(HybridModel):
     class InternalModel(nn.Module):
         def __init__(
             self,
@@ -87,36 +87,6 @@ class CnnHybrid(PytorchModel):
     
     def __init__(self) -> None:
         super().__init__("cnn_hybrid", self.InternalModel)
-        self.model = None
-        self.params = None
-        
-    
-    def dataset_x_tensor(self, dataset_x: List[Any]) -> Tuple[Tensor, Tensor]:
-        avg = [None] * len(dataset_x)
-        std = [None] * len(dataset_x)
-        
-        for i in range(len(dataset_x)):
-            avg[i], std[i] = dataset_x[i]
-            
-        avg = torch.stack(avg)
-        std = torch.stack(std)
-        
-        return avg, std
-        
-    def extract_data(self, dataset_x: List[Any], dataset_y: List[Any]) -> Tuple[Tuple[Tensor] | Tensor]:        
-        dataset_x = (
-            torch.stack(list(map(lambda x: x[0], dataset_x))).to(torch.float32),
-            torch.stack(list(map(lambda x: x[1], dataset_x))).to(torch.float32),
-            torch.stack(list(map(lambda x: x[2], dataset_x))).to(torch.float32)
-        )
-        if dataset_y is not None:
-            dataset_y = torch.stack(list(map(lambda x: x[0], dataset_y))).to(torch.float32)
-            
-        if self.use_gpu:
-            dataset_x = (dataset_x[0].cuda(), dataset_x[1].cuda(), dataset_x[2].cuda())
-            dataset_y = dataset_y.cuda() if dataset_y is not None else None
-                    
-        return dataset_x, dataset_y
     
     
     def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
