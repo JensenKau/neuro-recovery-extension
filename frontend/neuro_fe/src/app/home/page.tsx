@@ -10,7 +10,7 @@ const page = () => {
   return (
     <div>
       <HomeIcon />
-      <WelcomeMessage name="Ian" />
+      <WelcomeMessage header="Welcome back, " name="Ian" />
       <MyItems
         initialItems={["Ian", "Jack"]}
         FormButtonComponent={PatientForm}
