@@ -13,7 +13,7 @@ const CustomButton = ({ children, icon: Icon, clicked }: CustomButtonProps) => {
     <div>
       <Button
         startIcon={Icon ? <Icon /> : undefined}
-        variant="contained"
+        variant="outlined"
         aria-label="add patient"
         color="primary"
         sx={{ marginRight: "50px" }}
