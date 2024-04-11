@@ -1,15 +1,16 @@
 import React from "react";
 
 interface Props {
+  header: string;
   name: string;
 }
 
-const WelcomeMessage = ({ name }: Props) => {
+const WelcomeMessage = ({header, name}: Props) => {
   return (
     <div
     className="ml-10 mb-10 text-5xl"
     >
-      Welcome Back, <span className="text-blue-600">{name}</span>
+      {header} <span className="text-blue-600">{name}</span>
     </div>
   );
 };
