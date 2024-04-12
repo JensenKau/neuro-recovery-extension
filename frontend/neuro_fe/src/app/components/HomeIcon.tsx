@@ -12,10 +12,9 @@ const HomeIcon = () => {
           ":hover": {
             backgroundColor: "#d1d5db",
           },
-          margin: "30px"
         }}
       >
-        <HomeButton sx={{ fontSize: "50px" }} />
+        <HomeButton sx={{ fontSize: "70px" }} />
       </IconButton>
     </div>
   );
