@@ -1,7 +1,6 @@
 "use client";
 import React, { ComponentType } from "react";
 import { useState } from "react";
-import Folder from "@mui/icons-material/Folder";
 import Chips from "./Chips";
 import { FormProps } from "./PatientForm";
 
@@ -10,6 +9,10 @@ interface Props {
   initialItems: string[];
   FormButtonComponent?: ComponentType<FormProps>;
   FormButtonProps?: FormProps;
+  chipsIcon?: React.ElementType;
+  chipsHeight: string
+  chipsWidth: string
+  chipsClickable: boolean
 }
 
 const MyItems = ({
@@ -17,15 +20,19 @@ const MyItems = ({
   initialItems,
   FormButtonComponent,
   FormButtonProps,
+  chipsIcon,
+  chipsHeight,
+  chipsWidth,
+  chipsClickable
 }: Props) => {
   const [items, setItems] = useState<string[]>(initialItems);
-  const handleFormSubmit = (email: string) => {
-    setItems((currentItems) => [...currentItems, email]);
+  const handleFormSubmit = (name: string) => {
+    setItems((currentItems) => [...currentItems, name]);
   };
 
   return (
-    <div style={{ marginBottom: "65px" }}>
-      <div className="ml-[45px] mb-5 flex justify-between">
+    <div className="mt-[50px]">
+      <div className="ml-[45px] mb-[20px] flex justify-between">
         <span className="text-blue-600 text-3xl">{children}</span>
         {FormButtonComponent === undefined || FormButtonProps === undefined ? (
           <span></span>
@@ -37,7 +44,7 @@ const MyItems = ({
         )}
       </div>
 
-      <Chips items={items} icon={Folder} />
+      <Chips items={items} icon={chipsIcon} height={chipsHeight} width={chipsWidth} clickable={chipsClickable}/>
     </div>
   );
 };
