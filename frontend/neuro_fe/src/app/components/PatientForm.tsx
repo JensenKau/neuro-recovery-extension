@@ -18,6 +18,7 @@ export interface FormProps {
   ButtonComponent: ComponentType<CustomButtonProps>;
   buttonProps: CustomButtonProps;
   onSubmit?: (email: string) => void;
+  submitFormInfo: string
 }
 
 export default function Form({
@@ -26,6 +27,7 @@ export default function Form({
   ButtonComponent,
   buttonProps,
   onSubmit,
+  submitFormInfo
 }: FormProps) {
 
   const [open, setOpen] = React.useState(false);
@@ -191,7 +193,7 @@ export default function Form({
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button type="submit" onClick={clicked}>
-            Add Patient
+            {submitFormInfo}
           </Button>
         </DialogActions>
       </Dialog>
