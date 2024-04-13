@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class UserManager(BaseUserManager):
     def create_user(self, email: str, firstname: str, lastname: str, fullname: str, password: str = None) -> User:
@@ -35,13 +35,14 @@ class UserManager(BaseUserManager):
             password=password,
         )
         
+        user.is_staff = True
         user.is_superuser = True
         user.save()
         
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     email = models.CharField(primary_key=True, max_length=155)
     
     firstname = models.CharField(max_length=100)
@@ -49,7 +50,7 @@ class User(AbstractBaseUser):
     fullname = models.CharField(max_length=255)
     
     is_active = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     
     role = models.CharField(
         max_length=20, 

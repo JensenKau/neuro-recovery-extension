@@ -12,7 +12,7 @@ services:
 
   backend:
     build: "./neuro_prediction"
-    command: bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python3 manage.py makemigrations main && python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
     deploy:
       resources:
         reservations:
@@ -44,8 +44,8 @@ services:
       POSTGRES_DB: "postgres_db"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d postgres_db -U postgres_user"]
-      interval: 5s
-      timeout: 5s
+      interval: 10s
+      timeout: 10s
       retries: 5
 
 
