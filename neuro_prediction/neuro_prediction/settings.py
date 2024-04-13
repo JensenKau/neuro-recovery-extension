@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'neuro_prediction.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres_db',
+        'USER': 'postgres_user',
+        'PASSWORD': 'password123',
+        'HOST': 'postgres-db',
+        'PORT': '5432',
     }
 }
 

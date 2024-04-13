@@ -9,6 +9,12 @@ tmp/
 trained_models/
 training_db/
 
+#Database Folder
+postgres_db/
+
+#Localstack Folder
+localstack_storage/
+
 # Extra Things to Remove
 .dotnet/
 .ssh/
