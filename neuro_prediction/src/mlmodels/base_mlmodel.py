@@ -4,6 +4,7 @@ from typing import List, Tuple, Any, Dict
 from enum import Enum
 import os
 import csv
+import shutil
 
 import optuna
 import numpy as np
@@ -36,9 +37,15 @@ class BaseMLModel(ABC):
         self.optuna_model_copy = None
 
 
-    def train_model(self, dataset: List[PatientData]) -> None:
+    def train_model(self, dataset: List[PatientData], validation: List[PatientData] = None) -> None:
         dataset_x, dataset_y = self.reshape_input(dataset)
-        self.train_model_aux(dataset_x, dataset_y)
+        validation_x = None
+        validation_y = None
+        
+        if validation is not None:
+            validation_x, validation_y = self.reshape_input(validation)
+        
+        self.train_model_aux(dataset_x, dataset_y, validation_x, validation_y)
 
         
     def predict_result(self, dataset: List[PatientData]) -> List[Tuple[float, float]]:
@@ -47,7 +54,7 @@ class BaseMLModel(ABC):
 
     
     @abstractmethod
-    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
+    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any], validation_x: List[Any] = None, validation_y: List[Any] = None) -> None:
         pass
 
     
@@ -92,8 +99,27 @@ class BaseMLModel(ABC):
     
     
     @abstractmethod
-    def objective(self, trial: optuna.trial.Trial, dataset: List[PatientData]) -> BaseMLModel:
+    def objective(self, trial: optuna.trial.Trial) -> Dict[str, Any]:
         pass
+    
+    
+    @abstractmethod
+    def delete_model(self) -> None:
+        pass
+    
+    
+    def uninitialize_model(self) -> None:
+        os.makedirs(f"/root/neuro-recovery-prediction/tmp/models/{id(self)}", exist_ok=True)
+        self.save_model(f"/root/neuro-recovery-prediction/tmp/models/{id(self)}/{id(self)}.{self.get_save_file_extension()}")
+        self.delete_model()
+    
+    
+    def reinitialize_model(self) -> None:
+        self.load_model(f"/root/neuro-recovery-prediction/tmp/models/{id(self)}/{id(self)}.{self.get_save_file_extension()}")
+        
+    
+    def clear_tmp_folder(self) -> None:
+        shutil.rmtree("/root/neuro-recovery-prediction/tmp/models", ignore_errors=True)
     
     
     def get_avg_performance(self, performances: List[ModelPerformance]) -> ModelPerformance:
@@ -189,13 +215,16 @@ class BaseMLModel(ABC):
                 train_x, train_y = train_sets[j]
                 val_x, val_y = val_sets[j]
                 models[j] = current_model
-                current_model.train_model_aux(train_x, train_y)
+                current_model.train_model_aux(train_x, train_y, val_x, val_y)
                 pred_y = list(map(lambda x: x[0], current_model.predict_result_aux(val_x)))
                 performances[j] = ModelPerformance.generate_performance(self.dataset_y_classification_num(val_y), pred_y)
+                current_model.uninitialize_model()
             
             outer_models[i] = models[np.argmax(list(map(lambda x: x.get_acc(), performances)))]
+            outer_models[i].reinitialize_model()
             pred_y = list(map(lambda x: x[0], outer_models[i].predict_result_aux(test_x)))
             outer_performances[i] = ModelPerformance.generate_performance(self.dataset_y_classification_num(test_y), pred_y)
+            outer_models[i].uninitialize_model()
             
         self.k_fold_models = outer_models
         self.k_fold_perfs = outer_performances
@@ -223,14 +252,18 @@ class BaseMLModel(ABC):
                 index = np.argmax(acc_arr)
                 best_performance = self.k_fold_perfs[index].get_performance()
                 current_row = list(map(lambda x: str(best_performance[x]), csv_header))
+                self.k_fold_models[index].reinitialize_model()
                 self.k_fold_models[index].save_model(f"{folder}/model_{index}.{self.get_save_file_extension()}")
+                self.k_fold_models[index].uninitialize_model()
                 csv_content.append(current_row)
                 
             elif save_mode == self.SAVE_MODE.ALL:
                 for i in range(len(self.k_fold_models)):
                     curr_performance = self.k_fold_perfs[i].get_performance()
                     current_row = list(map(lambda x: str(curr_performance[x]), csv_header))
+                    self.k_fold_models[i].reinitialize_model()
                     self.k_fold_models[i].save_model(f"{folder}/model_{i}.{self.get_save_file_extension()}")
+                    self.k_fold_models[i].uninitialize_model()
                     csv_content.append(current_row)
                     
             with open(f"{folder}/performance.csv", "w", encoding="utf-8") as file:
@@ -254,19 +287,34 @@ class BaseMLModel(ABC):
         )
         
         def model_objective(trial: optuna.trial.Trial) -> float:
-            self.optuna_model_copy = self.objective(trial, dataset)
+            formatted_params = self.objective(trial)
+            
+            for t in trial.study.trials:
+                if t.state == optuna.trial.TrialState.COMPLETE and t.params == trial.params:
+                    raise optuna.TrialPruned('Duplicate parameter set')
+                
+            self.optuna_model_copy = self.__class__()
+            self.optuna_model_copy.initialize_model(**formatted_params)
+            self.optuna_model_copy.k_fold(dataset)   
+            
             return self.optuna_model_copy.get_k_fold_performances()["avg"].get_acc()
         
         def save_best_trial(study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
             if study.best_trial.number == trial.number:
-                self.optuna_model_copy.save_k_fold(f"/root/neuro-recovery-prediction/trained_models/{self.optuna_model_copy.model_name}")  
+                self.optuna_model_copy.save_k_fold(f"/root/neuro-recovery-prediction/trained_models/{self.optuna_model_copy.model_name}")
+                
+            if self.optuna_model_copy is not None:
+                self.optuna_model_copy.clear_tmp_folder()
+                self.optuna_model_copy = None
         
         study.optimize(
             func=model_objective, 
             n_trials=iteration,
             callbacks=[save_best_trial]
-        )
+        )        
             
+
+
 
 if __name__ == "__main__":
     pass
