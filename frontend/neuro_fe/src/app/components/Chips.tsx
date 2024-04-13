@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import Chip from "@mui/material/Chip";
-import Link from "next/link";
-import { ClickAwayListener } from "@mui/material";
+
+
 interface Props {
   items: string[];
   icon?: React.ElementType;
