@@ -18,7 +18,7 @@ export interface FormProps {
   ButtonComponent: ComponentType<CustomButtonProps>;
   buttonProps: CustomButtonProps;
   onSubmit?: (email: string) => void;
-  submitFormInfo: string
+  submitFormInfo: string;
 }
 
 export default function Form({
@@ -27,9 +27,8 @@ export default function Form({
   ButtonComponent,
   buttonProps,
   onSubmit,
-  submitFormInfo
+  submitFormInfo,
 }: FormProps) {
-
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -79,7 +78,11 @@ export default function Form({
           onSubmit: handleFormSubmit,
         }}
       >
-        <DialogTitle sx={{ textAlign: "center" }}>{title}</DialogTitle>
+        <DialogTitle
+          sx={{ textAlign: "center", color: "#1976d2", fontSize: "35px" }}
+        >
+          {title}
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
