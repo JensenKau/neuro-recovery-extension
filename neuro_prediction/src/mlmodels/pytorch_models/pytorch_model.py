@@ -97,7 +97,7 @@ class PytorchModel(BaseMLModel):
                 res = res.cpu()
                 for i in range(len(res)):
                     current_res = np.argmax(res[i]).tolist()
-                    output[i] = (current_res, res[i][current_res])
+                    output[i] = (current_res, res[i][current_res].item())
             
             return output
     

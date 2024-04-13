@@ -18,13 +18,13 @@ class CnnSimpleStatic2_2(StaticModel):
             output_chn2: int = 10,
             kernel2: int = 3,
             relu2: bool = False,
-            pool_kernel: int = 0,
+            pool_kernel: int = 1,
             linear_size1: int = 1000
         ) -> None:
             super().__init__()
             dimension1 = 22 - (kernel1 - 1)
             dimension2 = dimension1 - (kernel2 - 1)
-            dimension3 = dimension2 if pool_kernel == 0 else int(((dimension2 - (pool_kernel - 1) - 1) / pool_kernel) + 1)
+            dimension3 = int(((dimension2 - (pool_kernel - 1) - 1) / pool_kernel) + 1)
             linear_size_start = dimension3 * dimension3 * output_chn2
             
             layers = [
@@ -32,7 +32,7 @@ class CnnSimpleStatic2_2(StaticModel):
                 nn.ReLU() if relu1 else None,
                 nn.Conv2d(output_chn1, output_chn2, kernel2),
                 nn.ReLU() if relu2 else None,
-                nn.MaxPool2d(pool_kernel) if pool_kernel > 0 else None,
+                nn.MaxPool2d(pool_kernel) if pool_kernel > 1 else None,
                 nn.Flatten(),
                 nn.Linear(linear_size_start, linear_size1),
                 nn.Linear(linear_size1, 2),
@@ -55,14 +55,13 @@ class CnnSimpleStatic2_2(StaticModel):
     
     
     def objective(self, trial: Trial) -> Dict[str, Any]:
-        epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300])
-        output_chn1 = trial.suggest_int("output_chn1", 2, 10)
-        kernel1 = trial.suggest_int("kernel1", 2, 5)
+        output_chn1 = trial.suggest_int("output_chn1", 2, 20)
+        kernel1 = trial.suggest_int("kernel1", 1, 5)
         relu1 = trial.suggest_categorical("relu1", [True, False])
-        output_chn2 = trial.suggest_int("output_chn2", 2, 15)
-        kernel2 = trial.suggest_int("kernel2", 2, 5)
+        output_chn2 = trial.suggest_int("output_chn2", 2, 50)
+        kernel2 = trial.suggest_int("kernel2", 1, 5)
         relu2 = trial.suggest_categorical("relu2", [True, False])
-        pool_kernel = trial.suggest_int("pool_kernel", 0, 5)
+        pool_kernel = trial.suggest_int("pool_kernel", 1, 5)
         linear_size1 = trial.suggest_categorical("linear_size1", [100, 250, 500, 750, 1000])
         
         return trial.params
