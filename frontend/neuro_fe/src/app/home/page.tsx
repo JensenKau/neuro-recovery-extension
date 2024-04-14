@@ -30,6 +30,7 @@ const page = () => {
         chipsWidth="250px"
         chipsClickable
         chipsLinkable
+        chipsDeletable={false}
       >
         My Patients
       </MyItems>
@@ -42,6 +43,7 @@ const page = () => {
         chipsWidth="250px"
         chipsClickable
         chipsLinkable
+        chipsDeletable={false}
       >
         Shared With Me
       </MyItems>
