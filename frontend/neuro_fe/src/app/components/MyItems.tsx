@@ -15,6 +15,9 @@ interface Props {
   chipsWidth: string;
   chipsClickable: boolean;
   chipsLinkable: boolean;
+  chipsAdditionalInfo?: string[];
+  chipsDeletable: boolean;
+  chipsDeleteHandler?: () => void
 }
 
 const MyItems = ({
@@ -28,6 +31,9 @@ const MyItems = ({
   chipsWidth,
   chipsClickable,
   chipsLinkable,
+  chipsAdditionalInfo,
+  chipsDeletable,
+  chipsDeleteHandler
 }: Props) => {
   const [items, setItems] = useState<string[]>(initialItems);
   const handleFormSubmit = (name: string) => {
@@ -35,7 +41,7 @@ const MyItems = ({
   };
 
   return (
-    <div className="mt-[20px]">
+    <div className="mt-[20px] mb-[50px]">
       <div className="mb-[20px] flex justify-between">
         <span className={`text-blue-600 text-${childrenSize}`}>{children}</span>
         {FormButtonComponent === undefined || FormButtonProps === undefined ? (
@@ -55,6 +61,9 @@ const MyItems = ({
         width={chipsWidth}
         canClick={chipsClickable}
         linkable={chipsLinkable}
+        additionalItem={chipsAdditionalInfo}
+        deletable={chipsDeletable}
+        deleteHandler={chipsDeleteHandler}
       />
     </div>
   );
