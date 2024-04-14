@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import HomeIcon from "../../components/HomeIcon";
 import MyItems from "../../components/MyItems";
@@ -48,15 +49,47 @@ const page = ({ params }: any) => {
         FormButtonProps={{
           title: "Edit Patient Infomation",
           ButtonComponent: CustomButton,
-          buttonProps: { children: "Edit", icon: EditIcon, style: "outlined" },
+          buttonProps: {
+            children: "Edit patient info",
+            icon: EditIcon,
+            style: "outlined",
+          },
           submitFormInfo: "save changes",
         }}
         chipsHeight="55px"
         chipsWidth="327px"
         chipsClickable={false}
         chipsLinkable={false}
+        chipsDeletable={false}
       >
         Pateint Information
+      </MyItems>
+
+      <MyItems
+        initialItems={[
+          "Dynamic Model",
+          "Static Model"
+        ]}
+        childrenSize="3xl"
+        FormButtonComponent={PatientForm}
+        FormButtonProps={{
+          title: "Edit Patient Infomation",
+          ButtonComponent: CustomButton,
+          buttonProps: {
+            children: "Generate EEG",
+            style: "outlined",
+          },
+          submitFormInfo: "save changes",
+        }}
+        chipsHeight="55px"
+        chipsWidth="1350px"
+        chipsClickable
+        chipsLinkable={false}
+        chipsAdditionalInfo={["[12/03/2024 00:00:00]", "[20/04/2024 00:00:00]"]}
+        chipsDeletable
+        chipsDeleteHandler={()=>console.log("hi")}
+      >
+        Patients EEGs
       </MyItems>
     </div>
   );
