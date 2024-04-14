@@ -1,26 +1,32 @@
 "use client";
 import React from "react";
 import Chip from "@mui/material/Chip";
-
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Props {
   items: string[];
+  additionalItem?: string[];
   icon?: React.ElementType;
   clicked?: () => void;
   height: string;
   width: string;
   canClick: boolean;
   linkable: boolean;
+  deletable: boolean;
+  deleteHandler?: () => void;
 }
 
 const Chips = ({
   items,
+  additionalItem,
   icon: Icon,
   clicked,
   height,
   width,
   canClick,
   linkable,
+  deletable,
+  deleteHandler
 }: Props) => {
   return (
     <>
@@ -33,21 +39,33 @@ const Chips = ({
           <Chip
             key={index}
             icon={Icon ? <Icon /> : undefined}
-            label={item}
+            label={
+              additionalItem === undefined ? (
+                item
+              ) : (
+                <div className="space-x-[370px]">
+                  <span>{additionalItem[index]}</span>
+                  <span>{item}</span>
+                </div>
+              )
+            }
             onClick={clicked}
+            onDelete={deletable ? deleteHandler: undefined}
+            deleteIcon={<DeleteIcon color="error"/>}
+           
             sx={{
               height: { height },
               width: { width },
               fontSize: "1.2rem",
-              padding: canClick ? "0 20px" : "0",
+              padding: canClick ? "0 20px" : "0 20px",
               backgroundColor: "#bae6fd",
-              "&:hover": linkable
+              "&:hover": canClick
                 ? {
                     backgroundColor: "#64b5f6",
                   }
                 : {},
               margin: canClick ? "5px" : "0",
-              justifyContent: canClick ? "center" : "flex-start",
+              justifyContent: linkable ? "center" : "space-between",
             }}
             clickable={canClick}
             component="a"
