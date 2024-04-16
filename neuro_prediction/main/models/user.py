@@ -71,7 +71,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         "fullname"
     ]
     
-    object = UserManager()
+    objects = UserManager()
     
     
     def __str__(self) -> str:
