@@ -32,9 +32,9 @@ const Login = () => {
     )
 
     if (rememberme) {
-      localStorage.setItem("jwt_token", await res.text())
+      localStorage.setItem("jwt_token", await res.text());
     } else {
-      sessionStorage.setItem("jwt-token", await res.text())
+      sessionStorage.setItem("jwt-token", await res.text());
     }
   }
 
