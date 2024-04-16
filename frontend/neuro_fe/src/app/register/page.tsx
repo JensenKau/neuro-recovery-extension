@@ -30,8 +30,24 @@ const Register = () => {
 		return "";
 	}
 
-	const submitSignUp = () => {
-
+	const submitSignUp = async () => {
+		const res = await fetch(
+      "http://localhost:8000/api/user/create_user/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: 
+          JSON.stringify({
+            "email": email,
+            "password": password,
+						"firstname": firstName,
+						"lastname": lastName
+          }
+				)
+      }
+    )
 	}
 
 	return (
@@ -47,7 +63,7 @@ const Register = () => {
 					<SignupTextField error={!blankSubmitCheck && password.length === 0} text="Password" password={true} func={setPassword} />
 					<SignupTextField error={(!blankSubmitCheck && confirmPassword.length === 0) || !confirmPasswordCheck} text="Retype Password" password={true} func={setConfirmPassword} />
 
-					<Button className="bg-[#1976d2]" variant="contained" color="primary" onClick={submitSignUp}>Sign Up</Button>
+					<Button disabled={getErrorMsg() !== ""} className="bg-[#1976d2]" variant="contained" color="primary" onClick={submitSignUp}>Sign Up</Button>
 				</Stack>
 			</div>
 		</div>
