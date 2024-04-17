@@ -6,18 +6,31 @@ export interface CustomButtonProps {
   children: string;
   icon?: React.ElementType;
   clicked?: () => void;
+  style: "contained" | "outlined" | "text";
+  buttonHeight?: string;
+  buttonWidth?: string;
 }
 
-const CustomButton = ({ children, icon: Icon, clicked }: CustomButtonProps) => {
+const CustomButton = ({
+  children,
+  icon: Icon,
+  clicked,
+  style,
+  buttonHeight,
+  buttonWidth,
+}: CustomButtonProps) => {
   return (
     <div>
       <Button
         startIcon={Icon ? <Icon /> : undefined}
-        variant="outlined"
+        variant={style}
         aria-label="add patient"
         color="primary"
-        sx={{ marginRight: "50px" }}
         onClick={clicked}
+        sx={{
+          width: buttonWidth === undefined ? undefined : buttonWidth,
+          height: buttonHeight === undefined ? undefined : buttonHeight,
+        }}
       >
         {children}
       </Button>

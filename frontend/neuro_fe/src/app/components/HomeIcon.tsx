@@ -1,6 +1,7 @@
 import React from "react";
 import IconButton from "@mui/material/IconButton";
 import HomeButton from "@mui/icons-material/Home";
+import Link from "@mui/material/Link";
 
 const HomeIcon = () => {
   return (
@@ -14,7 +15,9 @@ const HomeIcon = () => {
           },
         }}
       >
-        <HomeButton sx={{ fontSize: "70px" }} />
+        <Link href="/home">
+          <HomeButton sx={{ fontSize: "70px" }} />
+        </Link>
       </IconButton>
     </div>
   );

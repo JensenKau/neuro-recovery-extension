@@ -7,33 +7,43 @@ import Folder from "@mui/icons-material/Folder";
 
 const page = () => {
   return (
-    <div>
-       <div className="mb-[80px] mt-[50px] ml-[30px] text-5xl">
-          Welcome Back, <span className="text-blue-600">Doctor</span>
-        </div>
+    <div className="mt-[60px] mb-[50px] ml-[50px] mr-[50px]">
+      <div className="mb-[80px] text-5xl">
+        Welcome Back, <span className="text-blue-600">Doctor</span>
+      </div>
       <MyItems
         initialItems={["Ian", "Jack"]}
+        childrenSize="3xl"
         FormButtonComponent={PatientForm}
         FormButtonProps={{
           title: "New Patient",
           ButtonComponent: CustomButton,
-          buttonProps: { children: "Add Patients", icon: AddIcon },
-          submitFormInfo: "add patient"
+          buttonProps: {
+            children: "Add Patients",
+            icon: AddIcon,
+            style: "outlined",
+          },
+          submitFormInfo: "add patient",
         }}
         chipsIcon={Folder}
         chipsHeight="55px"
         chipsWidth="250px"
         chipsClickable
+        chipsLinkable
+        chipsDeletable={false}
       >
         My Patients
       </MyItems>
 
       <MyItems
         initialItems={["Ian", "Jack"]}
+        childrenSize="3xl"
         chipsIcon={Folder}
         chipsHeight="55px"
         chipsWidth="250px"
         chipsClickable
+        chipsLinkable
+        chipsDeletable={false}
       >
         Shared With Me
       </MyItems>
