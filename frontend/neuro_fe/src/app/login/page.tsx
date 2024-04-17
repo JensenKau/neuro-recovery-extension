@@ -8,34 +8,15 @@ import TextField from "@mui/material/TextField";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
+import { apiSignIn } from "../utils/api";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberme, setRememberme] = useState(localStorage.getItem("rememberme") === "true");
+  const [rememberme, setRememberme] = useState(false);
 
   const submitLogin = async () => {
-    localStorage.setItem("rememberme", rememberme.toString());
-
-    const res = await fetch(
-      "http://localhost:8000/api/token/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: 
-          JSON.stringify({
-            "email": email,
-            "password": password
-          })
-      }
-    )
-
-    if (rememberme) {
-      localStorage.setItem("jwt_token", await res.text());
-    } else {
-      sessionStorage.setItem("jwt-token", await res.text());
-    }
+    apiSignIn(rememberme, email, password);
   }
 
   return (

@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import MyItems from "../components/MyItems";
 import AddIcon from "@mui/icons-material/Add";
@@ -6,6 +8,8 @@ import PatientForm from "../components/PatientForm";
 import Folder from "@mui/icons-material/Folder";
 
 const page = () => {
+
+  
   return (
     <div className="mt-[60px] mb-[50px] ml-[50px] mr-[50px]">
       <div className="mb-[80px] text-5xl">
