@@ -6,6 +6,7 @@ const getApi = () => {
 	return "http://localhost:8000/";
 }
 
+
 const validateToken = async () => {
 	if (typeof window !== "undefined") {
 		const rememberme = window.localStorage.getItem("rememberme");
@@ -110,3 +111,24 @@ export const apiSignIn = async (rememberme: boolean, email: string, password: st
 		}
 	}
 };
+
+
+export const apiSignUp = async (email: string, password: string, firstname: string, lastname: string) => {
+	await fetch(
+		`${getApi()}api/user/create_user/`,
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: 
+				JSON.stringify({
+					"email": email,
+					"password": password,
+					"firstname": firstname,
+					"lastname": lastname
+				}
+			)
+		}
+	);
+}

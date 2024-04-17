@@ -16,7 +16,7 @@ const Login = () => {
   const [rememberme, setRememberme] = useState(false);
 
   const submitLogin = async () => {
-    apiSignIn(rememberme, email, password);
+    await apiSignIn(rememberme, email, password);
   }
 
   return (

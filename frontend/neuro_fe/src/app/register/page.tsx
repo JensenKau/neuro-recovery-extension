@@ -7,6 +7,7 @@ import Stack from '@mui/material/Stack';
 import Alert from "@mui/material/Alert";
 import SignupTextField from "./components/SignupTextField";
 
+import { apiSignUp } from "../utils/api";
 
 const Register = () => {
 	const [lastName, setLastName] = useState("");
@@ -31,23 +32,7 @@ const Register = () => {
 	}
 
 	const submitSignUp = async () => {
-		const res = await fetch(
-      "http://localhost:8000/api/user/create_user/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: 
-          JSON.stringify({
-            "email": email,
-            "password": password,
-						"firstname": firstName,
-						"lastname": lastName
-          }
-				)
-      }
-    )
+		await apiSignUp(email, password, firstName, lastName);
 	}
 
 	return (
