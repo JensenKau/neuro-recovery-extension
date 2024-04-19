@@ -8,6 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import CustomButton, { CustomButtonProps } from "./CustomButton";
 import Chip from "@mui/material/Chip";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface FormProps {
   title: string;
@@ -108,6 +109,7 @@ export default function Form({
                   newEmailList.splice(index, 1);
                   setEmailList(newEmailList);
                 }}
+                deleteIcon={<DeleteIcon style={{color: "red"}}/>}
                 style={{
                   margin: "5px",
                   backgroundColor: "#bae6fd",
