@@ -24,7 +24,7 @@ const validateToken = async () => {
 				if (access_payload.exp !== undefined && access_payload.exp * 1000 < curr_time) {
 					if (refresh_payload.exp !== undefined && refresh_payload.exp * 1000 > curr_time) {
 						const res = await fetch(
-							`${getApi()}token/refresh/`,
+							`${getApi()}api/token/refresh/`,
 							{
 								method: "POST",
 								headers: {
@@ -33,14 +33,22 @@ const validateToken = async () => {
 								body:
 									JSON.stringify({
 										"refresh": payload.refresh
-									})
+									}),
+								next: {
+									revalidate: 0
+								}
 							}
 						);
 
+						const newTokens = JSON.stringify({
+							access: (await res.json()).access,
+							refresh: payload.refresh
+						});
+
 						if (rememberme === "true") {
-							window.localStorage.setItem("jwt_token", JSON.stringify((await res.json()).access));
+							window.localStorage.setItem("jwt_token", newTokens);
 						} else {
-							window.sessionStorage.setItem("jwt_token", JSON.stringify((await res.json()).access));
+							window.sessionStorage.setItem("jwt_token", newTokens);
 						}
 
 						return true;
@@ -54,7 +62,13 @@ const validateToken = async () => {
 };
 
 
-export const apiCall = async (method: "GET" | "POST", urlpath: string, body?: any) => {
+export const apiCall = async (
+	method: "GET" | "POST", 
+	urlpath: string, 
+	body?: string, 
+	revalidate: false | number = 0,
+	tags?: string[]
+) => {
 	const validated = await validateToken();
 
 	if (validated && typeof window !== "undefined") {
@@ -63,8 +77,10 @@ export const apiCall = async (method: "GET" | "POST", urlpath: string, body?: an
 		if (rememberme !== null) {
 			const token = (rememberme === "true") ? window.localStorage.getItem("jwt_token") : window.sessionStorage.getItem("jwt_token");
 
+
 			if (token !== null) {
 				const accessToken = JSON.parse(token).access;
+
 
 				return await fetch(
 					`${getApi()}${urlpath}`,
@@ -74,7 +90,11 @@ export const apiCall = async (method: "GET" | "POST", urlpath: string, body?: an
 							"Content-Type": "application/json",
 							"Authorization": `Bearer ${accessToken}`
 						},
-						body: body
+						body: body,
+						next: {
+							revalidate: revalidate,
+							tags: tags
+						}
 					}
 				)
 			}

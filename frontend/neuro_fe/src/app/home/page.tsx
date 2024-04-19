@@ -1,15 +1,24 @@
 "use client";
 
 import React from "react";
+import { useEffect } from "react";
 import MyItems from "../components/MyItems";
 import AddIcon from "@mui/icons-material/Add";
 import CustomButton from "../components/CustomButton";
 import PatientForm from "../components/PatientForm";
 import Folder from "@mui/icons-material/Folder";
 
-const page = () => {
+import { apiCall } from "../utils/api";
 
-  
+const page = async () => {
+  // const res = await apiCall("GET", "api/patient/get_patients/");
+
+  // if (res !== undefined) {
+  //   console.log(await res.json());
+  // } else {
+  //   console.log(undefined);
+  // }
+
   return (
     <div className="mt-[60px] mb-[50px] ml-[50px] mr-[50px]">
       <div className="mb-[80px] text-5xl">
