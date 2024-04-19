@@ -5,7 +5,7 @@ import { getApi } from "./api";
 export const signupMiddleware: MiddlewareFactory = (next) => {
 	return async (request: NextRequest, _next: NextFetchEvent) => {
 		if (request.nextUrl.pathname === "api/signup/") {
-			const res = await fetch(`${getApi()}api/user/create_user/`, {
+			const res = await fetch(`${getApi()}/api/user/create_user/`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

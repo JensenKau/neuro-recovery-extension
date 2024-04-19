@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 export const loginMiddleware: MiddlewareFactory = (next) => {
 	return async (request: NextRequest, _next: NextFetchEvent) => {
 		if (request.nextUrl.pathname === "/api/login/") {
-			const res = await fetch(`${getApi()}api/token/`, {
+			const res = await fetch(`${getApi()}/api/token/`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
