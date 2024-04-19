@@ -12,8 +12,10 @@ interface Props {
   width: string;
   canClick: boolean;
   linkable: boolean;
+  path?: string;
   deletable: boolean;
   deleteHandler?: () => void;
+  contentCentre? : boolean
 }
 
 const Chips = ({
@@ -25,8 +27,10 @@ const Chips = ({
   width,
   canClick,
   linkable,
+  path,
   deletable,
-  deleteHandler
+  deleteHandler,
+  contentCentre
 }: Props) => {
   return (
     <>
@@ -38,20 +42,21 @@ const Chips = ({
         {items.map((item, index) => (
           <Chip
             key={index}
-            icon={Icon ? <Icon /> : undefined}
+            icon={Icon && !deletable? <Icon /> : undefined}
             label={
               additionalItem === undefined ? (
                 item
               ) : (
                 <div className="space-x-[370px]">
-                  <span>{additionalItem[index]}</span>
+                  <span>{Icon ? <Icon/> : <span></span>} {additionalItem[index]}</span>
                   <span>{item}</span>
+
                 </div>
               )
             }
             onClick={clicked}
             onDelete={deletable ? deleteHandler: undefined}
-            deleteIcon={<DeleteIcon color="error"/>}
+            deleteIcon={<DeleteIcon style={{color: "red"}}/>}
            
             sx={{
               height: { height },
@@ -65,11 +70,11 @@ const Chips = ({
                   }
                 : {},
               margin: canClick ? "5px" : "0",
-              justifyContent: linkable ? "center" : "space-between",
+              justifyContent: contentCentre==undefined ? "space-between" : "center",
             }}
             clickable={canClick}
             component="a"
-            href={linkable ? `/home/${item}` : undefined}
+            href={linkable ? `${path}/${item}` : undefined}
           />
         ))}
       </div>
