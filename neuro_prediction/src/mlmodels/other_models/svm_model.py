@@ -26,7 +26,7 @@ class SVMModel(BaseMLModel):
         return output
     
     
-    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any]) -> None:
+    def train_model_aux(self, dataset_x: List[Any], dataset_y: List[Any], validation_x: List[Any] = None, validation_y: List[Any] = None) -> None:
         self.model.fit(dataset_x, dataset_y)
     
     
@@ -75,6 +75,10 @@ class SVMModel(BaseMLModel):
     def initialize_model(self, **kwargs) -> None:
         kwargs["probability"] = True
         self.model = SVC(**kwargs)
+        
+    
+    def delete_model(self) -> None:
+        self.model = None
 
 
     def dataset_y_classification_num(self, dataset_y: List[Any]) -> List[int]:

@@ -1,17 +1,13 @@
 from __future__ import annotations
-from typing import List, Any, Tuple
+from typing import Any, Dict
 
-import numpy as np
 from optuna import Trial
-import optuna
 import torch
 from torch import nn, Tensor
 
-from src.mlmodels import BaseMLModel
-from src.mlmodels.pytorch_models.pytorch_model import PytorchModel
-from src.patientdata.patient_data import PatientData
+from src.mlmodels.pytorch_models.dynamic.dynamic_model import DynamicModel
 
-class CnnSimple(PytorchModel):
+class CnnSimple(DynamicModel):
     class InternalModel(nn.Module):
         def __init__(
             self,
@@ -51,64 +47,16 @@ class CnnSimple(PytorchModel):
     
     def __init__(self) -> None:
         super().__init__("cnn_simple", self.InternalModel)
-        self.model = None
-        self.params = None
-        
-    
-    def dataset_x_tensor(self, dataset_x: List[Any]) -> Tuple[Tensor, Tensor]:
-        avg = [None] * len(dataset_x)
-        std = [None] * len(dataset_x)
-        
-        for i in range(len(dataset_x)):
-            avg[i], std[i] = dataset_x[i]
-            
-        avg = torch.stack(avg)
-        std = torch.stack(std)
-        
-        return avg, std
-        
-    def extract_data(self, dataset_x: List[Any], dataset_y: List[Any]) -> Tuple[Tuple[Tensor] | Tensor]:        
-        dataset_x = (
-            torch.stack(list(map(lambda x: x[0], dataset_x))).to(torch.float32),
-            torch.stack(list(map(lambda x: x[1], dataset_x))).to(torch.float32)
-        )
-        if dataset_y is not None:
-            dataset_y = torch.stack(list(map(lambda x: x[0], dataset_y))).to(torch.float32)
-            
-        if self.use_gpu:
-            dataset_x = (dataset_x[0].cuda(), dataset_x[1].cuda())
-            dataset_y = dataset_y.cuda() if dataset_y is not None else None
-                    
-        return dataset_x, dataset_y
     
     
-    def objective(self, trial: Trial, dataset: List[PatientData]) -> BaseMLModel:
+    def objective(self, trial: Trial) -> Dict[str, Any]:
         epoch = trial.suggest_categorical("epoch", [100, 150, 200, 250, 300])
         output_chn1 = trial.suggest_int("output_chn1", 2, 15)
         kernel1 = trial.suggest_int("kernel1", 2, 5)
         output_chn2 = trial.suggest_int("output_chn2", 2, 15)
         kernel2 = trial.suggest_int("kernel2", 2, 5)
         
-        for t in trial.study.trials:
-            if t.state != optuna.trial.TrialState.COMPLETE:
-                continue
-            if t.params == trial.params:
-                raise optuna.TrialPruned('Duplicate parameter set')
-    
-        model_copy = CnnSimple()
-        model_copy.initialize_model(
-            **{
-                "epoch": epoch,
-                "output_chn1": output_chn1,
-                "kernel1": kernel1,
-                "output_chn2": output_chn2,
-                "kernel2": kernel2,
-            }
-        )
-        
-        model_copy.k_fold(dataset)
-        
-        return model_copy
+        return trial.params
         
         
 if __name__ == "__main__":

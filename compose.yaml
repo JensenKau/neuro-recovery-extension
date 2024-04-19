@@ -1,0 +1,57 @@
+version: "1"
+
+services:
+  frontend:
+    build: "./frontend/neuro_fe"
+    command: ["npm", "run", "dev"]
+    volumes:
+      - "./frontend/neuro_fe:/app"
+    ports:
+      - "3000:3000"
+    
+
+  backend:
+    build: "./neuro_prediction"
+    command: bash -c "python3 manage.py makemigrations main && python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - "./neuro_prediction:/app"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    links:
+      - "postgres-db"
+
+
+  postgres-db:
+    image: "postgres:16.2-alpine3.19"
+    restart: "always"
+    volumes:
+      - "./postgres_db:/var/lib/postgresql/data"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "password123"
+      POSTGRES_USER: "postgres_user"
+      POSTGRES_DB: "postgres_db"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres_db -U postgres_user"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+
+  storage:
+    image: "localstack/localstack:s3-latest"
+    ports:
+      - "4566:4566"
+    volumes:
+      - "./localstack_storage:/var/lib/localstack"
