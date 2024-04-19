@@ -1,4 +1,5 @@
 
 export const getApi = () => {
-	return "http://localhost:8000"
+	return "http://host.docker.internal:8000";
+	// return "http://localhost:8000";
 }

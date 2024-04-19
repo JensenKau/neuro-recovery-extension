@@ -19,6 +19,8 @@ const page = () => {
         }
       }
     );
+
+    console.log(await res.json());
   }
   
   func();
