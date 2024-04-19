@@ -8,8 +8,6 @@ import TextField from "@mui/material/TextField";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
-import { apiSignIn } from "../utils/api";
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,6 +22,7 @@ const Login = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          rememberme: rememberme,
           email: email,
           password: password
         })
