@@ -4,7 +4,7 @@ import { getApi } from "./api";
 
 export const signupMiddleware: MiddlewareFactory = (next) => {
 	return async (request: NextRequest, _next: NextFetchEvent) => {
-		if (request.nextUrl.pathname === "api/signup") {
+		if (request.nextUrl.pathname === "/api/signup") {
 			const res = await fetch(`${getApi()}/api/user/create_user/`, {
 				method: "POST",
 				headers: {
@@ -13,7 +13,7 @@ export const signupMiddleware: MiddlewareFactory = (next) => {
 				body: await request.text(),
 			});
 
-			return NextResponse.next();
+			return NextResponse.json(await res.json());
 		}
 
 		return next(request, _next);

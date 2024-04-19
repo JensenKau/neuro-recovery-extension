@@ -32,7 +32,21 @@ const Register = () => {
 	}
 
 	const submitSignUp = async () => {
-		await apiSignUp(email, password, firstName, lastName);
+		await fetch(
+			"http://localhost:3000/api/signup",
+			{
+				method: "POST",
+				headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+					firstname: firstName,
+					lastname: lastName,
+          email: email,
+          password: password
+        })
+			}
+		);
 	}
 
 	return (
