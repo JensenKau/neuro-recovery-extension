@@ -1,23 +1,27 @@
 "use client";
 
 import React from "react";
-import { useEffect } from "react";
 import MyItems from "../components/MyItems";
 import AddIcon from "@mui/icons-material/Add";
 import CustomButton from "../components/CustomButton";
 import PatientForm from "../components/PatientForm";
 import Folder from "@mui/icons-material/Folder";
 
-import { apiCall } from "../utils/api";
-
-const page = async () => {
-  // const res = await apiCall("GET", "api/patient/get_patients/");
-
-  // if (res !== undefined) {
-  //   console.log(await res.json());
-  // } else {
-  //   console.log(undefined);
-  // }
+const page = () => {
+  const func = async () => {
+    const res = await fetch(
+      "http://localhost:3000/api/patient/get_patients/",
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+  }
+  
+  func();
 
   return (
     <div className="mt-[60px] mb-[50px] ml-[50px] mr-[50px]">

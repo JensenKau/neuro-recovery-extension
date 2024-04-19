@@ -20,7 +20,7 @@ export const loginMiddleware: MiddlewareFactory = (next) => {
 			const access_payload = jwtDecode(content.access);
 			const refresh_payload = jwtDecode(content.refresh);
 
-			const output = NextResponse.next();
+			const output = NextResponse.json({});
 
 			const access_cookie = { name: "jwt_access", value: content.access };
 			const refresh_cookie = { name: "jwt_refresh", value: content.refresh };				
@@ -28,6 +28,7 @@ export const loginMiddleware: MiddlewareFactory = (next) => {
 			if (requestBody.rememberme && access_payload.exp !== undefined && refresh_payload.exp !== undefined) {
 				output.cookies.set({ ...access_cookie, expires: access_payload.exp * 1000 });
 				output.cookies.set({ ...refresh_cookie, expires: refresh_payload.exp * 1000 });
+				output.cookies.set({ name: "jwt_remember", value: "true", expires: refresh_payload.exp * 1000 });
 			} else {
 				output.cookies.set(access_cookie);
 				output.cookies.set(refresh_cookie);
