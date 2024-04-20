@@ -3,7 +3,7 @@ import { MiddlewareFactory } from "./types";
 import { getApi } from "./api";
 
 export const headerMiddleware: MiddlewareFactory = (next) => {
-  return async (request: NextRequest, _next: NextFetchEvent) => {
+	return async (request: NextRequest, _next: NextFetchEvent) => {
 		if (request.nextUrl.pathname.startsWith("/api")) {
 			const accessToken = request.cookies.get("jwt_access")?.value;
 
@@ -11,21 +11,24 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 				method: request.method,
 				headers: {
 					"Content-Type": "application/json",
-					"Authorization": `Bearer ${accessToken}`
+					Authorization: `Bearer ${accessToken}`,
 				},
-				body: (request.method === "POST") ? await request.text() : undefined
+				body: request.method === "POST" ? await request.text() : undefined,
 			});
 
 			const content = await res.json();
+
+			console.log(content);
+
 			const output = NextResponse.json(content);
 
 			if (accessToken !== undefined) {
-				output.cookies.set({ name: "jwt_access", value: accessToken});
+				output.cookies.set({ name: "jwt_access", value: accessToken });
 			}
 
 			return output;
 		}
 
 		return next(request, _next);
-	}
-}
+	};
+};
