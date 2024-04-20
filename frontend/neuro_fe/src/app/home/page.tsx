@@ -2,16 +2,12 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import MyItems from "../components/MyItems";
-import AddIcon from "@mui/icons-material/Add";
-import CustomButton from "../components/CustomButton";
-import PatientForm from "../components/PatientForm";
-import Folder from "@mui/icons-material/Folder";
 import { ShortPatient } from "./interface";
 import { unstable_noStore as noStore } from "next/cache";
 
 import HomeSection from "./components/HomeSection";
 import HomeSectionHeader from "./components/HomeSectionHeader";
+import AddPatientForm from "./components/AddPatientForm";
 
 const HomePage = () => {
 	noStore();
@@ -42,6 +38,8 @@ const HomePage = () => {
 			<div className="mb-[80px] text-5xl">
 				Welcome Back, <span className="text-blue-600">Doctor</span>
 			</div>
+
+			<AddPatientForm />
 
 			<HomeSectionHeader label="My Patients" />
 			<HomeSection patients={owned} message="You do not seem to have any patients" />
