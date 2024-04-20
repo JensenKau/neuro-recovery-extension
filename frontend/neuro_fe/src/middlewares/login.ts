@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 
 export const loginMiddleware: MiddlewareFactory = (next) => {
 	return async (request: NextRequest, _next: NextFetchEvent) => {
-		if (request.nextUrl.pathname === "/api/login/") {
+		if (request.nextUrl.pathname === "/api/login") {
 			const requestBody = await request.json();
 
 			const res = await fetch(`${getApi()}/api/token/`, {
