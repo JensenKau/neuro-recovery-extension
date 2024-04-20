@@ -10,6 +10,9 @@ import Folder from "@mui/icons-material/Folder";
 import { ShortPatient } from "./interface";
 import { unstable_noStore as noStore } from "next/cache";
 
+import HomeSection from "./components/HomeSection";
+import HomeSectionHeader from "./components/HomeSectionHeader";
+
 const HomePage = () => {
 	noStore();
 
@@ -39,42 +42,12 @@ const HomePage = () => {
 			<div className="mb-[80px] text-5xl">
 				Welcome Back, <span className="text-blue-600">Doctor</span>
 			</div>
-			<MyItems
-				initialItems={["Ian", "Jack"]}
-				childrenSize="3xl"
-				FormButtonComponent={PatientForm}
-				FormButtonProps={{
-					title: "New Patient",
-					ButtonComponent: CustomButton,
-					buttonProps: {
-						children: "Add Patients",
-						icon: AddIcon,
-						style: "outlined",
-					},
-					submitFormInfo: "add patient",
-				}}
-				chipsIcon={Folder}
-				chipsHeight="55px"
-				chipsWidth="250px"
-				chipsClickable
-				chipsLinkable
-				chipsDeletable={false}
-			>
-				My Patients
-			</MyItems>
 
-			<MyItems
-				initialItems={["Ian", "Jack"]}
-				childrenSize="3xl"
-				chipsIcon={Folder}
-				chipsHeight="55px"
-				chipsWidth="250px"
-				chipsClickable
-				chipsLinkable
-				chipsDeletable={false}
-			>
-				Shared With Me
-			</MyItems>
+			<HomeSectionHeader label="My Patients" />
+			<HomeSection patients={owned} message="You do not seem to have any patients" />
+
+			<HomeSectionHeader label="Shared with Me" className="mt-16 mb-5" />
+			<HomeSection patients={access} message="You do not seem to have any patients shared with you" />
 		</div>
 	);
 };

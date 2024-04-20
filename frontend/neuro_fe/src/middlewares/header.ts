@@ -17,9 +17,6 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 			});
 
 			const content = await res.json();
-
-			console.log(content);
-
 			const output = NextResponse.json(content);
 
 			if (accessToken !== undefined) {
