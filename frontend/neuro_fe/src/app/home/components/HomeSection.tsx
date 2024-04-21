@@ -16,7 +16,7 @@ const HomeSection = ({ patients, message }: HomeSectionProp) => {
 			{
 				(patients.length > 0) ?
 				<div className="flex flex-wrap gap-4 w-full my-5">
-					{patients.map((patient) => <PatientFolder patient={patient} />)}
+					{patients.map((patient) => <PatientFolder patient={patient} key={patient.id} />)}
 				</div> :
 				<Typography variant="h5" className="text-center">{message}</Typography>
 			}

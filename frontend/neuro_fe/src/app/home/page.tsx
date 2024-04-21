@@ -39,8 +39,6 @@ const HomePage = () => {
 				Welcome Back, <span className="text-blue-600">Doctor</span>
 			</div>
 
-			<AddPatientForm />
-
 			<HomeSectionHeader label="My Patients" />
 			<HomeSection patients={owned} message="You do not seem to have any patients" />
 
