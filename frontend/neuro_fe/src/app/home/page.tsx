@@ -41,7 +41,7 @@ const HomePage = () => {
 
       <div className="grid grid-cols-2">
         <HomeSectionHeader label="My Patients" />
-        <AddPatientButton onSubmit={(value) => setOwned([...owned, value])} />
+        <AddPatientButton className="w-1/4 ml-auto" onSubmit={(value) => setOwned([...owned, value])} />
       </div>
 
       <HomeSection

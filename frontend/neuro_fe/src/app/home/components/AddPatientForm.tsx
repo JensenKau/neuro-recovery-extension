@@ -73,7 +73,7 @@ const AddPatientForm = ({ open, onClose, onSubmit }: AddPatientFormProps) => {
 			fullWidth={true}
 			maxWidth="sm"
     >
-      <DialogTitle>
+      <DialogTitle className="mx-auto mt-5 mb-3">
         <Typography variant="h5" className="text-[#01579b]">
           New Patient
         </Typography>
@@ -176,7 +176,7 @@ const AddPatientForm = ({ open, onClose, onSubmit }: AddPatientFormProps) => {
         />
       </DialogContent>
       <DialogActions className="">
-        <Button type="submit">Add Patient</Button>
+        <Button className="w-full mx-3 mb-5" type="submit" variant="contained">Add Patient</Button>
       </DialogActions>
     </Dialog>
   );
