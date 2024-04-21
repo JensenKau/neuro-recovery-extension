@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from ..models import Patient, User
 from ..serializers import ShortPatientSerializer, PatientSerializer
 
+
 class GetPatientsView(ListAPIView):    
     def get_queryset(self):
         return Patient.objects.none()
@@ -24,6 +25,29 @@ class GetPatientsView(ListAPIView):
             "owned": owned_serializer.data,
             "access": access_serializer.data
         })
+
+        
+class CreatePatientView(CreateAPIView):
+    def get_queryset(self):
+        return Patient.objects.none()
+    
+    def post(self, request: Request):
+        user_email = request.user.email
+        data = request.data
+        
+        new_patient = Patient.objects.create(
+            owner_id = user_email,
+            name = f"{data['firstname']} {data['lastname']}",
+            age = data["age"],
+            sex = data["gender"],
+            rosc = data["rosc"],
+            ohca = data["ohca"],
+            shockable_rhythm = data["sr"],
+            ttm = data["ttm"]
+        )
+        
+        return Response(ShortPatientSerializer(new_patient).data) 
+
 
 if __name__ == "__main__":
     pass

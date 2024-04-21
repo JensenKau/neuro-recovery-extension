@@ -11,6 +11,7 @@ user_urls = [
 
 patient_urls = [
     path("get_patients/", GetPatientsView.as_view()),
+    path("create_patient/", CreatePatientView.as_view()),
 ]
 
 main_urls = [

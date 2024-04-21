@@ -13,10 +13,10 @@ interface AddPatientButtonProps {
 
 const AddPatientButton = ({ onSubmit, className = "" }: AddPatientButtonProps) => {
 	const [open, setOpen] = useState(false);
-
+	
 	return (
 		<>
-			<Button className={`${className}`}>Add Patient</Button>
+			<Button variant="contained" className={`${className}`} onClick={() => setOpen(true)}>Add Patient</Button>
 			<AddPatientForm open={open} onClose={setOpen} onSubmit={onSubmit} />
 		</>
 	);
