@@ -6,7 +6,6 @@ import { FormProps } from "./PatientForm";
 
 interface Props {
   children: string;
-  childrenSize: string;
   initialItems: string[];
   FormButtonComponent?: ComponentType<FormProps>;
   FormButtonProps?: FormProps;
@@ -17,12 +16,13 @@ interface Props {
   chipsLinkable: boolean;
   chipsAdditionalInfo?: string[];
   chipsDeletable: boolean;
-  chipsDeleteHandler?: () => void
+  chipsDeleteHandler?: () => void,
+  chipsContentCenter?: boolean
+  chipsExtraPath?: string
 }
 
 const MyItems = ({
   children,
-  childrenSize,
   initialItems,
   FormButtonComponent,
   FormButtonProps,
@@ -33,7 +33,9 @@ const MyItems = ({
   chipsLinkable,
   chipsAdditionalInfo,
   chipsDeletable,
-  chipsDeleteHandler
+  chipsDeleteHandler,
+  chipsContentCenter,
+  chipsExtraPath
 }: Props) => {
   const [items, setItems] = useState<string[]>(initialItems);
   const handleFormSubmit = (name: string) => {
@@ -43,7 +45,7 @@ const MyItems = ({
   return (
     <div className="mt-[20px] mb-[50px]">
       <div className="mb-[20px] flex justify-between">
-        <span className={`text-blue-600 text-${childrenSize}`}>{children}</span>
+        <span className='text-blue-600' style={{fontSize: "35px"}}>{children}</span>
         {FormButtonComponent === undefined || FormButtonProps === undefined ? (
           <span></span>
         ) : (
@@ -64,6 +66,8 @@ const MyItems = ({
         additionalItem={chipsAdditionalInfo}
         deletable={chipsDeletable}
         deleteHandler={chipsDeleteHandler}
+        contentCentre={chipsContentCenter}
+        path={chipsExtraPath}
       />
     </div>
   );

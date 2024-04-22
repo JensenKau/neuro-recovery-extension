@@ -35,7 +35,7 @@ const HomePage = () => {
 
   return (
     <div className="mt-[60px] mb-[50px] ml-[50px] mr-[50px]">
-      <div className="mb-[80px] text-5xl">
+      <div className="mb-[30px] text-5xl">
         Welcome Back, <span className="text-blue-600">Doctor</span>
       </div>
 
