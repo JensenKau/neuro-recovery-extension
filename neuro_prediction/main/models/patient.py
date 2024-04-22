@@ -6,7 +6,7 @@ from .user import User
 
 class Patient(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="owner")
-    access = models.ManyToManyField(User, related_name="access")
+    access = models.ManyToManyField(User, related_name="access", blank=True)
     
     name = models.CharField(max_length=255)
     age = models.PositiveIntegerField(null=True)

@@ -11,31 +11,23 @@ import Checkbox from '@mui/material/Checkbox';
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberme, setRememberme] = useState(localStorage.getItem("rememberme") === "true");
+  const [rememberme, setRememberme] = useState(false);
 
   const submitLogin = async () => {
-    localStorage.setItem("rememberme", rememberme.toString());
-
-    const res = await fetch(
-      "http://localhost:8000/api/token/",
+    await fetch(
+      "http://localhost:3000/api/login",
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: 
-          JSON.stringify({
-            "email": email,
-            "password": password
-          })
+        body: JSON.stringify({
+          rememberme: rememberme,
+          email: email,
+          password: password
+        })
       }
-    )
-
-    if (rememberme) {
-      localStorage.setItem("jwt_token", await res.text());
-    } else {
-      sessionStorage.setItem("jwt-token", await res.text());
-    }
+    );
   }
 
   return (

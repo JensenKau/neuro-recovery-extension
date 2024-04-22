@@ -16,3 +16,8 @@ test_create_user_api:
 		-d '{"email": "testmail@fyp.com", "password": "1234321", "firstname": "bob", "lastname": "ross"}' \
 		http://localhost:8000/api/user/create_user/ \
 		> output.txt
+
+test_get_patients_api:
+	curl \
+		-X GET \
+		http://localhost:8000/api/patient/get_patients/
