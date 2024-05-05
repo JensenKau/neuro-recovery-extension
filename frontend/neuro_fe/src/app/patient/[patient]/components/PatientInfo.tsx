@@ -24,52 +24,6 @@ const PatientInfo = () => {
 				</div>
 			</div>
 		</div>
-
-		// <div>
-		// 	<div className="mt-[30px]">
-		// 		<ShareForm
-		// 			title="Share Profile"
-		// 			ButtonComponent={CustomButton}
-		// 			buttonProps={{
-		// 				children: "share profile",
-		// 				icon: ShareIcon,
-		// 				style: "text",
-		// 			}}
-		// 			submitFormInfo="done"
-		// 		/>
-		// 	</div>
-		// 	<div className="h-px bg-blue-400 w-full mb-[50px]"></div>
-		// 	<MyItems
-		// 		initialItems={[
-		// 			"First Name: ",
-		// 			"Last Name: ",
-		// 			"Age: ",
-		// 			"Gender: ",
-		// 			"ROSC: ",
-		// 			"OHCA: ",
-		// 			"Shockable Rhythm: ",
-		// 			"TTM: ",
-		// 		]}
-		// 		FormButtonComponent={PatientForm}
-		// 		FormButtonProps={{
-		// 			title: "Edit Patient Infomation",
-		// 			ButtonComponent: CustomButton,
-		// 			buttonProps: {
-		// 				children: "Edit patient info",
-		// 				icon: EditIcon,
-		// 				style: "outlined",
-		// 			},
-		// 			submitFormInfo: "save changes",
-		// 		}}
-		// 		chipsHeight="55px"
-		// 		chipsWidth="327px"
-		// 		chipsClickable={false}
-		// 		chipsLinkable={false}
-		// 		chipsDeletable={false}
-		// 	>
-		// 		Pateint Information
-		// 	</MyItems>
-		// </div>
 	);
 };
 

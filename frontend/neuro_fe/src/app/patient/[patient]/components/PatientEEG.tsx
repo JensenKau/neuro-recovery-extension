@@ -1,11 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import PatientEEGItem from "./PatientEEGItem";
 
 const PatientEEG = () => {
+	const [time, setTime] = useState("");
+
+	useEffect(() => {
+		setTime(new Date().toLocaleString());
+	}, [])
+
 	return (
-		<div>
-			<div className="my-auto text-3xl text-blue-600">Patient Information</div>
+		<div className="flex flex-col gap-5">
+			<div className="my-auto text-3xl text-blue-600">Patient EEGs</div>
+			<PatientEEGItem label="slkdfj" datetime={time}/>
 		</div>
 	);
 };

@@ -11,6 +11,7 @@ import ShareForm from "../../components/ShareProfile";
 import InfoIcon from "@mui/icons-material/Feed";
 import PatientPageHeader from "./components/PatientPageHeader";
 import PatientInfo from "./components/PatientInfo";
+import PatientEEG from "./components/PatientEEG";
 
 interface PatientPageParms {
 	params: {
@@ -26,8 +27,9 @@ const page = ({ params: { patient } }: PatientPageParms) => {
 		<div className="flex flex-col my-3 mx-5 gap-8">
 			<PatientPageHeader />
 
-			<div className="mx-5">
+			<div className="flex flex-col gap-8 mx-5">
 				<PatientInfo />
+				<PatientEEG />
 			</div>
 		</div>
 	);
