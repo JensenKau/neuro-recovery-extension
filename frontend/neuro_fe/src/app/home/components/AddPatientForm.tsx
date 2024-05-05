@@ -15,7 +15,7 @@ import {
   DialogActions,
   Typography,
 } from "@mui/material";
-import { ShortPatient } from "../interface";
+import { ShortPatient } from "../../interface";
 
 interface AddPatientFormProps {
   open: boolean;

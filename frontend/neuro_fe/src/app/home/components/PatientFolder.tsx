@@ -3,7 +3,7 @@
 import React from "react";
 import { Button } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
-import { ShortPatient } from "../interface";
+import { ShortPatient } from "../../interface";
 import { Typography } from "@mui/material";
 import Link from "next/link";
 
