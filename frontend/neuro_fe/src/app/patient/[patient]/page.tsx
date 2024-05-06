@@ -7,7 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CustomButton from "../../components/CustomButton";
 import PatientForm from "../../components/PatientForm";
 import ShareIcon from "@mui/icons-material/Share";
-import ShareForm from "../../components/ShareProfile";
+import ShareForm from "./components/ShareProfileForm";
 import InfoIcon from "@mui/icons-material/Feed";
 import PatientPageHeader from "./components/PatientPageHeader";
 import PatientInfo from "./components/PatientInfo";

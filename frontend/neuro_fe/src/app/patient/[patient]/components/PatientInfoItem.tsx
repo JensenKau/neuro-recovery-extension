@@ -11,7 +11,7 @@ interface PatientInfoItemProps {
 const PatientInfoItem = ({ label, value }: PatientInfoItemProps) => {
 	return (
 		<>
-			<Typography variant="h5" className="text-lg col-span-1">{label}</Typography>
+			<Typography variant="h5" className="text-lg col-span-1 font-bold">{label}</Typography>
 			<Typography variant="h5" className="text-lg col-span-2">{value}</Typography>
 		</>
 	);
