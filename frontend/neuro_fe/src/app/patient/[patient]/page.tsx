@@ -24,13 +24,19 @@ const page = ({ params: { patient } }: PatientPageParms) => {
 		return await res.json();
 	};
 
+	const modifyAccess = async (newAcess: Array<string>) => {
+		if (patientInfo) {
+			setPatientInfo({...patientInfo, ...{access: newAcess}});
+		}
+	};
+
 	useEffect(() => {
 		getInfo().then((res) => setPatientInfo(res));
 	}, []);
 
 	return (
 		<div className="flex flex-col my-3 mx-5 gap-8">
-			<PatientPageHeader patient={patientInfo} />
+			<PatientPageHeader patient={patientInfo} modifyAccess={modifyAccess} />
 
 			<div className="flex flex-col gap-8 mx-5">
 				<PatientInfo patient={patientInfo} />

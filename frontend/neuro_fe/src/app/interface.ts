@@ -14,6 +14,6 @@ export interface Patient {
 	sex: "male" | "female";
 	rosc: number;
 	ohca: boolean;
-	sr: boolean;
+	shockable_rhythm: boolean;
 	ttm: number;
 }

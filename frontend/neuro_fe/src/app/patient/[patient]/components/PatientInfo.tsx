@@ -26,7 +26,7 @@ const PatientInfo = ({ patient }: PatientInfoProps) => {
 					<div className="grid grid-cols-3 gap-3">
 						<PatientInfoItem label="ROSC" value={`${patient.rosc}`} />
 						<PatientInfoItem label="OHCA" value={`${patient.ohca}`} />
-						<PatientInfoItem label="Shockable Rhythm" value={`${patient.sr}`} />
+						<PatientInfoItem label="Shockable Rhythm" value={`${patient.shockable_rhythm}`} />
 						<PatientInfoItem label="TTM" value={`${patient.ttm}`} />
 					</div>
 				</div>) : (<Typography>Error</Typography>)}

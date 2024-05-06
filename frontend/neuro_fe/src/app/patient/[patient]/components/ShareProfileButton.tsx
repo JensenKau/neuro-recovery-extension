@@ -10,9 +10,10 @@ import { Patient } from "@/app/interface";
 interface ShareProfileButtonProps {
 	className?: string;
 	patient: Patient | null;
+	modifyAccess(newAcess: Array<string>): void;
 }
 
-const ShareProfileButton = ({ className = "", patient }: ShareProfileButtonProps) => {
+const ShareProfileButton = ({ className = "", patient, modifyAccess }: ShareProfileButtonProps) => {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -21,7 +22,7 @@ const ShareProfileButton = ({ className = "", patient }: ShareProfileButtonProps
 				<Share />
 				Share Profile
 			</Button>
-			<ShareProfileForm open={open} onClose={setOpen} patient={patient} />
+			<ShareProfileForm open={open} onClose={setOpen} patient={patient} modifyAccess={modifyAccess} />
 		</>
 	);
 };

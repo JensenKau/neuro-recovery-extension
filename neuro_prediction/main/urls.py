@@ -13,6 +13,8 @@ patient_urls = [
     path("get_patient/", GetPatientView.as_view()),
     path("get_patients/", GetPatientsView.as_view()),
     path("create_patient/", CreatePatientView.as_view()),
+    path("add_user/", AddUserAccess.as_view()),
+    path("delete_user/", DeleteUserAccess.as_view()),
 ]
 
 main_urls = [

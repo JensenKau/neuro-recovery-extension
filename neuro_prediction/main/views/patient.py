@@ -66,6 +66,46 @@ class CreatePatientView(CreateAPIView):
         )
         
         return Response(ShortPatientSerializer(new_patient).data) 
+    
+
+
+
+class AddUserAccess(CreateAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def post(self, request: Request):
+        data = request.data
+        
+        patient_id = data["patient_id"]
+        email = data["email"]
+        
+        Patient.access.through.objects.create(
+            patient_id=patient_id,
+            user_id=email
+        )
+        
+        return Response({})
+    
+    
+    
+
+class DeleteUserAccess(CreateAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def post(self, request: Request):
+        data = request.data
+        
+        patient_id = data["patient_id"]
+        email = data["email"]
+        
+        Patient.access.through.objects.filter(
+            patient_id=patient_id,
+            user_id=email
+        ).delete()
+        
+        return Response({})
 
 
 if __name__ == "__main__":
