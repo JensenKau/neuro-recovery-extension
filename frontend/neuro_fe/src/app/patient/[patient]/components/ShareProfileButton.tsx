@@ -5,12 +5,14 @@ import { useState } from "react";
 import { Button } from "@mui/material";
 import Share from "@mui/icons-material/Share";
 import ShareProfileForm from "./ShareProfileForm";
+import { Patient } from "@/app/interface";
 
 interface ShareProfileButtonProps {
 	className?: string;
+	patient: Patient | null;
 }
 
-const ShareProfileButton = ({ className = "" }: ShareProfileButtonProps) => {
+const ShareProfileButton = ({ className = "", patient }: ShareProfileButtonProps) => {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -19,7 +21,7 @@ const ShareProfileButton = ({ className = "" }: ShareProfileButtonProps) => {
 				<Share />
 				Share Profile
 			</Button>
-			<ShareProfileForm open={open} onClose={setOpen} />
+			<ShareProfileForm open={open} onClose={setOpen} patient={patient} />
 		</>
 	);
 };

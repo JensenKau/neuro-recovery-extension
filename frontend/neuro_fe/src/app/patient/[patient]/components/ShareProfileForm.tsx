@@ -11,13 +11,15 @@ import {
 import { Add } from "@mui/icons-material";
 import React from "react";
 import ShareProfileItem from "./ShareProfileItem";
+import { Patient } from "@/app/interface";
 
 interface ShareProfileForm {
 	open: boolean;
 	onClose(value: boolean): void;
+	patient: Patient | null;
 }
 
-const ShareProfileForm = ({ open, onClose }: ShareProfileForm) => {
+const ShareProfileForm = ({ open, onClose, patient }: ShareProfileForm) => {
 	return (
 		<Dialog
 			open={open}
@@ -45,7 +47,7 @@ const ShareProfileForm = ({ open, onClose }: ShareProfileForm) => {
 
 				<div className="flex flex-col gap-1">
 					<Typography className="text-blue-600 text-xl">Owner</Typography>
-					<ShareProfileItem email="jkau0039@student.monash.edu" />
+					{patient && <ShareProfileItem email={patient.owner} />}
 				</div>
 
 				<div className="flex flex-col gap-1">
@@ -53,13 +55,7 @@ const ShareProfileForm = ({ open, onClose }: ShareProfileForm) => {
 						User with Access
 					</Typography>
 					<div className="flex flex-col gap-2 overflow-y-scroll overflow-x-hidden h-[200px]">
-						<ShareProfileItem email="jkau0039@student.monash.edu" deletable />
-						<ShareProfileItem email="jkau0039@student.monash.edu" deletable />
-						<ShareProfileItem email="jkau0039@student.monash.edu" deletable />
-						<ShareProfileItem email="jkau0039@student.monash.edu" deletable />
-						<ShareProfileItem email="jkau0039@student.monash.edu" deletable />
-						<ShareProfileItem email="jkau0039@student.monash.edu" deletable />
-						<ShareProfileItem email="jkau0039@student.monash.edu" deletable />
+						{patient && patient.access.map((val) => <ShareProfileItem email={val} deletable />)}
 					</div>
 				</div>
 

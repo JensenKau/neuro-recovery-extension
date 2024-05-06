@@ -20,7 +20,7 @@ const PatientPageHeader = ({patient}: PatientPageHeaderProps) => {
 						My Patients {">"} <span className="text-blue-600">{`${patient ? patient.name : ""}`}</span>
 					</div>
 				</div>
-				<ShareProfileButton className="my-auto h-3/4 p-3" />
+				<ShareProfileButton patient={patient} className="my-auto h-3/4 p-3" />
 			</div>
 			<Divider className="my-3" />
 		</div>
