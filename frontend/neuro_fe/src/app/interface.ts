@@ -8,6 +8,8 @@ export interface Patient {
 	owner: string;
 	access: Array<string>;
 	name: string;
+	first_name: string;
+	last_name: string;
 	age: number;
 	sex: "male" | "female";
 	rosc: number;

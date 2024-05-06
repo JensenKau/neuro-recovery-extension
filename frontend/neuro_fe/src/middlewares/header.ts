@@ -7,7 +7,7 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 		if (request.nextUrl.pathname.startsWith("/api")) {
 			const accessToken = request.cookies.get("jwt_access")?.value;
 
-			const res = await fetch(`${getApi()}${request.nextUrl.pathname}/`, {
+			const res = await fetch(`${getApi()}${request.nextUrl.pathname}/${request.nextUrl.searchParams.toString() !== "" ? "?" + request.nextUrl.searchParams.toString() : ""}`, {
 				method: request.method,
 				headers: {
 					"Content-Type": "application/json",

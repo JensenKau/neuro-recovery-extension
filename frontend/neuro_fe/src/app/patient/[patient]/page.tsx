@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, {useState, useEffect} from "react";
 import HomeIcon from "./components/HomeIcon";
 import MyItems from "../../components/MyItems";
 import EditIcon from "@mui/icons-material/Edit";
@@ -12,6 +12,7 @@ import InfoIcon from "@mui/icons-material/Feed";
 import PatientPageHeader from "./components/PatientPageHeader";
 import PatientInfo from "./components/PatientInfo";
 import PatientEEG from "./components/PatientEEG";
+import { Patient } from "@/app/interface";
 
 interface PatientPageParms {
 	params: {
@@ -20,15 +21,27 @@ interface PatientPageParms {
 }
 
 const page = ({ params: { patient } }: PatientPageParms) => {
-	const patientId = parseInt(patient);
-	const patientName = parseInt(patient);
+	const [patientInfo, setPatientInfo] = useState<Patient | null>(null);
+
+	const getInfo = async () => {
+		const res = await fetch(`http://localhost:3000/api/patient/get_patient/?id=${patient}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+		return await res.json();
+	};
+
+	useEffect(() => {
+		getInfo().then((res) => setPatientInfo(res));
+	}, []);
 
 	return (
 		<div className="flex flex-col my-3 mx-5 gap-8">
-			<PatientPageHeader />
+			<PatientPageHeader patient={patientInfo} />
 
 			<div className="flex flex-col gap-8 mx-5">
-				<PatientInfo />
+				<PatientInfo patient={patientInfo} />
 				<PatientEEG />
 			</div>
 		</div>
