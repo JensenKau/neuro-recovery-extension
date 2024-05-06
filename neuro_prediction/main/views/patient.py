@@ -8,6 +8,23 @@ from ..models import Patient, User
 from ..serializers import ShortPatientSerializer, PatientSerializer
 
 
+class GetPatientView(ListAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request):
+        data = request.query_params
+        
+        print(data)
+        
+        patient = Patient.objects.get(id=data["id"])
+        patient_serializer = PatientSerializer(patient)
+        
+        return Response(patient_serializer.data)
+
+
+
+
 class GetPatientsView(ListAPIView):    
     def get_queryset(self):
         return Patient.objects.none()
@@ -38,6 +55,8 @@ class CreatePatientView(CreateAPIView):
         new_patient = Patient.objects.create(
             owner_id = user_email,
             name = f"{data['firstname']} {data['lastname']}",
+            first_name = data["firstname"],
+            last_name = data["lastname"],
             age = data["age"],
             sex = data["gender"],
             rosc = data["rosc"],

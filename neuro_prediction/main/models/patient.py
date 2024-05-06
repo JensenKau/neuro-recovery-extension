@@ -9,6 +9,9 @@ class Patient(models.Model):
     access = models.ManyToManyField(User, related_name="access", blank=True)
     
     name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255, null=True)
+    last_name = models.CharField(max_length=255, null=True)
+    
     age = models.PositiveIntegerField(null=True)
     sex = models.CharField(max_length=10, choices={"male": "male", "female": "female"}, null=True)
     rosc = models.FloatField(null=True)

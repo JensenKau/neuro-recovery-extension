@@ -27,9 +27,11 @@ const PatientEEGUploadForm = ({ open, onClose }: PatientEEGUploadFormProps) => {
 			maxWidth="sm"
 		>
 			<DialogTitle className="mx-auto mt-5 mb-3">
-				<Typography variant="h5" className="text-[#01579b]">
-					New Patient
-				</Typography>
+				<div>
+					<Typography variant="h5" className="text-[#01579b]">
+						New Patient
+					</Typography>
+				</div>
 			</DialogTitle>
 
 			<DialogContent className="flex flex-col gap-5">
