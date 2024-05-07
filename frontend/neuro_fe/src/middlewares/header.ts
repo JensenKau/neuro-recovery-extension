@@ -10,7 +10,7 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 			const res = await fetch(`${getApi()}${request.nextUrl.pathname}/${request.nextUrl.searchParams.toString() !== "" ? "?" + request.nextUrl.searchParams.toString() : ""}`, {
 				method: request.method,
 				headers: {
-					"Content-Type": "application/json",
+					...request.headers,
 					Authorization: `Bearer ${accessToken}`,
 				},
 				body: request.method === "POST" ? await request.text() : undefined,
