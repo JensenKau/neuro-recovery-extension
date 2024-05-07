@@ -6,7 +6,7 @@ import React from "react";
 
 interface UplaodFileButtonProps {
 	label: string;
-	onChange(file: string): void;
+	onChange(file: File): void;
 }
 
 const UploadFileButton = ({ label, onChange }: UplaodFileButtonProps) => {
@@ -21,7 +21,7 @@ const UploadFileButton = ({ label, onChange }: UplaodFileButtonProps) => {
 				<Typography className="my-auto text-slate-400 text-lg">
 					Upload from Computer
 				</Typography>
-				<input type="file" hidden onChange={(e) => {e.target.files ? onChange(e.target.files[0].name) : ""}} />
+				<input type="file" hidden onChange={(e) => {e.target.files ? onChange(e.target.files[0]) : ""}} />
 			</Button>
 		</div>
 	);

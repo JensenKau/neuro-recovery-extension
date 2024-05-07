@@ -14,9 +14,7 @@ class GetPatientView(ListAPIView):
     
     def get(self, request: Request):
         data = request.query_params
-        
-        print(data)
-        
+                
         patient = Patient.objects.get(id=data["id"])
         patient_serializer = PatientSerializer(patient)
         

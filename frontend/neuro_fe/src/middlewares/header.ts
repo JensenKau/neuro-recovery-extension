@@ -13,7 +13,7 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 					...request.headers,
 					Authorization: `Bearer ${accessToken}`,
 				},
-				body: request.method === "POST" ? await request.text() : undefined,
+				body: request.method === "POST" ? await request.formData() : undefined,
 			});
 
 			const content = await res.json();
