@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import { ShortPatient } from "./interface";
+import { ShortPatient } from "../interface";
 import { unstable_noStore as noStore } from "next/cache";
 
 import HomeSection from "./components/HomeSection";

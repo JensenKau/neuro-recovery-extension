@@ -12,10 +12,8 @@ class PatientEEG(models.Model):
     start_time = models.PositiveBigIntegerField()
     end_time = models.PositiveBigIntegerField()
     utility_freq = models.PositiveSmallIntegerField()
-    sampling_freq = models.PositiveSmallIntegerField()
-    
-    raw_file = models.CharField(max_length=255)
-    proc_file = models.CharField(max_length=255)
+    sampling_freq = models.PositiveSmallIntegerField()    
+    raw_file = models.FileField(upload_to="raw_eeg")
     
     static_fc = ArrayField(ArrayField(models.FloatField(), 22), 22)
     avg_fc = ArrayField(ArrayField(models.FloatField(), 22), 22)

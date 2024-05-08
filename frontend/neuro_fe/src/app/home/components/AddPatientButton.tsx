@@ -3,7 +3,7 @@
 import React from "react";
 import { useState } from "react";
 import AddPatientForm from "./AddPatientForm";
-import { ShortPatient } from "../interface";
+import { ShortPatient } from "../../interface";
 import { Button } from "@mui/material";
 
 interface AddPatientButtonProps {

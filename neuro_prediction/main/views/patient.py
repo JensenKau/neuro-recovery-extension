@@ -8,6 +8,21 @@ from ..models import Patient, User
 from ..serializers import ShortPatientSerializer, PatientSerializer
 
 
+class GetPatientView(ListAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request):
+        data = request.query_params
+                
+        patient = Patient.objects.get(id=data["id"])
+        patient_serializer = PatientSerializer(patient)
+        
+        return Response(patient_serializer.data)
+
+
+
+
 class GetPatientsView(ListAPIView):    
     def get_queryset(self):
         return Patient.objects.none()
@@ -38,6 +53,8 @@ class CreatePatientView(CreateAPIView):
         new_patient = Patient.objects.create(
             owner_id = user_email,
             name = f"{data['firstname']} {data['lastname']}",
+            first_name = data["firstname"],
+            last_name = data["lastname"],
             age = data["age"],
             sex = data["gender"],
             rosc = data["rosc"],
@@ -47,6 +64,46 @@ class CreatePatientView(CreateAPIView):
         )
         
         return Response(ShortPatientSerializer(new_patient).data) 
+    
+
+
+
+class AddUserAccess(CreateAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def post(self, request: Request):
+        data = request.data
+        
+        patient_id = data["patient_id"]
+        email = data["email"]
+        
+        Patient.access.through.objects.create(
+            patient_id=patient_id,
+            user_id=email
+        )
+        
+        return Response({})
+    
+    
+    
+
+class DeleteUserAccess(CreateAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def post(self, request: Request):
+        data = request.data
+        
+        patient_id = data["patient_id"]
+        email = data["email"]
+        
+        Patient.access.through.objects.filter(
+            patient_id=patient_id,
+            user_id=email
+        ).delete()
+        
+        return Response({})
 
 
 if __name__ == "__main__":

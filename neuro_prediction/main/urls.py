@@ -10,13 +10,22 @@ user_urls = [
 ]
 
 patient_urls = [
+    path("get_patient/", GetPatientView.as_view()),
     path("get_patients/", GetPatientsView.as_view()),
     path("create_patient/", CreatePatientView.as_view()),
+    path("add_user/", AddUserAccess.as_view()),
+    path("delete_user/", DeleteUserAccess.as_view()),
+]
+
+patient_eeg_urls = [
+    path("generate_eeg/", GenerateEEGData.as_view()),
+    path("get_eegs/", GetEEGs.as_view()),
 ]
 
 main_urls = [
     path("user/", include(user_urls)),
     path("patient/", include(patient_urls)),
+    path("patient_eeg/", include(patient_eeg_urls)),
 ]
  
 if __name__ == "__main__":

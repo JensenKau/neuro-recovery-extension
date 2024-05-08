@@ -2,7 +2,7 @@
 
 import React from "react";
 import PatientFolder from "./PatientFolder";
-import { ShortPatient } from "../interface";
+import { ShortPatient } from "../../interface";
 import { Typography } from "@mui/material";
 
 interface HomeSectionProp {
