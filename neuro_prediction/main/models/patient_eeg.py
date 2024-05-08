@@ -14,8 +14,8 @@ class PatientEEG(models.Model):
     utility_freq = models.PositiveSmallIntegerField()
     sampling_freq = models.PositiveSmallIntegerField()
     
-    raw_file = models.CharField(max_length=255)
-    proc_file = models.CharField(max_length=255)
+    raw_file = models.FileField(upload_to="raw_eeg")
+    proc_file = models.FileField(upload_to="proc_eeg")
     
     static_fc = ArrayField(ArrayField(models.FloatField(), 22), 22)
     avg_fc = ArrayField(ArrayField(models.FloatField(), 22), 22)
