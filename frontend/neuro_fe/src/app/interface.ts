@@ -17,3 +17,10 @@ export interface Patient {
 	shockable_rhythm: boolean;
 	ttm: number;
 }
+
+
+export interface ShortEEG {
+	patient: number;
+	name: string;
+	created_at: string;
+}

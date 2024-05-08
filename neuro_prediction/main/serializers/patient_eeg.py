@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from rest_framework.serializers import ModelSerializer, ListField, FileField, Serializer
 
-class MultipleFileSerializer(Serializer):
-    files = ListField(child=FileField())
+from ..models import PatientEEG
 
-if __name__ == "__main__":
-    pass
+class ShortEEGSerializer(ModelSerializer):
+    class Meta:
+        model = PatientEEG
+        fields = ["patient", "name", "created_at"]

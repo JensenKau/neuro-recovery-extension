@@ -3,18 +3,31 @@
 import React, { useEffect, useState } from "react";
 import PatientEEGItem from "./PatientEEGItem";
 import PatientEEGUploadButton from "./PatientEEGUploadButton";
-import { Patient } from "@/app/interface";
+import { Patient, ShortEEG } from "@/app/interface";
 
 interface PatientEEGProps {
 	patient: Patient | null;
 }
 
 const PatientEEG = ({ patient }: PatientEEGProps) => {
-	const [time, setTime] = useState("");
+	const [eegs, setEegs] = useState<ShortEEG[]>([]);
+
+	const getEEG = async () => {
+		if (patient) {
+			const res = await fetch(`http://localhost:3000/api/patient_eeg/get_eegs/?patient_id=${patient.id}`, {
+				method: "GET",
+				credentials: "include"
+			});
+
+			return (await res.json()).eegs;
+		}
+
+		return [];
+	};
 
 	useEffect(() => {
-		setTime(new Date().toLocaleString());
-	}, []);
+		getEEG().then(setEegs);
+	}, [patient]);
 
 	return (
 		<div className="flex flex-col gap-5">
@@ -22,7 +35,7 @@ const PatientEEG = ({ patient }: PatientEEGProps) => {
 				<div className="my-auto text-3xl text-blue-600">Patient EEGs</div>
 				<PatientEEGUploadButton patient={patient} />
 			</div>
-			<PatientEEGItem label="slkdfj" datetime={time} />
+			{eegs.map((val) => <PatientEEGItem patient={val.patient} label={val.name} datetime={new Date(val.created_at).toLocaleString()} key={val.name} />)}
 		</div>
 	);
 };

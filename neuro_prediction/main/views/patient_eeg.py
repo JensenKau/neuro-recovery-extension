@@ -9,6 +9,7 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 
 from ..models import PatientEEG, Patient
+from ..serializers import ShortEEGSerializer
 from src.patientdata.patient_data import PatientData
 from src.patientdata.eeg_data import PatientEEGData
 from src.patientdata.meta_data import PatientMetaData
@@ -18,7 +19,7 @@ class GenerateEEGData(CreateAPIView):
     def get_queryset(self):
         return super().get_queryset()
     
-    def post(self, request: Request):
+    def post(self, request: Request) -> Response:
         data = request.data
         
         patient_id = int(data["patient_id"])
@@ -70,6 +71,21 @@ class GenerateEEGData(CreateAPIView):
             )
                 
         return Response({})
+    
+    
+class GetEEGs(ListAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request) -> Response:
+        data = request.query_params
+        
+        patient_id = data["patient_id"]
+        
+        queries = PatientEEG.objects.filter(patient_id=patient_id)
+        serializer = ShortEEGSerializer(queries, many=True)
+        
+        return Response({"eegs": serializer.data})
 
 
 if __name__ == "__main__":
