@@ -9,9 +9,10 @@ import { Patient } from "@/app/interface";
 interface PatientEEGUploadButtonProps {
 	className?: string;
 	patient: Patient | null;
+	onUpload(): void;
 }
 
-const PatientEEGUploadButton = ({ className = "", patient }: PatientEEGUploadButtonProps) => {
+const PatientEEGUploadButton = ({ className = "", patient, onUpload }: PatientEEGUploadButtonProps) => {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -20,7 +21,7 @@ const PatientEEGUploadButton = ({ className = "", patient }: PatientEEGUploadBut
 				<FileUpload />
 				Upload EEG
 			</Button>
-			<PatientEEGUploadForm patient={patient} open={open} onClose={setOpen} />
+			<PatientEEGUploadForm patient={patient} open={open} onClose={setOpen} onUpload={onUpload} />
 		</>
 	);
 };

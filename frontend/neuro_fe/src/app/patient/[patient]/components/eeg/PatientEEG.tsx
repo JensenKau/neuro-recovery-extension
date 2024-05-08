@@ -11,6 +11,7 @@ interface PatientEEGProps {
 
 const PatientEEG = ({ patient }: PatientEEGProps) => {
 	const [eegs, setEegs] = useState<ShortEEG[]>([]);
+	const [uploaded, setUploaded] = useState(false);
 
 	const getEEG = async () => {
 		if (patient) {
@@ -27,13 +28,14 @@ const PatientEEG = ({ patient }: PatientEEGProps) => {
 
 	useEffect(() => {
 		getEEG().then(setEegs);
-	}, [patient]);
+		setUploaded(false);
+	}, [patient, uploaded]);
 
 	return (
 		<div className="flex flex-col gap-5">
 			<div className="flex justify-between">
 				<div className="my-auto text-3xl text-blue-600">Patient EEGs</div>
-				<PatientEEGUploadButton patient={patient} />
+				<PatientEEGUploadButton patient={patient} onUpload={() => setUploaded(true)} />
 			</div>
 			{eegs.map((val) => <PatientEEGItem patient={val.patient} label={val.name} datetime={new Date(val.created_at).toLocaleString()} key={val.name} />)}
 		</div>
