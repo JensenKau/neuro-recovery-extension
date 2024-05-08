@@ -25,6 +25,7 @@ const PatientEEGUploadForm = ({ patient, open, onClose }: PatientEEGUploadFormPr
 		if (patient && hea && mat) {
 			const formData = new FormData();
 			formData.append("patient_id", `${patient.id}`);
+			formData.append("filename", "some_file_name");
 			formData.append("heaFile", hea);
 			formData.append("matFile", mat);
 
