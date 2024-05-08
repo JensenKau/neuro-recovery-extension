@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+import shutil
 
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.request import Request
@@ -64,11 +65,13 @@ class GenerateEEGData(CreateAPIView):
                 end_time=patient_data.get_end_time(),
                 utility_freq=patient_data.get_utility_frequency(),
                 sampling_freq=patient_data.get_sampling_frequency(),
-                raw_file=File(file, name=f"{folder}/{filename}.mat"),
-                static_fc=static_fc,
-                avg_fc=avg_fc,
-                std_fc=std_fc
+                raw_file=ContentFile(file.read(), name=f"{filename}.mat"),
+                static_fc=static_fc.tolist(),
+                avg_fc=avg_fc.tolist(),
+                std_fc=std_fc.tolist()
             )
+        
+        shutil.rmtree(os.path.join(default_storage.location, folder))
                 
         return Response({})
     
