@@ -1,9 +1,9 @@
 "use client";
 
 import React, {useState, useEffect} from "react";
-import PatientPageHeader from "./components/PatientPageHeader";
-import PatientInfo from "./components/PatientInfo";
-import PatientEEG from "./components/PatientEEG";
+import PatientPageHeader from "./components/header/PatientPageHeader";
+import PatientInfo from "./components/info/PatientInfo";
+import PatientEEG from "./components/eeg/PatientEEG";
 import { Patient } from "@/app/interface";
 
 interface PatientPageParms {
