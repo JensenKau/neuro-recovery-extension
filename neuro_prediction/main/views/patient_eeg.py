@@ -3,7 +3,8 @@ from __future__ import annotations
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.cores.files import File
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 
 from ..models import PatientEEG
 
@@ -14,11 +15,14 @@ class GenerateEEGData(CreateAPIView):
     def post(self, request: Request):
         data = request.data
         
-        patient_id = data["patient_id"]
+        patient_id = int(data["patient_id"])
         heaFile = data["heaFile"]
         matFile = data["matFile"]
         
-        # filecount = len(PatientEEG.objects.filter(patient_id=patient_id))
+        filecount = len(PatientEEG.objects.filter(patient_id=patient_id))
+        
+        default_storage.save(f"header_eeg/{patient_id}_{filecount}.hea", heaFile)
+        default_storage.save(f"raw_eeg/{patient_id}_{filecount}.mat", matFile)
         
         # with open(f"./tmp/{patient_id}_{filecount}.txt", "wb") as file:
         #     for chunk in heaFile.chunks():
@@ -27,8 +31,6 @@ class GenerateEEGData(CreateAPIView):
         # with open(f"./tmp/{patient_id}_{filecount}.mat", "wb") as file:
         #     for chunk in matFile.chunks():
         #         file.write(chunk)
-                
-        
         
         return Response({})
 

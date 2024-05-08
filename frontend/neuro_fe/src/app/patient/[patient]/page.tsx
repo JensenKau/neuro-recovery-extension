@@ -40,7 +40,7 @@ const page = ({ params: { patient } }: PatientPageParms) => {
 
 			<div className="flex flex-col gap-8 mx-5">
 				<PatientInfo patient={patientInfo} />
-				<PatientEEG />
+				<PatientEEG patient={patientInfo} />
 			</div>
 		</div>
 	);

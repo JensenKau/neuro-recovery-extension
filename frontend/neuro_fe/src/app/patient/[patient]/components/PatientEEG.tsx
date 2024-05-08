@@ -3,8 +3,13 @@
 import React, { useEffect, useState } from "react";
 import PatientEEGItem from "./PatientEEGItem";
 import PatientEEGUploadButton from "./PatientEEGUploadButton";
+import { Patient } from "@/app/interface";
 
-const PatientEEG = () => {
+interface PatientEEGProps {
+	patient: Patient | null;
+}
+
+const PatientEEG = ({ patient }: PatientEEGProps) => {
 	const [time, setTime] = useState("");
 
 	useEffect(() => {
@@ -15,7 +20,7 @@ const PatientEEG = () => {
 		<div className="flex flex-col gap-5">
 			<div className="flex justify-between">
 				<div className="my-auto text-3xl text-blue-600">Patient EEGs</div>
-				<PatientEEGUploadButton />
+				<PatientEEGUploadButton patient={patient} />
 			</div>
 			<PatientEEGItem label="slkdfj" datetime={time} />
 		</div>

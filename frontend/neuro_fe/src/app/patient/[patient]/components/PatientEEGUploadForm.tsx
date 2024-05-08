@@ -9,19 +9,22 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import UploadFileButton from "./UploadFileButton";
+import { Patient } from "@/app/interface";
 
 interface PatientEEGUploadFormProps {
+	patient: Patient | null;
 	open: boolean;
 	onClose(value: boolean): void;
 }
 
-const PatientEEGUploadForm = ({ open, onClose }: PatientEEGUploadFormProps) => {
+const PatientEEGUploadForm = ({ patient, open, onClose }: PatientEEGUploadFormProps) => {
 	const [hea, setHea] = useState<File | null>(null);
 	const [mat, setMat] = useState<File | null>(null);
 
 	const uploadFile = async () => {
-		if (hea && mat) {
+		if (patient && hea && mat) {
 			const formData = new FormData();
+			formData.append("patient_id", `${patient.id}`);
 			formData.append("heaFile", hea);
 			formData.append("matFile", mat);
 

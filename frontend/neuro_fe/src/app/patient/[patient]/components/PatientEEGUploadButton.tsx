@@ -4,12 +4,14 @@ import { Button } from "@mui/material";
 import { FileUpload } from "@mui/icons-material";
 import React, { useState } from "react";
 import PatientEEGUploadForm from "./PatientEEGUploadForm";
+import { Patient } from "@/app/interface";
 
 interface PatientEEGUploadButtonProps {
 	className?: string;
+	patient: Patient | null;
 }
 
-const PatientEEGUploadButton = ({className = ""}: PatientEEGUploadButtonProps) => {
+const PatientEEGUploadButton = ({ className = "", patient }: PatientEEGUploadButtonProps) => {
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -18,7 +20,7 @@ const PatientEEGUploadButton = ({className = ""}: PatientEEGUploadButtonProps) =
 				<FileUpload />
 				Upload EEG
 			</Button>
-			<PatientEEGUploadForm open={open} onClose={setOpen} />
+			<PatientEEGUploadForm patient={patient} open={open} onClose={setOpen} />
 		</>
 	);
 };
