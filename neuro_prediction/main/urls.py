@@ -20,6 +20,7 @@ patient_urls = [
 patient_eeg_urls = [
     path("generate_eeg/", GenerateEEGData.as_view()),
     path("get_eegs/", GetEEGs.as_view()),
+    path("get_eeg/", GetEEG.as_view()),
 ]
 
 main_urls = [
