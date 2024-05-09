@@ -36,3 +36,15 @@ export interface EEG {
 	created_at: string;
 	updated_at: string;
 }
+
+
+export interface Prediction {
+	patient_eeg: number;
+	ai_model: {
+		id: number;
+		name: string;
+	};
+	outcome_pred: string;
+	confidence: number;
+	comments: string;
+}

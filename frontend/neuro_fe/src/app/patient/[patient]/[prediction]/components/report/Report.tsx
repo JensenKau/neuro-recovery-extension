@@ -4,10 +4,11 @@ import React, { useState, useEffect } from "react";
 import ReportHeader from "./ReportHeader";
 import ReportInfo from "./ReportInfo";
 import ReportContent from "./ReportContent";
-import { EEG } from "@/app/interface";
+import { EEG, Prediction } from "@/app/interface";
 
 const Report = () => {
   const [eeg, setEeg] = useState<EEG>();
+  const [prediction, setPrediction] = useState<Prediction>();
 
   const getTime = (time: number) => {
     const hr = Math.floor(time / 3600);
@@ -31,11 +32,17 @@ const Report = () => {
   };
 
   const getPrediction = async () => {
+    const res = await fetch("http://localhost:3000/api/prediction/get_prediction/?eeg_id=8", {
+      method: "GET",
+      credentials: "include"
+    });
 
+    return await res.json();
   };
 
   useEffect(() => {
     getEEG().then(setEeg);
+    getPrediction().then(setPrediction);
   }, [])
 
   return (
@@ -49,13 +56,13 @@ const Report = () => {
           { key: "Utility Frequency", value: `${eeg.utility_freq}` },
           { key: "Sampling Frequency", value: `${eeg.sampling_freq}` }
         ]} />}
-        
 
-        <ReportInfo title="Model Prediction" items={[
-          { key: "Model Name", value: getTime(0) },
-          { key: "Outcome Prediction", value: getTime(0) },
-          { key: "Prediction Confidence", value: `${0}` },
-        ]} />
+        {prediction && <ReportInfo title="Model Prediction" items={[
+          { key: "Model ID", value: `${prediction.ai_model.id}` },
+          { key: "Model Name", value: prediction.ai_model.name },
+          { key: "Outcome Prediction", value: `${prediction.outcome_pred}`},
+          { key: "Prediction Confidence", value: `${prediction?.confidence}` }
+        ]} />}
       </div>
 
       <ReportContent />
