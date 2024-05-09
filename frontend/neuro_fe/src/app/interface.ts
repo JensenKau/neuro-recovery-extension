@@ -27,6 +27,7 @@ export interface ShortEEG {
 
 
 export interface EEG {
+	id: number;
 	patient: number;
 	name: string;
 	start_time: number;

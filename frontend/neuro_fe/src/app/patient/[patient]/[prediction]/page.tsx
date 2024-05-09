@@ -10,11 +10,18 @@ import { Margin } from "@mui/icons-material";
 import Report from "./components/report/Report";
 import { EEG } from "@/app/interface";
 
-const page = () => {
+interface PredictionPageProps {
+  params: {
+    patient: string;
+    prediction: string;
+  }
+}
+
+const page = ({ params }: PredictionPageProps) => {
   return (
     <div className="grid grid-cols-2 h-screen">
       <div />
-      <Report />
+      <Report patient_id={parseInt(params.patient)} filename={params.prediction} />
     </div>
   );
 

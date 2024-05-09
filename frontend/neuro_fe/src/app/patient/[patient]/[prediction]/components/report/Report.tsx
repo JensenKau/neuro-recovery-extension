@@ -6,7 +6,12 @@ import ReportInfo from "./ReportInfo";
 import ReportContent from "./ReportContent";
 import { EEG, Prediction } from "@/app/interface";
 
-const Report = () => {
+interface ReportProps {
+  patient_id: number;
+  filename: string;
+}
+
+const Report = ({patient_id, filename}: ReportProps) => {
   const [eeg, setEeg] = useState<EEG>();
   const [prediction, setPrediction] = useState<Prediction>();
 
@@ -23,7 +28,7 @@ const Report = () => {
   }
 
   const getEEG = async () => {
-    const res = await fetch("http://localhost:3000/api/patient_eeg/get_eeg/?patient_id=4&filename=some_file_name", {
+    const res = await fetch(`http://localhost:3000/api/patient_eeg/get_eeg/?patient_id=${patient_id}&filename=${filename}`, {
       method: "GET",
       credentials: "include"
     });
@@ -32,7 +37,7 @@ const Report = () => {
   };
 
   const getPrediction = async () => {
-    const res = await fetch("http://localhost:3000/api/prediction/get_prediction/?eeg_id=8", {
+    const res = await fetch(`http://localhost:3000/api/prediction/get_prediction/?eeg_id=${eeg?.id}`, {
       method: "GET",
       credentials: "include"
     });
@@ -42,8 +47,11 @@ const Report = () => {
 
   useEffect(() => {
     getEEG().then(setEeg);
+  }, []);
+
+  useEffect(() => {
     getPrediction().then(setPrediction);
-  }, [])
+  }, [eeg])
 
   return (
     <div className="flex flex-col gap-5 bg-slate-200 h-full py-3 px-5">
