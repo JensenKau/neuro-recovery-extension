@@ -40,6 +40,7 @@ export interface EEG {
 
 
 export interface Prediction {
+	id: number;
 	patient_eeg: number;
 	ai_model: {
 		id: number;

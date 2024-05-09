@@ -3,6 +3,19 @@ import { MiddlewareFactory } from "./types";
 import { getApi } from "./api";
 
 export const headerMiddleware: MiddlewareFactory = (next) => {
+	const extractBody = async (request: NextRequest) => {
+		if (request.method === "POST") {
+			const clone = request.clone();
+
+			try {
+				return await clone.formData();
+			} catch (err) {
+				return await request.blob();
+			}
+		}
+		return undefined;
+	};
+
 	return async (request: NextRequest, _next: NextFetchEvent) => {
 		if (request.nextUrl.pathname.startsWith("/api")) {
 			const accessToken = request.cookies.get("jwt_access")?.value;
@@ -13,7 +26,7 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 					...request.headers,
 					Authorization: `Bearer ${accessToken}`,
 				},
-				body: request.method === "POST" ? await request.formData() : undefined,
+				body: await extractBody(request),
 			});
 
 			const content = await res.json();

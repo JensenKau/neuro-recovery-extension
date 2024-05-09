@@ -11,7 +11,7 @@ interface ReportProps {
   filename: string;
 }
 
-const Report = ({patient_id, filename}: ReportProps) => {
+const Report = ({ patient_id, filename }: ReportProps) => {
   const [eeg, setEeg] = useState<EEG>();
   const [prediction, setPrediction] = useState<Prediction>();
 
@@ -37,12 +37,14 @@ const Report = ({patient_id, filename}: ReportProps) => {
   };
 
   const getPrediction = async () => {
-    const res = await fetch(`http://localhost:3000/api/prediction/get_prediction/?eeg_id=${eeg?.id}`, {
-      method: "GET",
-      credentials: "include"
-    });
+    if (eeg) {
+      const res = await fetch(`http://localhost:3000/api/prediction/get_prediction/?eeg_id=${eeg?.id}`, {
+        method: "GET",
+        credentials: "include"
+      });
 
-    return await res.json();
+      return await res.json();
+    }
   };
 
   useEffect(() => {
@@ -51,7 +53,7 @@ const Report = ({patient_id, filename}: ReportProps) => {
 
   useEffect(() => {
     getPrediction().then(setPrediction);
-  }, [eeg])
+  }, [eeg]);
 
   return (
     <div className="flex flex-col gap-5 bg-slate-200 h-full py-3 px-5">
@@ -68,12 +70,12 @@ const Report = ({patient_id, filename}: ReportProps) => {
         {prediction && <ReportInfo title="Model Prediction" items={[
           { key: "Model ID", value: `${prediction.ai_model.id}` },
           { key: "Model Name", value: prediction.ai_model.name },
-          { key: "Outcome Prediction", value: `${prediction.outcome_pred}`},
+          { key: "Outcome Prediction", value: `${prediction.outcome_pred}` },
           { key: "Prediction Confidence", value: `${prediction?.confidence}` }
         ]} />}
       </div>
 
-      <ReportContent />
+      {prediction && <ReportContent eeg_id={prediction.id} startComment={prediction.comments} /> }
     </div>
   );
 };

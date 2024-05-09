@@ -1,20 +1,43 @@
 "use client";
 
 import { Typography, TextField, Button } from "@mui/material";
-import { Edit, Save, IosShare } from "@mui/icons-material";
+import { Save, IosShare } from "@mui/icons-material";
 import React, { useState } from "react";
 
-const ReportContent = () => {
+interface ReportContentProps {
+  eeg_id: number;
+  startComment: string;
+}
+
+const ReportContent = ({ eeg_id, startComment}: ReportContentProps) => {
+  const [comment, setComment] = useState(startComment);
+
+  const saveChanges = async () => {
+    const res = await fetch("http://localhost:3000/api/prediction/update_comment", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8"
+      },
+      body: JSON.stringify({
+        eeg_id: eeg_id,
+        comment: comment
+      })
+    });
+
+    console.log(await res.text())
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex justify-between">
         <Typography variant="h5">Comment</Typography>
       </div>
 
-      <TextField className="w-full" label="Comment" maxRows={10} multiline />
+      <TextField className="w-full" label="Comment" defaultValue={comment} onChange={(e) => setComment(e.target.value)} maxRows={10} multiline />
 
       <div className="flex flex-row-reverse gap-2">
-        <Button variant="contained" className="flex gap-1 normal-case">
+        <Button variant="contained" className="flex gap-1 normal-case" onClick={saveChanges}>
           <Save />
           Save Changes
         </Button>

@@ -27,12 +27,12 @@ class UpdatePredictionComment(CreateAPIView):
         return super().get_queryset()
     
     def post(self, request: Request) -> Response:
-        data = request.body
-        
+        data = request.data
+                
         eeg_id = data["eeg_id"]
         comment = data["comment"]
         
-        query = Prediction.objects.get(patient_eeg_id=eeg_id)
+        query = Prediction.objects.get(id=eeg_id)
         query.comments = comment
         query.save()
         
