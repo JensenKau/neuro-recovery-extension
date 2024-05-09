@@ -8,8 +8,7 @@ import Button from "@mui/material/Button";
 import SnackBarButton from "../../../components/SnackBarButton";
 import { Margin } from "@mui/icons-material";
 import Report from "./components/report/Report";
-import { EEG } from "@/app/interface";
-
+import Display from "./components/display/Display";
 interface PredictionPageProps {
   params: {
     patient: string;
@@ -20,7 +19,7 @@ interface PredictionPageProps {
 const page = ({ params }: PredictionPageProps) => {
   return (
     <div className="grid grid-cols-2 h-screen">
-      <div />
+      <Display />
       <Report patient_id={parseInt(params.patient)} filename={params.prediction} />
     </div>
   );

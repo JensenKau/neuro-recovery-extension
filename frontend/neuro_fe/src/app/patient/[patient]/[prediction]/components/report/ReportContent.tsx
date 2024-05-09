@@ -17,21 +17,19 @@ const ReportContent = ({ eeg_id, startComment}: ReportContentProps) => {
       method: "POST",
       credentials: "include",
       headers: {
-        "Content-Type": "application/json; charset=UTF-8"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         eeg_id: eeg_id,
         comment: comment
       })
     });
-
-    console.log(await res.text())
   }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex justify-between">
-        <Typography variant="h5">Comment</Typography>
+        <Typography variant="h5" className="text-blue-600 text-3xl">Comment</Typography>
       </div>
 
       <TextField className="w-full" label="Comment" defaultValue={comment} onChange={(e) => setComment(e.target.value)} maxRows={10} multiline />
