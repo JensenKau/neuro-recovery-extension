@@ -23,10 +23,16 @@ patient_eeg_urls = [
     path("get_eeg/", GetEEG.as_view()),
 ]
 
+prediction_urls = [
+    path("get_prediction/", GetPrediction.as_view()),
+    path("update_comment/", UpdatePredictionComment.as_view()),
+]
+
 main_urls = [
     path("user/", include(user_urls)),
     path("patient/", include(patient_urls)),
     path("patient_eeg/", include(patient_eeg_urls)),
+    path("prediction/", include(prediction_urls)),
 ]
  
 if __name__ == "__main__":
