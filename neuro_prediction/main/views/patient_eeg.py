@@ -9,12 +9,13 @@ from django.core.files.base import ContentFile
 from django.core.files import File
 from django.core.files.storage import default_storage
 
-from ..models import PatientEEG, Patient
+from ..models import PatientEEG, Patient, Prediction, AiModel
 from ..serializers import ShortEEGSerializer, EEGSerializer, FCSerializer
 from src.patientdata.patient_data import PatientData
 from src.patientdata.eeg_data import PatientEEGData
 from src.patientdata.meta_data import PatientMetaData
 from src.patientdata.data_enum import *
+from src.mlmodels.pytorch_models.dynamic.cnn_dynamic2_2 import CnnDynamic2_2
 
 class GenerateEEGData(CreateAPIView):    
     def get_queryset(self):
@@ -55,24 +56,40 @@ class GenerateEEGData(CreateAPIView):
             )
         )
         
-        avg_fc, std_fc, static_fc = patient_data.get_fcs()
+        patient_eeg = None
         
-        with open(os.path.join(default_storage.location, f"{folder}/{filename}.mat"), "rb") as file:
-            PatientEEG.objects.create(
-                name=filename,
-                patient=patient,
-                start_time=patient_data.get_start_time(),
-                end_time=patient_data.get_end_time(),
-                utility_freq=patient_data.get_utility_frequency(),
-                sampling_freq=patient_data.get_sampling_frequency(),
-                raw_file=ContentFile(file.read(), name=f"{filename}.mat"),
-                static_fc=static_fc.tolist(),
-                avg_fc=avg_fc.tolist(),
-                std_fc=std_fc.tolist()
-            )
+        with open(os.path.join(default_storage.location, f"{folder}/{filename}.mat"), "rb") as mat_file:
+            with open(os.path.join(default_storage.location, f"{folder}/{filename}.hea"), "rb") as hea_file:
+                avg_fc, std_fc, static_fc = patient_data.get_fcs()
+                patient_eeg = PatientEEG.objects.create(
+                    name=filename,
+                    patient=patient,
+                    start_time=patient_data.get_start_time(),
+                    end_time=patient_data.get_end_time(),
+                    utility_freq=patient_data.get_utility_frequency(),
+                    sampling_freq=patient_data.get_sampling_frequency(),
+                    header_file=ContentFile(hea_file.read(), name=f"{filename}.hea"),
+                    raw_file=ContentFile(mat_file.read(), name=f"{filename}.mat"),
+                    static_fc=static_fc.tolist(),
+                    avg_fc=avg_fc.tolist(),
+                    std_fc=std_fc.tolist()
+                )
         
         shutil.rmtree(os.path.join(default_storage.location, folder))
-                
+        
+        cnn = CnnDynamic2_2()
+        cnn.load_model("./mlmodel/model_0.pt")
+        pred, conf = cnn.predict_result([patient_data])[0]
+        
+        Prediction.objects.create(
+            patient_eeg=patient_eeg,
+            ai_model=AiModel.objects.get(id=1),
+            outcome_pred="good" if pred == 0 else "bad",
+            cpc_pred=None,
+            confidence=conf,
+            comments=""
+        )
+        
         return Response({})
     
     
@@ -121,6 +138,23 @@ class GetFCs(ListAPIView):
         serializer = FCSerializer(query)
         
         return Response(serializer.data)
+    
+    
+class GetEEGPoints(ListAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request) -> Response:
+        data = request.query_params
+        
+        patient_id = data["patient_id"]
+        filename = data["filename"]
+        
+        query = PatientEEG.objects.get(patient_id=patient_id, name=filename)
+        
+        
+        return Response({})
+
 
 
 if __name__ == "__main__":

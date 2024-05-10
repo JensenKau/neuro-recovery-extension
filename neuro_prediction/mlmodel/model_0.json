@@ -1,0 +1,1 @@
+{"epoch": 100, "output_chn1_1": 3, "kernel1_1": 3, "relu1_1": true, "output_chn1_2": 13, "kernel1_2": 4, "relu1_2": true, "pool1_1": 4, "output_chn2_1": 5, "kernel2_1": 4, "relu2_1": true, "output_chn2_2": 7, "kernel2_2": 3, "relu2_2": true, "pool2_1": 4, "output_chn3_1": 6, "kernel3_1": 4, "relu3_1": false, "pool3_1": 2, "linear_layer": 1}

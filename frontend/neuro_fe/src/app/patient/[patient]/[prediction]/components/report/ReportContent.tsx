@@ -9,7 +9,7 @@ interface ReportContentProps {
   startComment: string;
 }
 
-const ReportContent = ({ eeg_id, startComment}: ReportContentProps) => {
+const ReportContent = ({ eeg_id, startComment }: ReportContentProps) => {
   const [comment, setComment] = useState(startComment);
 
   const saveChanges = async () => {

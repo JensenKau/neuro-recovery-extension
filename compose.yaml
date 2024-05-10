@@ -1,13 +1,13 @@
 version: "1"
 
 services:
-  frontend:
-    build: "./frontend/neuro_fe"
-    command: ["npm", "run", "dev"]
-    volumes:
-      - "./frontend/neuro_fe:/app"
-    ports:
-      - "3000:3000"
+  # frontend:
+  #   build: "./frontend/neuro_fe"
+  #   command: ["npm", "run", "dev"]
+  #   volumes:
+  #     - "./frontend/neuro_fe:/app"
+  #   ports:
+  #     - "3000:3000"
     
 
   backend:
@@ -47,11 +47,3 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
-
-
-  storage:
-    image: "localstack/localstack:s3-latest"
-    ports:
-      - "4566:4566"
-    volumes:
-      - "./localstack_storage:/var/lib/localstack"

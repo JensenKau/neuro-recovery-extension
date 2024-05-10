@@ -38,7 +38,7 @@ const Report = ({ patient_id, filename }: ReportProps) => {
 
   const getPrediction = async () => {
     if (eeg) {
-      const res = await fetch(`http://localhost:3000/api/prediction/get_prediction/?eeg_id=${eeg?.id}`, {
+      const res = await fetch(`http://localhost:3000/api/prediction/get_prediction/?eeg_id=${eeg.id}`, {
         method: "GET",
         credentials: "include"
       });
@@ -71,7 +71,7 @@ const Report = ({ patient_id, filename }: ReportProps) => {
           { key: "Model ID", value: `${prediction.ai_model.id}` },
           { key: "Model Name", value: prediction.ai_model.name },
           { key: "Outcome Prediction", value: `${prediction.outcome_pred}` },
-          { key: "Prediction Confidence", value: `${prediction?.confidence}` }
+          { key: "Prediction Confidence", value: `${Math.round((prediction.confidence + Number.EPSILON) * 1e5) / 1e5}` }
         ]} />}
       </div>
 

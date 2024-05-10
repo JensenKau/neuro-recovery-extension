@@ -40,7 +40,7 @@ const FuncConnChart = ({matrix}: FuncConnChartProps) => {
         return {
           from: val / 100,
           to: ((val + 1) / 100) - 1e-9,
-          color: `#${convert.hwb.hex([0, val, 0])}`
+          color: `#${convert.hwb.hex([0, 100 - val, 0])}`
         };
       });
 
