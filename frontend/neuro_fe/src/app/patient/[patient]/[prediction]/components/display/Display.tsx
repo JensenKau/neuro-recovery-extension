@@ -2,12 +2,16 @@
 
 import React, { useState } from "react";
 import { Box, Tabs, Tab } from "@mui/material";
-import { ClassNames } from "@emotion/react";
 import BrainEEG from "./BrainEEG";
 import FuncConn from "./FuncConn";
 import BrainPlot from "./BrainPlot";
 
-const Display = () => {
+interface DisplayProps {
+  patient_id: number;
+  filename: string;
+}
+
+const Display = ({patient_id, filename}: DisplayProps) => {
   const [tab, setTab] = useState(0);
 
   return (
@@ -27,7 +31,7 @@ const Display = () => {
       </div>
 
       <div hidden={tab !== 1}>
-        <FuncConn />
+        <FuncConn patient_id={patient_id} filename={filename} />
       </div>
 
       <div hidden={tab !== 2}>

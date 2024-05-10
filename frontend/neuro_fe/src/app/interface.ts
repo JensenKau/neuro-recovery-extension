@@ -50,3 +50,10 @@ export interface Prediction {
 	confidence: number;
 	comments: string;
 }
+
+
+export interface FunctionalConnectivity {
+	static_fc: Array<Array<number>>;
+	avg_fc: Array<Array<number>>;
+	std_fc: Array<Array<number>>;
+}

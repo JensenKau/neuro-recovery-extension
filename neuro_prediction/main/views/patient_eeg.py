@@ -10,7 +10,7 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 
 from ..models import PatientEEG, Patient
-from ..serializers import ShortEEGSerializer, EEGSerializer
+from ..serializers import ShortEEGSerializer, EEGSerializer, FCSerializer
 from src.patientdata.patient_data import PatientData
 from src.patientdata.eeg_data import PatientEEGData
 from src.patientdata.meta_data import PatientMetaData
@@ -55,7 +55,7 @@ class GenerateEEGData(CreateAPIView):
             )
         )
         
-        static_fc, avg_fc, std_fc = patient_data.get_fcs()
+        avg_fc, std_fc, static_fc = patient_data.get_fcs()
         
         with open(os.path.join(default_storage.location, f"{folder}/{filename}.mat"), "rb") as file:
             PatientEEG.objects.create(
@@ -106,6 +106,21 @@ class GetEEG(ListAPIView):
         
         return Response(serializer.data)
     
+    
+class GetFCs(ListAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request) -> Response:
+        data = request.query_params
+        
+        patient_id = data["patient_id"]
+        filename = data["filename"]
+        
+        query = PatientEEG.objects.get(patient_id=patient_id, name=filename)
+        serializer = FCSerializer(query)
+        
+        return Response(serializer.data)
 
 
 if __name__ == "__main__":
