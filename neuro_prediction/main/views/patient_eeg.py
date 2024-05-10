@@ -1,6 +1,7 @@
 from __future__ import annotations
 import os
 import shutil
+from typing import List, Tuple
 
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.request import Request
@@ -8,12 +9,16 @@ from rest_framework.response import Response
 from django.core.files.base import ContentFile
 from django.core.files import File
 from django.core.files.storage import default_storage
+import numpy as np
+from numpy.typing import NDArray
+import scipy
 
 from ..models import PatientEEG, Patient, Prediction, AiModel
 from ..serializers import ShortEEGSerializer, EEGSerializer, FCSerializer
 from src.patientdata.patient_data import PatientData
 from src.patientdata.eeg_data import PatientEEGData
 from src.patientdata.meta_data import PatientMetaData
+from src.patientdata.connectivity_data import PatientConnectivityData
 from src.patientdata.data_enum import *
 from src.mlmodels.pytorch_models.dynamic.cnn_dynamic2_2 import CnnDynamic2_2
 
@@ -143,6 +148,26 @@ class GetFCs(ListAPIView):
 class GetEEGPoints(ListAPIView):
     def get_queryset(self):
         return super().get_queryset()
+
+    
+    def load_patient_connectivity(self, eeg_data: PatientEEGData) -> List[List[float]]:
+        actual_eeg = eeg_data.get_eeg_data()
+        num_points = eeg_data.get_num_points()
+        sampling_frequency = eeg_data.get_sampling_frequency()
+        utility_frequency = eeg_data.get_utility_frequency()
+        regions = PatientConnectivityData.BRAIN_REGION
+        organized_data = [None] * len(regions)
+
+        for i in range(len(regions)):
+            if regions[i] in actual_eeg:
+                organized_data[i] = actual_eeg[regions[i]]
+            else:
+                organized_data[i] = np.zeros(num_points)
+                
+        organized_data, sampling_frequency = PatientConnectivityData.preprocess_data(np.array(organized_data), sampling_frequency, utility_frequency)
+        
+        return organized_data.tolist()
+    
     
     def get(self, request: Request) -> Response:
         data = request.query_params
@@ -151,9 +176,13 @@ class GetEEGPoints(ListAPIView):
         filename = data["filename"]
         
         query = PatientEEG.objects.get(patient_id=patient_id, name=filename)
+
+        eeg = PatientEEGData.load_eeg_data(query.header_file.path, query.raw_file.path)
+        processed = self.load_patient_connectivity(eeg)
         
-        
-        return Response({})
+        return Response({
+            "data": processed
+        })
 
 
 
