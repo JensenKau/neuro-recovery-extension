@@ -29,8 +29,8 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 				body: await extractBody(request),
 			});
 
-			const content = await res.json();
-			const output = NextResponse.json(content);
+			const content = await res.blob();
+			const output = new NextResponse(content);
 
 			if (accessToken !== undefined) {
 				output.cookies.set({ name: "jwt_access", value: accessToken });

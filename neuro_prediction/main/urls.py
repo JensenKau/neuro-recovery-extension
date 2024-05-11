@@ -23,6 +23,7 @@ patient_eeg_urls = [
     path("get_eeg/", GetEEG.as_view()),
     path("get_fcs/", GetFCs.as_view()),
     path("get_eeg_points/", GetEEGPoints.as_view()),
+    path("get_brain_plot/", GetBrainPlot.as_view()),
 ]
 
 prediction_urls = [

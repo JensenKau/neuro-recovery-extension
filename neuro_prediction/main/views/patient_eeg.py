@@ -2,16 +2,19 @@ from __future__ import annotations
 import os
 import shutil
 from typing import List, Tuple
+import random
+import string
 
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.renderers import TemplateHTMLRenderer, StaticHTMLRenderer
 from django.core.files.base import ContentFile
 from django.core.files import File
 from django.core.files.storage import default_storage
 import numpy as np
-from numpy.typing import NDArray
 import scipy
+from nilearn import plotting
 
 from ..models import PatientEEG, Patient, Prediction, AiModel
 from ..serializers import ShortEEGSerializer, EEGSerializer, FCSerializer
@@ -183,7 +186,61 @@ class GetEEGPoints(ListAPIView):
         return Response({
             "data": processed
         })
+        
+        
+class GetBrainPlot(ListAPIView):
+    renderer_classes = [StaticHTMLRenderer]
+    
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request) -> Response:
+        data = request.query_params
+        
+        patient_id = data["patient_id"]
+        filename = data["filename"]
+        plot = data["plot"]
+        
+        query = PatientEEG.objects.get(patient_id=patient_id, name=filename)
+        fc = query.static_fc if plot == "static" else query.avg_fc
 
+        coords = [
+            (-18, 62, 0),
+            (24, 60, 0),
+            (-48, 26, -4),
+            (48, 24, -8),
+            (-38, 28, 38),
+            (42, 30, 34),
+            (-60, -18, -8),
+            (64, -18, -10),
+            (-48, -18, 52),
+            (52, -14, 48),
+            (-52, -64, 0 ),
+            (54, -60, -2 ),
+            (-40, -66, 46),
+            (46, -62, 42),
+            (-24, -92, 10),
+            (26, -92, 8),
+            (2, 32, 54),
+            (4, -16, 70),
+            (4, -64, 58),
+            (4, 62, 0),
+            (2, -92, 10),
+            (2, -92, 10)
+        ]
+        
+        html_file = f"{''.join(random.choices(string.ascii_lowercase + string.digits, k=10))}.html"
+        
+        view = plotting.view_connectome(fc, coords, edge_threshold='70%')
+        view.save_as_html(html_file)
+        
+        res = None
+        with open(html_file, "r") as file:
+            res = file.read()
+            
+        os.remove(html_file)
+        
+        return Response(res)
 
 
 if __name__ == "__main__":

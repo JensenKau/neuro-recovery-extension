@@ -15,7 +15,7 @@ const Display = ({patient_id, filename}: DisplayProps) => {
   const [tab, setTab] = useState(0);
 
   return (
-    <Box className="m-3 rounded">
+    <Box className="m-3 rounded h-full">
       <Tabs value={tab}
         onChange={(e, val) => setTab(val)}
         variant="fullWidth"
@@ -26,16 +26,16 @@ const Display = ({patient_id, filename}: DisplayProps) => {
         <Tab label="3D Brain Plotting" />
       </Tabs>
 
-      <div hidden={tab !== 0}>
+      <div hidden={tab !== 0} className="h-full">
         <BrainEEG patient_id={patient_id} filename={filename} />
       </div>
 
-      <div hidden={tab !== 1}>
+      <div hidden={tab !== 1} className="h-full">
         <FuncConn patient_id={patient_id} filename={filename} />
       </div>
 
-      <div hidden={tab !== 2}>
-        <BrainPlot />
+      <div hidden={tab !== 2} className="h-full">
+        <BrainPlot patient_id={patient_id} filename={filename} />
       </div>
     </Box>
   );
