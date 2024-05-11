@@ -45,7 +45,7 @@ class PatientConnectivityData:
       
       
     @classmethod
-    def preprocess_data(cls, data: NDArray, sampling_frequency: int, utility_frequency: int) -> Tuple[NDArray, int]:
+    def preprocess_data(cls, data: NDArray, sampling_frequency: int, utility_frequency: int, resampling_frequency: int = None) -> Tuple[NDArray, int]:
         # Define the bandpass frequencies.
         passband = [0.1, 30.0]
 
@@ -59,11 +59,12 @@ class PatientConnectivityData:
         # Apply a bandpass filter.
         data = mne.filter.filter_data(data, sampling_frequency, passband[0], passband[1], n_jobs=4, verbose='error')
 
-        # Resample the data.
-        if sampling_frequency % 2 == 0:
-            resampling_frequency = 128
-        else:
-            resampling_frequency = 125
+        if resampling_frequency is None:
+            # Resample the data.
+            if sampling_frequency % 2 == 0:
+                resampling_frequency = 128
+            else:
+                resampling_frequency = 125
             
         lcm = np.lcm(int(round(sampling_frequency)), int(round(resampling_frequency)))
         up = int(round(lcm / sampling_frequency))

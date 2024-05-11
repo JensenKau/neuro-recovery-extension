@@ -164,7 +164,7 @@ class GetEEGPoints(ListAPIView):
             else:
                 organized_data[i] = np.zeros(num_points)
                 
-        organized_data, sampling_frequency = PatientConnectivityData.preprocess_data(np.array(organized_data), sampling_frequency, utility_frequency)
+        organized_data, sampling_frequency = PatientConnectivityData.preprocess_data(np.array(organized_data), sampling_frequency, utility_frequency, 1)
         
         return organized_data.tolist()
     

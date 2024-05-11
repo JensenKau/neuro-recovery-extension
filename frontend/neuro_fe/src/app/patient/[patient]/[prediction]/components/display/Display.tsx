@@ -27,7 +27,7 @@ const Display = ({patient_id, filename}: DisplayProps) => {
       </Tabs>
 
       <div hidden={tab !== 0}>
-        <BrainEEG />
+        <BrainEEG patient_id={patient_id} filename={filename} />
       </div>
 
       <div hidden={tab !== 1}>
