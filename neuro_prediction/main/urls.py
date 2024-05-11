@@ -7,6 +7,7 @@ from .views import *
 
 user_urls = [
     path("create_user/", CreateUserView.as_view()),
+    path("patient_access/", PatientAccess.as_view()),
 ]
 
 patient_urls = [

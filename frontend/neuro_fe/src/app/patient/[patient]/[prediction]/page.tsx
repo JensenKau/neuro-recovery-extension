@@ -13,7 +13,7 @@ interface PredictionPageProps {
 
 const page = ({ params }: PredictionPageProps) => {
   return (
-    <div className="grid grid-cols-2 h-screen">
+    <div className="grid grid-cols-2 h-screen overflow-hidden">
       <Display patient_id={parseInt(params.patient)} filename={params.prediction} />
       <Report patient_id={parseInt(params.patient)} filename={params.prediction} />
     </div>
