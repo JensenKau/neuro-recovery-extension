@@ -2,33 +2,23 @@ from __future__ import annotations
 
 import numpy as np
 import torch
+from nilearn import plotting
+import matplotlib.pyplot as plt
+from PIL import Image
 
-from src.mlmodels.pytorch_models.static.cnn_simple_static import CnnSimpleStatic
-from src.mlmodels.pytorch_models.static.cnn_simple_static2 import CnnSimpleStatic2
-from src.mlmodels.pytorch_models.static.cnn_simple_static2_2 import CnnSimpleStatic2_2
-from src.mlmodels.pytorch_models.static.cnn_simple_static2_3 import CnnSimpleStatic2_3
-from src.mlmodels.pytorch_models.hybrid.cnn_hybrid_2 import CnnHybrid1_2
-from src.mlmodels.pytorch_models.hybrid.cnn_hybrid2 import CnnHybrid2
 from src.patientdata.patient_data import PatientData
 from src.patientdata.patient_dataset import PatientDataset
-
+from src.patientdata.connectivity_data import PatientConnectivityData
 from src.load_data import load_data
 
 if __name__ == "__main__":
-    cnn = CnnSimpleStatic2_2()
     patient_dataset = PatientDataset.load_processed_dataset("src/balanced_connectivity.pkl")
+    data = patient_dataset.get_dataset()[0].get_static_fc()
     
-    # cnn.load_model("/root/neuro-recovery-prediction/trained_models/pytorch_cnn_simple_static_2_2/model_0.pt")
-    # res = cnn.predict_result(patient_dataset.get_dataset())
+    # view = plotting.view_connectome(
+    #     data, coords, edge_threshold="80%"
+    # )
     
-    # for i in range(len(res)):
-    #     print(f"Input {i}: Result {res[i][0]}, Probability {res[i][1]}")
-        
-    # cnn.initialize_model()
-    # cnn.k_fold(patient_dataset.get_dataset())
-    # # cnn.save_k_fold("../../trained_models/test_save2", BaseMLModel.SAVE_MODE.ALL)
-    
-    # print(cnn.get_k_fold_performances()["avg"])
-    
-    # cnn.tune_paramters(1000, patient_dataset.get_dataset())
-    # cnn.clear_tmp_folder()
+    test = plotting.plot_matrix(data, labels=PatientConnectivityData.BRAIN_REGION, colorbar=True, vmax=1, vmin=1).make_image("agg")
+    res = Image.fromarray(test[0])
+    res.save("bcd.png")

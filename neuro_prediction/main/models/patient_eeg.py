@@ -12,7 +12,9 @@ class PatientEEG(models.Model):
     start_time = models.PositiveBigIntegerField()
     end_time = models.PositiveBigIntegerField()
     utility_freq = models.PositiveSmallIntegerField()
-    sampling_freq = models.PositiveSmallIntegerField()    
+    sampling_freq = models.PositiveSmallIntegerField()
+    
+    header_file = models.FileField(upload_to="hea_eeg")
     raw_file = models.FileField(upload_to="raw_eeg")
     
     static_fc = ArrayField(ArrayField(models.FloatField(), 22), 22)

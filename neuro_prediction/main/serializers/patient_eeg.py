@@ -8,3 +8,19 @@ class ShortEEGSerializer(ModelSerializer):
     class Meta:
         model = PatientEEG
         fields = ["patient", "name", "created_at"]
+        
+
+class EEGSerializer(ModelSerializer):
+    class Meta:
+        model = PatientEEG
+        exclude = ["raw_file", "static_fc", "avg_fc", "std_fc"]
+        
+
+class FCSerializer(ModelSerializer):
+    class Meta:
+        model = PatientEEG
+        fields = ["static_fc", "avg_fc", "std_fc"]
+        
+
+if __name__ == "__main__":
+    pass

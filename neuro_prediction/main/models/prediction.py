@@ -13,7 +13,7 @@ class Prediction(models.Model):
     cpc_pred = models.PositiveSmallIntegerField(null=True)
     confidence = models.FloatField()
 
-    comments = models.TextField()
+    comments = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

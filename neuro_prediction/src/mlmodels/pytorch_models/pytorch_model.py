@@ -111,6 +111,9 @@ class PytorchModel(BaseMLModel):
     def load_model(self, filename: str) -> None:
         with open(filename.replace(".pt", ".json"), "r", encoding="utf-8") as file:
             self.parameters = dict(json.load(file))
+            
+        if "epoch" in self.parameters:
+            del self.parameters["epoch"]
         
         param_copy = self.parameters.copy()
         
