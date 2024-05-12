@@ -4,6 +4,8 @@ import { Typography, TextField, Button } from "@mui/material";
 import { Save, IosShare } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import { User } from "@/app/interface";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ReportContentProps {
   eeg_id: number;
@@ -26,6 +28,19 @@ const ReportContent = ({ eeg_id, startComment }: ReportContentProps) => {
         comment: comment
       })
     });
+
+    if (res.status === 200) {
+      toast.success("Changes Saved Successfully", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+			});
+    }
   };
 
   const getUser = async () => {

@@ -5,6 +5,8 @@ import PatientEEGItem from "./PatientEEGItem";
 import PatientEEGUploadButton from "./PatientEEGUploadButton";
 import { Patient, ShortEEG } from "@/app/interface";
 import { Typography } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 interface PatientEEGProps {
 	patient: Patient | null;
@@ -27,6 +29,20 @@ const PatientEEG = ({ patient }: PatientEEGProps) => {
 
 	useEffect(() => {
 		getEEG().then(setEegs);
+
+		if (uploaded) {
+			toast.success("Upload Successful", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+			});
+		}
+
 		setUploaded(false);
 	}, [patient, uploaded]);
 

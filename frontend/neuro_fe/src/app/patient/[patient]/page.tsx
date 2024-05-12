@@ -5,6 +5,8 @@ import PatientPageHeader from "./components/header/PatientPageHeader";
 import PatientInfo from "./components/info/PatientInfo";
 import PatientEEG from "./components/eeg/PatientEEG";
 import { Patient } from "@/app/interface";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 interface PatientPageParms {
 	params: {

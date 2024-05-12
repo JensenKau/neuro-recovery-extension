@@ -8,6 +8,8 @@ import { unstable_noStore as noStore } from "next/cache";
 import HomeSection from "./components/HomeSection";
 import HomeSectionHeader from "./components/HomeSectionHeader";
 import AddPatientButton from "./components/AddPatientButton";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const HomePage = () => {
   noStore();
@@ -56,7 +58,32 @@ const HomePage = () => {
 
       <div className="grid grid-cols-2">
         <HomeSectionHeader label="My Patients" />
-        <AddPatientButton className="w-1/4 ml-auto" onSubmit={(value) => setOwned([...owned, value])} />
+        <AddPatientButton className="w-1/4 ml-auto" onSubmit={(value) => {
+          if (value) {
+            setOwned([...owned, value]);
+            toast.success("Patient Created", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          } else {
+            toast.error("Fail to Create Patient", {
+              position: "top-center",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+          }
+        }} />
       </div>
 
       <HomeSection

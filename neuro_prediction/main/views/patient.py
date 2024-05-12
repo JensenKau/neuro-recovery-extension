@@ -57,6 +57,9 @@ class CreatePatientView(CreateAPIView):
         user_email = request.user.email
         data = request.data
         
+        if data["firstname"] == "" or data["lastname"] == "":
+            return Response({"message: blank firstname or lastname"}, status=500)
+        
         new_patient = Patient.objects.create(
             owner_id = user_email,
             name = f"{data['firstname']} {data['lastname']}",

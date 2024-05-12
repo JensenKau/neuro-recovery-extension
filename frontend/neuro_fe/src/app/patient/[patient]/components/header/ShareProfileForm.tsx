@@ -12,6 +12,8 @@ import { Add } from "@mui/icons-material";
 import React, { useState } from "react";
 import ShareProfileItem from "./ShareProfileItem";
 import { Patient } from "@/app/interface";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 interface ShareProfileForm {
 	open: boolean;
@@ -35,7 +37,31 @@ const ShareProfileForm = ({ open, onClose, patient, onUpdate }: ShareProfileForm
 				email: email
 			})
 		});
-		onUpdate(true);
+
+		if (res.status === 200) {
+			onUpdate(true);
+			toast.success("Share Successful", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+			});
+		} else {
+			toast.error("Share Failed", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+			});
+		}
 	};
 
 	const deleteUser = async (del_email: string) => {
@@ -50,7 +76,31 @@ const ShareProfileForm = ({ open, onClose, patient, onUpdate }: ShareProfileForm
 				email: del_email
 			})
 		});
-		onUpdate(true);
+
+		if (res.status === 200) {
+			onUpdate(true);
+			toast.success("User Removed Successfully", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+			});
+		} else {
+			toast.error("User Removal Failed", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+			});
+		}
 	};
 
 	return (
