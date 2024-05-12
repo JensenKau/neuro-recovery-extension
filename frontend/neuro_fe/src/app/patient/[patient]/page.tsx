@@ -5,6 +5,8 @@ import PatientPageHeader from "./components/header/PatientPageHeader";
 import PatientInfo from "./components/info/PatientInfo";
 import PatientEEG from "./components/eeg/PatientEEG";
 import { Patient } from "@/app/interface";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 interface PatientPageParms {
 	params: {
@@ -14,29 +16,28 @@ interface PatientPageParms {
 
 const page = ({ params: { patient } }: PatientPageParms) => {
 	const [patientInfo, setPatientInfo] = useState<Patient | null>(null);
+	const [update, setUpdate] = useState(false);
 
 	const getInfo = async () => {
 		const res = await fetch(`http://localhost:3000/api/patient/get_patient/?id=${patient}`, {
       method: "GET",
       credentials: "include",
     });
-
 		return await res.json();
-	};
-
-	const modifyAccess = async (newAcess: Array<string>) => {
-		if (patientInfo) {
-			setPatientInfo({...patientInfo, ...{access: newAcess}});
-		}
 	};
 
 	useEffect(() => {
 		getInfo().then((res) => setPatientInfo(res));
 	}, []);
 
+	useEffect(() => {
+		getInfo().then((res) => setPatientInfo(res));
+		setUpdate(false);
+	}, [update])
+
 	return (
 		<div className="flex flex-col my-3 mx-5 gap-8">
-			<PatientPageHeader patient={patientInfo} modifyAccess={modifyAccess} />
+			<PatientPageHeader patient={patientInfo} onUpdate={setUpdate} />
 
 			<div className="flex flex-col gap-8 mx-5">
 				<PatientInfo patient={patientInfo} />

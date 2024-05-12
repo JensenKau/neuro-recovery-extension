@@ -34,27 +34,23 @@ const AddPatientForm = ({ open, onClose, onSubmit }: AddPatientFormProps) => {
   const [ttm, setTtm] = useState<number | null>(null);
 
   const createPatient = async (): Promise<ShortPatient> => {
-    const res = await fetch(
-      "http://localhost:3000/api/patient/create_patient",
-      {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lastname: lastname,
-          firstname: firstname,
-          age: age,
-          gender: gender,
-          rosc: rosc,
-          ohca: ohca,
-          sr: sr,
-          ttm: ttm,
-        }),
-      }
-    );
-
+    const res = await fetch("http://localhost:3000/api/patient/create_patient", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lastname: lastname,
+        firstname: firstname,
+        age: age,
+        gender: gender,
+        rosc: rosc,
+        ohca: ohca,
+        sr: sr,
+        ttm: ttm,
+      }),
+    });
     return await res.json();
   };
 

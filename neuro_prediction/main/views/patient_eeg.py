@@ -215,8 +215,8 @@ class GetBrainPlot(ListAPIView):
             (64, -18, -10),
             (-48, -18, 52),
             (52, -14, 48),
-            (-52, -64, 0 ),
-            (54, -60, -2 ),
+            (-52, -64, 0),
+            (54, -60, -2),
             (-40, -66, 46),
             (46, -62, 42),
             (-24, -92, 10),
@@ -231,7 +231,7 @@ class GetBrainPlot(ListAPIView):
         
         html_file = f"{''.join(random.choices(string.ascii_lowercase + string.digits, k=10))}.html"
         
-        view = plotting.view_connectome(fc, coords, edge_threshold='70%')
+        view = plotting.view_connectome(fc, coords, edge_threshold=0.7)
         view.save_as_html(html_file)
         
         res = None

@@ -11,6 +11,8 @@ import {
 import React, { useState } from "react";
 import UploadFileButton from "./UploadFileButton";
 import { Patient } from "@/app/interface";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 interface PatientEEGUploadFormProps {
 	patient: Patient | null;
@@ -25,7 +27,7 @@ const PatientEEGUploadForm = ({ patient, open, onClose, onUpload }: PatientEEGUp
 	const [filename, setFilename] = useState("");
 
 	const uploadFile = async () => {
-		if (patient && hea && mat) {
+		if (patient && hea && mat && filename !== "") {
 			const formData = new FormData();
 			formData.append("patient_id", `${patient.id}`);
 			formData.append("filename", filename);
@@ -42,6 +44,17 @@ const PatientEEGUploadForm = ({ patient, open, onClose, onUpload }: PatientEEGUp
 
 			onUpload();
 			onClose(false);
+		} else {
+			toast.error("Upload Failed", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+			});
 		}
 	};
 
@@ -61,7 +74,7 @@ const PatientEEGUploadForm = ({ patient, open, onClose, onUpload }: PatientEEGUp
 			</DialogTitle>
 
 			<DialogContent className="flex flex-col gap-5">
-				<TextField className="mt-2" label="File Name" placeholder="Enter File Name..." onChange={(e) => setFilename(e.target.value)} />
+				<TextField className="mt-2" label="File Name" required placeholder="Enter File Name..." onChange={(e) => setFilename(e.target.value)} />
 				<UploadFileButton label=".hea" onChange={setHea} />
 				<UploadFileButton label=".mat" onChange={setMat} />
 

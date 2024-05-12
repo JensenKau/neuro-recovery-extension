@@ -30,7 +30,7 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 			});
 
 			const content = await res.blob();
-			const output = new NextResponse(content);
+			const output = new NextResponse(content, {status: res.status});
 
 			if (accessToken !== undefined) {
 				output.cookies.set({ name: "jwt_access", value: accessToken });

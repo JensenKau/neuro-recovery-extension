@@ -31,7 +31,7 @@ const BrainEEG = ({ patient_id, filename }: BrainEEGProps) => {
       const acceptedPoints = Math.ceil(points[0].length / 750);
       const series = {
         name: regions[regionIndex],
-        data: points[regionIndex].filter((val, index) => index % acceptedPoints === 0).map((val, index) => { return { x: index, y: val }; })
+        data: points[regionIndex].map((val, index) => { return { x: index, y: val }; }).filter((val, index) => index % acceptedPoints === 0)
       };
 
       return {

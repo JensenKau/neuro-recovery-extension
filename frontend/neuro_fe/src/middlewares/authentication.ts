@@ -3,9 +3,15 @@ import { MiddlewareFactory } from "./types";
 import { getApi } from "./api";
 import { jwtDecode } from "jwt-decode";
 
+const freeRoute = [
+	"/",
+	"/login",
+	"/register"
+]
+
 export const authenticationMiddleware: MiddlewareFactory = (next) => {
 	return async (request: NextRequest, _next: NextFetchEvent) => {
-		if (request.nextUrl.pathname.startsWith("/api")) {
+		if (!freeRoute.includes(request.nextUrl.pathname)) {
 			const access = request.cookies.get("jwt_access")?.value;
 			const refresh = request.cookies.get("jwt_refresh")?.value;
 

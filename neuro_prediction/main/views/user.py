@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from django.core.validators import validate_email
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response 
 from rest_framework.permissions import AllowAny
 
-from ..models import User
+from ..models import User, Patient
+from ..serializers import UserSerializer
 
 
 class CreateUserView(CreateAPIView):
@@ -22,10 +24,54 @@ class CreateUserView(CreateAPIView):
         email = data["email"]
         password = data["password"]
         
+        if firstname == "" or lastname == "" or email == "" or password == "":
+            return Response({}, status=500)
+        
+        validate_email(email)
+        
         User.objects.create_user(email, firstname, lastname, fullname, password)
         
         return Response({"email": email})
+    
 
+class GetUserView(ListAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request) -> Response:
+        user = request.user
+        serializer = UserSerializer(user)
+        
+        return Response(serializer.data)
+    
+
+
+class PatientAccess(ListAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request) -> Response:
+        user = request.user
+        user_email = user.email
+        data = request.query_params
+        
+        patient_id = data["patient_id"]
+        
+        patient = Patient.objects.get(id=patient_id)
+        access = User.objects.filter(access__id=patient_id)
+                        
+        for i in range(len(access)):
+            if user_email == access[i].email:
+                return Response({"access": "sucess"})
+                
+        if user_email == patient.owner_id:
+            return Response({"access": "sucess"})
+        
+        if user.role == "doctor":
+            return Response({"access": "sucess"})
+        
+        return Response({"access": "fail"}, status=500)
+    
 
 
 

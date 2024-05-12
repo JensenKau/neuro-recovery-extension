@@ -3,6 +3,7 @@ from __future__ import annotations
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response 
+from django.db.models import Q
 
 from ..models import Patient, User
 from ..serializers import ShortPatientSerializer, PatientSerializer
@@ -28,10 +29,16 @@ class GetPatientsView(ListAPIView):
         return Patient.objects.none()
     
     def get(self, request: Request):
-        user_email = request.user.email
+        user = request.user
+        user_email = user.email
         
         owned = Patient.objects.filter(owner__email=user_email)
-        access = Patient.objects.filter(access__email=user_email)
+        
+        access = None
+        if user.role == "doctor":
+            access = Patient.objects.filter(~Q(owner_id=user_email))
+        else:
+            access = Patient.objects.filter(access__email=user_email)
                 
         owned_serializer = ShortPatientSerializer(owned, many=True)
         access_serializer = ShortPatientSerializer(access, many=True) 
@@ -49,6 +56,9 @@ class CreatePatientView(CreateAPIView):
     def post(self, request: Request):
         user_email = request.user.email
         data = request.data
+        
+        if data["firstname"] == "" or data["lastname"] == "":
+            return Response({"message: blank firstname or lastname"}, status=500)
         
         new_patient = Patient.objects.create(
             owner_id = user_email,
@@ -74,7 +84,7 @@ class AddUserAccess(CreateAPIView):
     
     def post(self, request: Request):
         data = request.data
-        
+                
         patient_id = data["patient_id"]
         email = data["email"]
         

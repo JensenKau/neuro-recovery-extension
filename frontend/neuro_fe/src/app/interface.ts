@@ -1,3 +1,10 @@
+export interface User {
+	email: string;
+	fullname: string;
+	role: string;
+}
+
+
 export interface ShortPatient {
 	id: number;
 	name: string;

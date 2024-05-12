@@ -13,7 +13,11 @@ export const signupMiddleware: MiddlewareFactory = (next) => {
 				body: await request.text(),
 			});
 
-			return NextResponse.json(await res.json());
+			if (res.status === 200) {
+				return NextResponse.json(await res.json());
+			};
+
+			return new NextResponse(new Blob(), {status: 500});
 		}
 
 		return next(request, _next);

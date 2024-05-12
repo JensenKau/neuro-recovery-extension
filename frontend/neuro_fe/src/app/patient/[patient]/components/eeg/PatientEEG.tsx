@@ -4,6 +4,9 @@ import React, { useEffect, useState } from "react";
 import PatientEEGItem from "./PatientEEGItem";
 import PatientEEGUploadButton from "./PatientEEGUploadButton";
 import { Patient, ShortEEG } from "@/app/interface";
+import { Typography } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 interface PatientEEGProps {
 	patient: Patient | null;
@@ -19,15 +22,27 @@ const PatientEEG = ({ patient }: PatientEEGProps) => {
 				method: "GET",
 				credentials: "include"
 			});
-
 			return (await res.json()).eegs;
 		}
-
 		return [];
 	};
 
 	useEffect(() => {
 		getEEG().then(setEegs);
+
+		if (uploaded) {
+			toast.success("Upload Successful", {
+				position: "top-center",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+			});
+		}
+
 		setUploaded(false);
 	}, [patient, uploaded]);
 
@@ -37,7 +52,10 @@ const PatientEEG = ({ patient }: PatientEEGProps) => {
 				<div className="my-auto text-3xl text-blue-600">Patient EEGs</div>
 				<PatientEEGUploadButton patient={patient} onUpload={() => setUploaded(true)} />
 			</div>
-			{eegs.map((val) => <PatientEEGItem patient={val.patient} label={val.name} datetime={new Date(val.created_at).toLocaleString()} key={val.name} />)}
+			{eegs.length > 0
+				? eegs.map((val) => <PatientEEGItem patient={val.patient} label={val.name} datetime={new Date(val.created_at).toLocaleString()} key={val.name} />)
+				: <Typography variant="h5" className="mx-auto">This patient currently does not have any EEG uploaded</Typography>
+			}
 		</div>
 	);
 };

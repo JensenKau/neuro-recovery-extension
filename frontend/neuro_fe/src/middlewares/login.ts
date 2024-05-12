@@ -17,11 +17,15 @@ export const loginMiddleware: MiddlewareFactory = (next) => {
 			});
 
 			const content = await res.json();
+
+			if (!content.access || !content.refresh) {
+				return NextResponse.json({status: "fail"}, {status: 500});
+			}
+
 			const access_payload = jwtDecode(content.access);
 			const refresh_payload = jwtDecode(content.refresh);
 
-			const output = NextResponse.json({});
-
+			const output = NextResponse.json({status: "success"});
 			const access_cookie = { name: "jwt_access", value: content.access };
 			const refresh_cookie = { name: "jwt_refresh", value: content.refresh };				
 
