@@ -57,7 +57,7 @@ const Report = ({ patient_id, filename }: ReportProps) => {
 
   return (
     <div className="flex flex-col gap-5 bg-slate-200 h-full py-3 px-5">
-      <ReportHeader />
+      <ReportHeader patient={`${patient_id}`} />
 
       <div className="grid grid-cols-2">
         {eeg && <ReportInfo title="EEG Information" items={[
