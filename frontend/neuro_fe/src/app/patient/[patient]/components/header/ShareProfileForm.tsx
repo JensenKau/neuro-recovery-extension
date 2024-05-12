@@ -17,44 +17,40 @@ interface ShareProfileForm {
 	open: boolean;
 	onClose(value: boolean): void;
 	patient: Patient | null;
-	modifyAccess(newAccess: Array<string>): void;
+	onUpdate(value: boolean): void;
 }
 
-const ShareProfileForm = ({ open, onClose, patient, modifyAccess }: ShareProfileForm) => {
+const ShareProfileForm = ({ open, onClose, patient, onUpdate }: ShareProfileForm) => {
 	const [email, setEmail] = useState("");
 
 	const addUser = async () => {
 		const res = await fetch("http://localhost:3000/api/patient/add_user", {
 			method: "POST",
 			credentials: "include",
+			headers: {
+				"Content-Type": "application/json"
+			},
 			body: JSON.stringify({
 				patient_id: patient?.id,
 				email: email
 			})
 		});
-
-		if (patient) {
-			modifyAccess([...patient.access, email]);
-		}
-
-		return await res.json();
+		onUpdate(true);
 	};
 
 	const deleteUser = async (del_email: string) => {
 		const res = await fetch("http://localhost:3000/api/patient/delete_user", {
 			method: "POST",
 			credentials: "include",
+			headers: {
+				"Content-Type": "application/json"
+			},
 			body: JSON.stringify({
 				patient_id: patient?.id,
 				email: del_email
 			})
 		});
-
-		if (patient) {
-			modifyAccess(patient.access.filter((val) => val !== del_email))
-		}
-
-		return await res.json();
+		onUpdate(true);
 	};
 
 	return (

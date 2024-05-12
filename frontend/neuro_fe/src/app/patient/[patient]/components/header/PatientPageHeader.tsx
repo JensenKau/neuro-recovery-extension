@@ -8,10 +8,10 @@ import { Patient } from "@/app/interface";
 
 interface PatientPageHeaderProps {
 	patient: Patient | null;
-	modifyAccess(newAcess: Array<string>): void;
+	onUpdate(value: boolean): void;
 }
 
-const PatientPageHeader = ({ patient, modifyAccess }: PatientPageHeaderProps) => {
+const PatientPageHeader = ({ patient, onUpdate }: PatientPageHeaderProps) => {
 	return (
 		<div>
 			<div className="flex justify-between">
@@ -21,7 +21,7 @@ const PatientPageHeader = ({ patient, modifyAccess }: PatientPageHeaderProps) =>
 						My Patients {">"} <span className="text-blue-600">{`${patient ? patient.name : ""}`}</span>
 					</div>
 				</div>
-				<ShareProfileButton patient={patient} modifyAccess={modifyAccess} className="my-auto h-3/4 p-3" />
+				<ShareProfileButton patient={patient} onUpdate={onUpdate} className="my-auto h-3/4 p-3" />
 			</div>
 			<Divider className="my-3" />
 		</div>

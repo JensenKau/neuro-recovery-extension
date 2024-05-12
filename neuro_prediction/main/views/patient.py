@@ -81,7 +81,7 @@ class AddUserAccess(CreateAPIView):
     
     def post(self, request: Request):
         data = request.data
-        
+                
         patient_id = data["patient_id"]
         email = data["email"]
         
