@@ -12,6 +12,7 @@ Therefore, to reduce the labour and time required for generating the prognosis a
 ### Project Goal
 To develop a Convolutional Neural Network (CNN) Deep Learning model that is capable of predicting the neurological recovery of a coma patient at a high degree of accuracy. 
 
+<br />
 
 ## Installation Guide
 1. Download and Install Docker
@@ -21,6 +22,7 @@ docker compose up
 ```
 3. Access http://localhost:3000 through your browser
 
+<br />
 
 ## Technology Stack
 
@@ -33,6 +35,7 @@ docker compose up
 | Next.js       | Frontend Web Application |
 | Docker        | Containerization |
 
+<br />
 
 ## Team Members
 1. Jensen Kau (jkau0039@student.monash.edu)
