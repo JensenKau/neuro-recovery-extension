@@ -27,7 +27,11 @@ class UpdatePredictionComment(CreateAPIView):
         return super().get_queryset()
     
     def post(self, request: Request) -> Response:
+        user = request.user
         data = request.data
+                
+        if user.role != "doctor":
+            return Response({"message": "Unauthorized Access"}, status=500)
                 
         eeg_id = data["eeg_id"]
         comment = data["comment"]
@@ -36,7 +40,7 @@ class UpdatePredictionComment(CreateAPIView):
         query.comments = comment
         query.save()
         
-        return Response({})
+        return Response({"message": "Change Successful"})
 
 
 if __name__ == "__main__":
