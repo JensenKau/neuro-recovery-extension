@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import { ShortPatient } from "../interface";
+import { ShortPatient, User } from "../interface";
 import { unstable_noStore as noStore } from "next/cache";
 
 import HomeSection from "./components/HomeSection";
@@ -14,8 +14,9 @@ const HomePage = () => {
 
   const [owned, setOwned] = useState<ShortPatient[]>([]);
   const [access, setAccess] = useState<ShortPatient[]>([]);
+  const [user, setUser] = useState<User>();
 
-  const func = async (): Promise<{
+  const getPatients = async (): Promise<{
     owned: ShortPatient[];
     access: ShortPatient[];
   }> => {
@@ -23,21 +24,34 @@ const HomePage = () => {
       method: "GET",
       credentials: "include",
     });
-
     return await res.json();
   };
 
+  const getUser = async (): Promise<User> => {
+    const res = await fetch("http://localhost:3000/api/user/get_user/", {
+      method: "GET",
+      credentials: "include"
+    });
+    return await res.json();
+  }
+
   useEffect(() => {
-    func().then((value) => {
+    getPatients().then((value) => {
       setOwned(value.owned);
       setAccess(value.access);
     });
+
+    getUser().then(setUser);
   }, []);
 
   return (
     <div className="mt-[60px] mb-[50px] ml-[50px] mr-[50px]">
       <div className="mb-[30px] text-5xl">
-        Welcome Back, <span className="text-blue-600">Doctor</span>
+        Welcome Back, {" "}
+        <span className="text-blue-600">
+          {user && user.role === "doctor" ? "Dr. " : ""}
+          {user && user.fullname}
+        </span>
       </div>
 
       <div className="grid grid-cols-2">

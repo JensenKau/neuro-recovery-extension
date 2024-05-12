@@ -6,6 +6,8 @@ import Button from "@mui/material/Button";
 import Stack from '@mui/material/Stack';
 import { TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
 	const router = useRouter();
@@ -33,7 +35,18 @@ const Register = () => {
 
 			if (res.status === 200) {
 				router.push("/login");
-			}			
+			} else {
+				toast.error("Registration Failed", {
+					position: "top-center",
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					draggable: true,
+					progress: undefined,
+					theme: "light",
+				});
+			}
 		}
 	};
 
@@ -52,6 +65,19 @@ const Register = () => {
 					<Button variant="contained" onClick={submitSignUp}>Sign Up</Button>
 				</Stack>
 			</div>
+
+			<ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
 		</div>
 	);
 };

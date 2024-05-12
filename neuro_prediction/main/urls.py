@@ -8,6 +8,7 @@ from .views import *
 user_urls = [
     path("create_user/", CreateUserView.as_view()),
     path("patient_access/", PatientAccess.as_view()),
+    path("get_user/", GetUserView.as_view()),
 ]
 
 patient_urls = [

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
 from ..models import User, Patient
+from ..serializers import UserSerializer
 
 
 class CreateUserView(CreateAPIView):
@@ -31,6 +32,18 @@ class CreateUserView(CreateAPIView):
         User.objects.create_user(email, firstname, lastname, fullname, password)
         
         return Response({"email": email})
+    
+
+class GetUserView(ListAPIView):
+    def get_queryset(self):
+        return super().get_queryset()
+    
+    def get(self, request: Request) -> Response:
+        user = request.user
+        serializer = UserSerializer(user)
+        
+        return Response(serializer.data)
+    
 
 
 class PatientAccess(ListAPIView):

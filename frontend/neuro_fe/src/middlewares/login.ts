@@ -19,7 +19,7 @@ export const loginMiddleware: MiddlewareFactory = (next) => {
 			const content = await res.json();
 
 			if (!content.access || !content.refresh) {
-				return NextResponse.json({status: "fail"});
+				return NextResponse.json({status: "fail"}, {status: 500});
 			}
 
 			const access_payload = jwtDecode(content.access);
