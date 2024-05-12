@@ -29,7 +29,8 @@ const HomePage = () => {
 
   useEffect(() => {
     func().then((value) => {
-      setOwned(value.owned), setAccess(value.access);
+      setOwned(value.owned);
+      setAccess(value.access);
     });
   }, []);
 

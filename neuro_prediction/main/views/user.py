@@ -38,7 +38,8 @@ class PatientAccess(ListAPIView):
         return super().get_queryset()
     
     def get(self, request: Request) -> Response:
-        user = request.user.email
+        user = request.user
+        user_email = user.email
         data = request.query_params
         
         patient_id = data["patient_id"]
@@ -47,10 +48,13 @@ class PatientAccess(ListAPIView):
         access = User.objects.filter(access__id=patient_id)
                         
         for i in range(len(access)):
-            if user == access[i].email:
+            if user_email == access[i].email:
                 return Response({"access": "sucess"})
                 
-        if user == patient.owner_id:
+        if user_email == patient.owner_id:
+            return Response({"access": "sucess"})
+        
+        if user.role == "doctor":
             return Response({"access": "sucess"})
         
         return Response({"access": "fail"}, status=500)
