@@ -78,7 +78,7 @@ const PatientEEGUploadForm = ({ patient, open, onClose, onUpload }: PatientEEGUp
 				<UploadFileButton label=".hea" onChange={setHea} />
 				<UploadFileButton label=".mat" onChange={setMat} />
 
-				<Button variant="contained" className="w-full" onClick={uploadFile}>
+				<Button variant="contained" className="w-full bg-[#1976d2]" onClick={uploadFile}>
 					Upload
 				</Button>
 			</DialogContent>

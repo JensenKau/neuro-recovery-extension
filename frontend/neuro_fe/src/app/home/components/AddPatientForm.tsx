@@ -174,7 +174,7 @@ const AddPatientForm = ({ open, onClose, onSubmit }: AddPatientFormProps) => {
         />
       </DialogContent>
       <DialogActions className="">
-        <Button className="w-full mx-3 mb-5" type="submit" variant="contained">Add Patient</Button>
+        <Button className="w-full mx-3 mb-5 bg-[#1976d2]" type="submit" variant="contained">Add Patient</Button>
       </DialogActions>
     </Dialog>
   );

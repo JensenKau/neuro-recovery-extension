@@ -113,7 +113,7 @@ const ShareProfileForm = ({ open, onClose, patient, onUpdate }: ShareProfileForm
 			<DialogTitle className="mx-auto mt-5 mb-3">
 				<div>
 					<Typography variant="h5" className="text-[#01579b]">
-						New Patient
+						Share with...
 					</Typography>
 				</div>
 			</DialogTitle>
@@ -121,7 +121,7 @@ const ShareProfileForm = ({ open, onClose, patient, onUpdate }: ShareProfileForm
 			<DialogContent className="flex flex-col gap-4 w-full">
 				<div className="flex gap-3 my-2">
 					<TextField className="w-full" label="Share with..." onChange={(e) => setEmail(e.target.value)} />
-					<Button variant="contained" className="h-auto w-fit flex gap-1" onClick={addUser}>
+					<Button variant="contained" className="h-auto w-fit flex gap-1 bg-[#1976d2]" onClick={addUser}>
 						<Add className="text-bold" />
 						Add
 					</Button>
