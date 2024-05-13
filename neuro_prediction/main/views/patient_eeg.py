@@ -231,7 +231,7 @@ class GetBrainPlot(ListAPIView):
         
         html_file = f"{''.join(random.choices(string.ascii_lowercase + string.digits, k=10))}.html"
         
-        view = plotting.view_connectome(fc, coords, edge_threshold=0.7)
+        view = plotting.view_connectome(fc, coords, edge_threshold=0.6)
         view.save_as_html(html_file)
         
         res = None
