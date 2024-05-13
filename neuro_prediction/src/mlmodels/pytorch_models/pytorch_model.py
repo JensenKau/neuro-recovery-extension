@@ -121,7 +121,7 @@ class PytorchModel(BaseMLModel):
         if self.use_gpu:
             self.model.cuda()
         
-        self.model.load_state_dict(torch.load(filename))
+        self.model.load_state_dict(torch.load(filename, map_location=torch.device("cuda:0" if self.use_gpu else "cpu")))
     
     
     def initialize_model(self, **kwargs) -> None:
