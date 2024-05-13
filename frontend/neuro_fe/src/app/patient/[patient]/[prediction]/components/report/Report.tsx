@@ -27,31 +27,29 @@ const Report = ({ patient_id, filename }: ReportProps) => {
     return `${hrStr}:${minStr}:${secStr}`
   }
 
-  const getEEG = async () => {
-    const res = await fetch(`http://localhost:3000/api/patient_eeg/get_eeg/?patient_id=${patient_id}&filename=${filename}`, {
-      method: "GET",
-      credentials: "include"
-    });
-
-    return await res.json();
-  };
-
-  const getPrediction = async () => {
-    if (eeg) {
-      const res = await fetch(`http://localhost:3000/api/prediction/get_prediction/?eeg_id=${eeg.id}`, {
+  useEffect(() => {
+    const getEEG = async () => {
+      const res = await fetch(`http://localhost:3000/api/patient_eeg/get_eeg/?patient_id=${patient_id}&filename=${filename}`, {
         method: "GET",
         credentials: "include"
       });
-
       return await res.json();
-    }
-  };
+    };
 
-  useEffect(() => {
     getEEG().then(setEeg);
-  }, []);
+  }, [patient_id, filename]);
 
   useEffect(() => {
+    const getPrediction = async () => {
+      if (eeg) {
+        const res = await fetch(`http://localhost:3000/api/prediction/get_prediction/?eeg_id=${eeg.id}`, {
+          method: "GET",
+          credentials: "include"
+        });
+        return await res.json();
+      }
+    };
+
     getPrediction().then(setPrediction);
   }, [eeg]);
 

@@ -16,15 +16,7 @@ const BrainEEG = ({ patient_id, filename }: BrainEEGProps) => {
 
   const [points, setPoints] = useState<Array<Array<number>>>();
   const [Chart, setChart] = useState<any>();
-  const [region, setRegion] = useState(0);
-
-  const getEegPoints = async () => {
-    const res = await fetch(`http://localhost:3000/api/patient_eeg/get_eeg_points/?patient_id=${patient_id}&filename=${filename}`, {
-      method: "GET",
-      credentials: "include"
-    });
-    return (await res.json()).data;
-  };
+  const [region, setRegion] = useState(0);  
 
   const chartProperty = ((regionIndex: number) => {
     if (points) {
@@ -49,11 +41,19 @@ const BrainEEG = ({ patient_id, filename }: BrainEEGProps) => {
   })(region);
 
   useEffect(() => {
+    const getEegPoints = async () => {
+      const res = await fetch(`http://localhost:3000/api/patient_eeg/get_eeg_points/?patient_id=${patient_id}&filename=${filename}`, {
+        method: "GET",
+        credentials: "include"
+      });
+      return (await res.json()).data;
+    };
+
     getEegPoints().then(setPoints);
     import("react-apexcharts").then((mod) => {
       setChart(() => mod.default);
     });
-  }, []);
+  }, [patient_id, filename]);
 
   return (
     <div className="flex flex-col gap-3">

@@ -14,17 +14,17 @@ const FuncConn = ({ patient_id, filename }: FuncConnProps) => {
   const [fcType, setFcType] = useState("static");
   const [fc, setFc] = useState<FunctionalConnectivity>();
 
-  const retrieveFc = async () => {
-    const res = await fetch(`http://localhost:3000/api/patient_eeg/get_fcs/?patient_id=${patient_id}&filename=${filename}`, {
-      method: "GET",
-      credentials: "include"
-    });
-    return await res.json();
-  };
-
   useEffect(() => {
+    const retrieveFc = async () => {
+      const res = await fetch(`http://localhost:3000/api/patient_eeg/get_fcs/?patient_id=${patient_id}&filename=${filename}`, {
+        method: "GET",
+        credentials: "include"
+      });
+      return await res.json();
+    };
+
     retrieveFc().then(setFc);
-  }, []);
+  }, [patient_id, filename]);
 
   return (
     <div className="flex flex-col gap-3">

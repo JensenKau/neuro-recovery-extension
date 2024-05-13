@@ -11,7 +11,7 @@ interface PredictionPageProps {
   }
 }
 
-const page = ({ params }: PredictionPageProps) => {
+const PredictionPage = ({ params }: PredictionPageProps) => {
   return (
     <div className="grid grid-cols-2 h-screen overflow-hidden">
       <Display patient_id={parseInt(params.patient)} filename={params.prediction} />
@@ -20,4 +20,4 @@ const page = ({ params }: PredictionPageProps) => {
   );
 };
 
-export default page;
+export default PredictionPage;

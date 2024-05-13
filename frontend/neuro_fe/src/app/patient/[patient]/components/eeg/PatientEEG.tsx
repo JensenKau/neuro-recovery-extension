@@ -16,18 +16,18 @@ const PatientEEG = ({ patient }: PatientEEGProps) => {
 	const [eegs, setEegs] = useState<ShortEEG[]>([]);
 	const [uploaded, setUploaded] = useState(false);
 
-	const getEEG = async () => {
-		if (patient) {
-			const res = await fetch(`http://localhost:3000/api/patient_eeg/get_eegs/?patient_id=${patient.id}`, {
-				method: "GET",
-				credentials: "include"
-			});
-			return (await res.json()).eegs;
-		}
-		return [];
-	};
-
 	useEffect(() => {
+		const getEEG = async () => {
+			if (patient) {
+				const res = await fetch(`http://localhost:3000/api/patient_eeg/get_eegs/?patient_id=${patient.id}`, {
+					method: "GET",
+					credentials: "include"
+				});
+				return (await res.json()).eegs;
+			}
+			return [];
+		};
+
 		getEEG().then(setEegs);
 
 		if (uploaded) {

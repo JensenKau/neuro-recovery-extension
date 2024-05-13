@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-const Register = () => {
+const RegisterPage = () => {
 	const router = useRouter();
 
 	const [lastName, setLastName] = useState("");
@@ -69,4 +69,4 @@ const Register = () => {
 	);
 };
 
-export default Register;
+export default RegisterPage;

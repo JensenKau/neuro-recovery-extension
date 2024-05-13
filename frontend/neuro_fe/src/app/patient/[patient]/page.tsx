@@ -14,26 +14,22 @@ interface PatientPageParms {
 	};
 }
 
-const page = ({ params: { patient } }: PatientPageParms) => {
+const PatientPage = ({ params: { patient } }: PatientPageParms) => {
 	const [patientInfo, setPatientInfo] = useState<Patient | null>(null);
 	const [update, setUpdate] = useState(false);
 
-	const getInfo = async () => {
-		const res = await fetch(`http://localhost:3000/api/patient/get_patient/?id=${patient}`, {
-      method: "GET",
-      credentials: "include",
-    });
-		return await res.json();
-	};
-
 	useEffect(() => {
-		getInfo().then((res) => setPatientInfo(res));
-	}, []);
+		const getInfo = async () => {
+			const res = await fetch(`http://localhost:3000/api/patient/get_patient/?id=${patient}`, {
+				method: "GET",
+				credentials: "include",
+			});
+			return await res.json();
+		};
 
-	useEffect(() => {
 		getInfo().then((res) => setPatientInfo(res));
 		setUpdate(false);
-	}, [update])
+	}, [update, patient])
 
 	return (
 		<div className="flex flex-col my-3 mx-5 gap-8">
@@ -47,4 +43,4 @@ const page = ({ params: { patient } }: PatientPageParms) => {
 	);
 };
 
-export default page;
+export default PatientPage;
