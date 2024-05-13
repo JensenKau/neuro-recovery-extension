@@ -141,7 +141,7 @@ const ShareProfileForm = ({ open, onClose, patient, onUpdate }: ShareProfileForm
 					</div>
 				</div>
 
-				<Button variant="contained" onClick={() => onClose(false)}>Done</Button>
+				<Button variant="contained" className="bg-[#1976d2]" onClick={() => onClose(false)}>Done</Button>
 			</DialogContent>
 		</Dialog>
 	);

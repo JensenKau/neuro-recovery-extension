@@ -71,14 +71,14 @@ const ReportContent = ({ eeg_id, startComment }: ReportContentProps) => {
 
       <div className="flex flex-row-reverse gap-2">
         {user && user.role === "doctor" &&
-          <Button variant="contained" className="flex gap-1 normal-case" onClick={saveChanges}>
+          <Button variant="contained" className="flex gap-1 normal-case bg-[#1976d2]" onClick={saveChanges}>
             <Save />
             Save Changes
           </Button>
         }
 
 
-        <Button variant="contained" className="flex gap-1 normal-case">
+        <Button variant="contained" className="flex gap-1 normal-case bg-[#1976d2]">
           <IosShare />
           Export as PDF
         </Button>

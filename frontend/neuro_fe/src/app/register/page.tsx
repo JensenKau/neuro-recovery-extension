@@ -62,7 +62,7 @@ const Register = () => {
 					<TextField label="Password" type="password" onChange={(e) => setPassword(e.target.value)} />
 					<TextField label="Re-Type Password" type="password" onChange={(e) => setConfirmPassword(e.target.value)} />
 
-					<Button variant="contained" onClick={submitSignUp}>Sign Up</Button>
+					<Button variant="contained" className="bg-[#1976d2]" onClick={submitSignUp}>Sign Up</Button>
 				</Stack>
 			</div>
 		</div>

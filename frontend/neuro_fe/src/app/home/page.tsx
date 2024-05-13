@@ -58,7 +58,7 @@ const HomePage = () => {
 
       <div className="grid grid-cols-2">
         <HomeSectionHeader label="My Patients" />
-        <AddPatientButton className="w-1/4 ml-auto" onSubmit={(value) => {
+        <AddPatientButton className="bg-[#1976d2] w-1/4 ml-auto" onSubmit={(value) => {
           if (value) {
             setOwned([...owned, value]);
             toast.success("Patient Created", {

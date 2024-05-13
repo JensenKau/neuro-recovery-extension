@@ -63,7 +63,7 @@ const Login = () => {
             <FormControlLabel control={<Checkbox onChange={(e) => setRememberme(e.target.checked)} />} label="Remember Me" />
           </div>
 
-          <Button variant="contained" onClick={submitLogin}>Login</Button>
+          <Button variant="contained" className="bg-[#1976d2]" onClick={submitLogin}>Login</Button>
           <h1 className="text-center">
             New User? {" "}
             <Link href="/register">

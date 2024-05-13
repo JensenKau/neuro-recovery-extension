@@ -17,7 +17,7 @@ const PatientEEGUploadButton = ({ className = "", patient, onUpload }: PatientEE
 
 	return (
 		<>
-			<Button variant="contained" className={`${className} flex gap-2`} onClick={() => setOpen(true)}>
+			<Button variant="contained" className={`${className} flex gap-2 bg-[#1976d2]`} onClick={() => setOpen(true)}>
 				<FileUpload />
 				Upload EEG
 			</Button>
