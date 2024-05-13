@@ -4,6 +4,9 @@ env/
 # pycache
 __pycache__/
 
+# Media
+media/
+
 # Common
 README.md
 CHANGELOG.md
