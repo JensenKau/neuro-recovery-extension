@@ -9,20 +9,13 @@ services:
     
 
   backend:
-    image: "jensenkau/fyp_backend:gpu"
+    image: "jensenkau/fyp_backend:no_gpu"
     command: > 
       bash -c "
       python3 manage.py makemigrations main && 
       python3 manage.py migrate && 
       python3 manage.py shell < populate.py &&
       gunicorn --bind 0.0.0.0:8000 --workers 3 neuro_prediction.wsgi:application"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     volumes:
       - "./media:/app/media"
     ports:
