@@ -15,12 +15,17 @@ To develop a Convolutional Neural Network (CNN) Deep Learning model that is capa
 <br />
 
 ## Installation Guide
-1. Download and Install Docker
-2. Run the following Command
-```
-docker compose up
-```
-3. Access http://localhost:3000 through your browser
+1. Download and Install Docker Desktop (https://www.docker.com/products/docker-desktop/)
+2. For ARM64 processors (Mac M1, M2 etc.), run the following command
+  ```
+  docker compose -f compose_bulid_arm.yaml up
+  ```
+  For x86 processors, run the following command instead
+  ```
+  docker compose -f compose_build_amd.yaml up
+  ```
+
+3. Once the frontend, backend and database server is fully loaded, access http://localhost:3000 through your browser
 
 <br />
 
