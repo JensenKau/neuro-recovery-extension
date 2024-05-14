@@ -30,20 +30,31 @@ const PatientEEGUploadForm = ({ patient, open, onClose, onUpload }: PatientEEGUp
 		if (patient && hea && mat && filename !== "") {
 			const formData = new FormData();
 			formData.append("patient_id", `${patient.id}`);
-			formData.append("filename", filename);
+			formData.append("filename", filename.replace(" ", "_"));
 			formData.append("heaFile", hea);
 			formData.append("matFile", mat);
 
 			const res = await fetch("http://localhost:3000/api/patient_eeg/generate_eeg", {
 				method: "POST",
-				headers: {
-					"credentials": "include"
-				},
+				credentials: "include",
 				body: formData
 			});
 
-			onUpload();
-			onClose(false);
+			if (res.status !== 200) {
+				toast.error("Upload Failed", {
+					position: "top-center",
+					autoClose: 5000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					draggable: true,
+					progress: undefined,
+					theme: "light",
+				});
+			} else {
+				onUpload();
+				onClose(false);
+			}
 		} else {
 			toast.error("Upload Failed", {
 				position: "top-center",

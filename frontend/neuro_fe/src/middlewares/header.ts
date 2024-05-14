@@ -7,11 +7,7 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 		if (request.method === "POST") {
 			const clone = request.clone();
 
-			try {
-				return await clone.formData();
-			} catch (err) {
-				return await request.blob();
-			}
+			return await request.blob();
 		}
 		return undefined;
 	};
@@ -19,18 +15,16 @@ export const headerMiddleware: MiddlewareFactory = (next) => {
 	return async (request: NextRequest, _next: NextFetchEvent) => {
 		if (request.nextUrl.pathname.startsWith("/api")) {
 			const accessToken = request.cookies.get("jwt_access")?.value;
+			request.headers.append("Authorization", `Bearer ${accessToken}`);
 
 			const res = await fetch(`${getApi()}${request.nextUrl.pathname}/${request.nextUrl.searchParams.toString() !== "" ? "?" + request.nextUrl.searchParams.toString() : ""}`, {
 				method: request.method,
-				headers: {
-					...request.headers,
-					Authorization: `Bearer ${accessToken}`,
-				},
+				headers: request.headers,
 				body: await extractBody(request),
 			});
 
 			const content = await res.blob();
-			const output = new NextResponse(content, {status: res.status});
+			const output = new NextResponse(content, { status: res.status });
 
 			if (accessToken !== undefined) {
 				output.cookies.set({ name: "jwt_access", value: accessToken });

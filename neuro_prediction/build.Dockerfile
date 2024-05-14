@@ -10,8 +10,6 @@ RUN pip install -r requirements.txt --no-cache-dir
 
 COPY . .
 
+RUN python3 manage.py collectstatic --noinput
+
 EXPOSE 8000
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "neuro_prediction.wsgi:application"]
-
-# CMD ["python3", "manage.py", "migrate", "&&", "python3", "manage.py", "runserver", "0.0.0.0:8000"]

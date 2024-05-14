@@ -10,6 +10,6 @@ RUN pip install -r requirements_nogpu.txt --no-cache-dir
 
 COPY . .
 
-EXPOSE 8000
+RUN python3 manage.py collectstatic --noinput
 
-# CMD ["python3", "manage.py", "migrate", "&&", "python3", "manage.py", "runserver", "0.0.0.0:8000"]
+EXPOSE 8000

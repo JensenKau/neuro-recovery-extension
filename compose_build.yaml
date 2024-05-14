@@ -2,18 +2,14 @@ version: "1"
 
 services:
   frontend:
-    build: 
-      context: "./frontend/neuro_fe"
-      dockerfile: "./build.Dockerfile"
-    command: npm run start
+    image: "jensenkau/fyp_frontend:latest"
+    command: 'node server.js'
     ports:
       - "3000:3000"
     
 
   backend:
-    build: 
-      context: "./neuro_prediction"
-      dockerfile: "./build.Dockerfile"
+    image: "jensenkau/fyp_backend:gpu"
     command: > 
       bash -c "
       python3 manage.py makemigrations main && 
