@@ -1,4 +1,5 @@
 from __future__ import annotations
+import random
 
 import numpy as np
 import torch
@@ -9,16 +10,28 @@ from PIL import Image
 from src.patientdata.patient_data import PatientData
 from src.patientdata.patient_dataset import PatientDataset
 from src.patientdata.connectivity_data import PatientConnectivityData
-from src.load_data import load_data
+from src.mlmodels.pytorch_models.dynamic.cnn_dynamic2_2 import CnnDynamic2_2
 
 if __name__ == "__main__":
-    patient_dataset = PatientDataset.load_processed_dataset("src/balanced_connectivity.pkl")
-    data = patient_dataset.get_dataset()[0].get_static_fc()
+    heaFile = "/root/neuro-recovery-prediction/data/training/training/1016/1016_006_012_EEG.hea"
+    matFile = "/root/neuro-recovery-prediction/data/training/training/1016/1016_006_012_EEG.mat"
+    metaFile = "/root/neuro-recovery-prediction/data/training/training/1016/1016.txt"
     
-    # view = plotting.view_connectome(
-    #     data, coords, edge_threshold="80%"
-    # )
+    data = PatientData.load_patient_data(metaFile, heaFile, matFile)
     
-    test = plotting.plot_matrix(data, labels=PatientConnectivityData.BRAIN_REGION, colorbar=True, vmax=1, vmin=1).make_image("agg")
-    res = Image.fromarray(test[0])
-    res.save("bcd.png")
+    # # Input random data
+    # random.seed(4567)
+    # data.connectivity.static_fc = [[random.random() for _ in range(22)] for _ in range(22)]
+    # data.connectivity.avg_fc = [[random.random() for _ in range(22)] for _ in range(22)]
+    # data.connectivity.std_fc = [[random.random() for _ in range(22)] for _ in range(22)]
+    
+    dataset = [data]
+    
+    model = CnnDynamic2_2()
+    model.load_model("/root/neuro-recovery-prediction/neuro_prediction/mlmodel/model_0.pt")
+    
+    res = model.predict_result(dataset)[0]
+    
+    print(f"Prediction: {res[0]}, Confidence: {res[1]}")
+    
+    
