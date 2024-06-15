@@ -1,6 +1,5 @@
 # Data folder
-data/
-dataset/
+_dataset/
 
 # Temp folder
 temp/
