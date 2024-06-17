@@ -5,6 +5,7 @@ from numpy.typing import NDArray
 import scipy.io
 import numpy as np
 import mne
+from scipy.interpolate import CubicSpline
 
 class PatientEEGData:
     LOW_PASS = 0.1
@@ -15,13 +16,18 @@ class PatientEEGData:
         "Oz", "F9"
     ]
     
-    def __init__(self, eeg_data: Dict[str, NDArray], num_points: int, sampling_frequency: int, utility_frequency: int, start_time: int, end_time: int) -> None:
+    def __init__(self, eeg_data: Dict[str, NDArray], num_points: int, sampling_frequency: int, utility_frequency: int, start_time: int, end_time: int, preprocess: bool = True) -> None:
         self.eeg_data = eeg_data
         self.num_points = num_points
         self.sampling_frequency = sampling_frequency
         self.utility_frequency = utility_frequency
         self.start_time = start_time
         self.end_time = end_time
+        
+        if preprocess:
+            self.apply_filter()
+            self.apply_resampling(128)
+            self.apply_normalization()
         
         
     @classmethod
@@ -96,8 +102,51 @@ class PatientEEGData:
         
     
     @classmethod
-    def merge_eeg_data(cls, eegs: List[PatientEEGData]) -> PatientEEGData:
-        pass
+    def merge_eeg_data(cls, eegs: List[PatientEEGData], resampling_frequency: int = 128) -> PatientEEGData:
+        time = [None] * len(eegs)
+        wave = [[None] * len(eegs) for _ in range(len(cls.BRAIN_REGION))]
+        output_wave = {}
+        
+        for i in range(len(eegs)):
+            eeg = eegs[i]
+            eeg.apply_resampling(resampling_frequency)
+            regions = eeg.get_eeg_data()
+            time[i] = np.linspace(eeg.get_start_time(), eeg.get_end_time(), eeg.get_num_points(), dtype=np.float64)
+            
+            for j in range(len(cls.BRAIN_REGION)):
+                region = cls.BRAIN_REGION[j]
+                if region in regions:
+                    wave[j][i] = regions[region]
+                    
+        start_time = np.min(time)
+        end_time = np.max(time)
+        num_points = (end_time - start_time) * resampling_frequency
+                    
+        for i in range(len(cls.BRAIN_REGION)):
+            current_time = []
+            current_wave = []
+            
+            for j in range(len(time)):
+                if wave[i][j] is not None:
+                    current_time.append(time[j])
+                    current_wave.append(wave[i][j])
+
+            if len(current_time) > 0:
+                current_time = np.concatenate(current_time, axis=None, dtype=np.float64)
+                current_wave = np.concatenate(current_wave, axis=None, dtype=np.float64)
+                interpolator = CubicSpline(current_time, current_wave)
+                output_wave[cls.BRAIN_REGION[i]] = interpolator(np.linspace(start_time, end_time, num_points))
+                
+        return PatientEEGData(
+            output_wave,
+            num_points,
+            resampling_frequency,
+            eegs[0].get_utility_frequency(),
+            start_time,
+            end_time,
+            False
+        )
+
     
     
     def convert_eeg_to_table(self) -> NDArray:
@@ -157,7 +206,7 @@ class PatientEEGData:
         table = scipy.signal.resample_poly(table, up, down, axis=1)
         
         self.eeg_data = self.convert_table_to_eeg(table)
-        self.sampling_frequency = resampling_frequency
+        self.sampling_frequency = int(resampling_frequency)
        
        
     def delete_eeg_data(self) -> None:

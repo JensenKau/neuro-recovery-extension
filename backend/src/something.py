@@ -1,10 +1,13 @@
 from __future__ import annotations
-from patientdata.eeg_data import PatientEEGData
+from scipy.interpolate import CubicSpline
+import numpy as np
 
 if __name__ == "__main__":
-    eeg = PatientEEGData.load_eeg_data(
-        header_file=r"C:\Users\USER\Desktop\School\neuro-recovery-extension\__dataset\train\1016\1016_006_012_EEG.hea",
-        content_file=r"C:\Users\USER\Desktop\School\neuro-recovery-extension\__dataset\train\1016\1016_006_012_EEG.mat"
-    )
+    x = np.arange(10)
+    y = np.sin(x)
+    cs = CubicSpline(x, y)
+    xs = np.arange(0, 9.6, 0.1)
+    ys = cs(xs)
     
-    print(eeg.get_eeg_data())
+    print(y)
+    print(ys)
