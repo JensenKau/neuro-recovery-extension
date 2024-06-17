@@ -1,11 +1,20 @@
 from __future__ import annotations
-from typing import Dict, Tuple, Callable, Any
-from numpy.typing import NDArray
+from typing import Dict, Tuple, Callable, Any, List
 
+from numpy.typing import NDArray
 import scipy.io
 import numpy as np
+import mne
 
-class PatientEEGData:    
+class PatientEEGData:
+    LOW_PASS = 0.1
+    HIGH_PASS = 30.0
+    BRAIN_REGION = [
+        "Fp1", "Fp2", "F7", "F8", "F3", "F4", "T3", "T4", "C3", "C4", 
+        "T5", "T6", "P3", "P4", "O1", "O2", "Fz", "Cz", "Pz", "Fpz", 
+        "Oz", "F9"
+    ]
+    
     def __init__(self, eeg_data: Dict[str, NDArray], num_points: int, sampling_frequency: int, utility_frequency: int, start_time: int, end_time: int) -> None:
         self.eeg_data = eeg_data
         self.num_points = num_points
@@ -84,7 +93,72 @@ class PatientEEGData:
             start_time=start_time,
             end_time=end_time
         )
+        
     
+    @classmethod
+    def merge_eeg_data(cls, eegs: List[PatientEEGData]) -> PatientEEGData:
+        pass
+    
+    
+    def convert_eeg_to_table(self) -> NDArray:
+        output = [None] * len(self.BRAIN_REGION)
+        
+        for i in range(len(self.BRAIN_REGION)):
+            region = self.BRAIN_REGION[i]
+            if region in self.eeg_data:
+                output[i] = self.eeg_data[region]
+            else:
+                output[i] = np.zeros(self.num_points)
+        
+        return np.asarray(output, dtype=np.float64)
+    
+    
+    def convert_table_to_eeg(self, table: NDArray) -> Dict[str, NDArray]:
+        output = {}
+        
+        for i in range(len(self.BRAIN_REGION)):
+            region = self.BRAIN_REGION[i]
+            if region in self.eeg_data:
+                output[region] = table[i]
+        
+        return output
+    
+    
+    def apply_filter(self) -> None:
+        table = self.convert_eeg_to_table()
+        
+        if self.LOW_PASS <= self.utility_frequency <= self.HIGH_PASS:
+            table = mne.filter.notch_filter(table, self.sampling_frequency, self.utility_frequency, n_jobs=4, verbose="error")
+        table = mne.filter.filter_data(table, self.sampling_frequency, self.LOW_PASS, self.HIGH_PASS, n_jobs=4, verbose="error")
+        
+        self.eeg_data = self.convert_table_to_eeg(table)
+    
+    
+    def apply_normalization(self) -> None:
+        table = self.convert_eeg_to_table()
+        
+        min_value = np.min(table)
+        max_value = np.max(table)
+        if min_value != max_value:
+            table = 2.0 / (max_value - min_value) * (table - 0.5 * (min_value + max_value))
+        else:
+            table = 0 * table
+        
+        self.eeg_data = self.convert_table_to_eeg(table)
+    
+    
+    def apply_resampling(self, resampling_frequency: int) -> None:
+        table = self.convert_eeg_to_table()
+        
+        lcm = np.lcm(int(round(self.sampling_frequency)), int(round(resampling_frequency)))
+        up = int(round(lcm / self.sampling_frequency))
+        down = int(round(lcm / resampling_frequency))
+        resampling_frequency = self.sampling_frequency * up / down
+        table = scipy.signal.resample_poly(table, up, down, axis=1)
+        
+        self.eeg_data = self.convert_table_to_eeg(table)
+        self.sampling_frequency = resampling_frequency
+       
        
     def delete_eeg_data(self) -> None:
         self.eeg_data = None
