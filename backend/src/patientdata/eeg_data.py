@@ -5,7 +5,8 @@ from numpy.typing import NDArray
 import scipy.io
 import numpy as np
 import mne
-from scipy.interpolate import CubicSpline
+from scipy.interpolate import interp1d
+import matplotlib.pyplot as plt
 
 class PatientEEGData:
     LOW_PASS = 0.1
@@ -65,11 +66,13 @@ class PatientEEGData:
     
     @classmethod
     def parse_item(cls, func: Callable[[str], Any], line: str, *args) -> Any:
-        return func(line) if func(line) is not None else args
+        return func(line) if func(line) is not None else (
+            args if len(args) > 1 else args[0]
+        )
     
     
     @classmethod
-    def load_eeg_data(cls, header_file: str, content_file: str) -> PatientEEGData:
+    def load_eeg_data(cls, header_file: str, content_file: str, preprocess: bool = True) -> PatientEEGData:
         raw_eeg = scipy.io.loadmat(content_file)["val"]
         eeg_data = {}
         sampling_frequncy, num_points = 0, 0
@@ -90,22 +93,38 @@ class PatientEEGData:
                 
                 if gain is not None and offset is not None and channel is not None:
                     eeg_data[channel] = (raw_eeg[i - 1].astype(np.float64) - offset) / gain
-        
+                            
         return PatientEEGData(
             eeg_data=eeg_data,
             num_points=num_points,
             sampling_frequency=sampling_frequncy,
             utility_frequency=utility_frequency,
             start_time=start_time,
-            end_time=end_time
+            end_time=end_time,
+            preprocess=preprocess
         )
         
     
     @classmethod
-    def merge_eeg_data(cls, eegs: List[PatientEEGData], resampling_frequency: int = 128) -> PatientEEGData:
+    def load_eeg_datas(cls, header_files: List[str], content_files: List[str]) -> PatientEEGData:
+        eegs = [None] * len(header_files)
+        
+        for i in range(len(header_files)):
+            current_eeg = cls.load_eeg_data(header_files[i], content_files[i], False)
+            eegs[i] = current_eeg
+        
+        return cls.merge_eeg_data(eegs)
+        
+    
+    @classmethod
+    def merge_eeg_data(cls, eegs: List[PatientEEGData], resampling_frequency: int = 128, preprocess: bool = True) -> PatientEEGData:
+        eegs = sorted(eegs, key=lambda x: x.get_start_time())
         time = [None] * len(eegs)
         wave = [[None] * len(eegs) for _ in range(len(cls.BRAIN_REGION))]
         output_wave = {}
+        start_time = eegs[0].get_start_time()
+        end_time = eegs[-1].get_end_time()
+        num_points = (end_time - start_time + 1) * resampling_frequency
         
         for i in range(len(eegs)):
             eeg = eegs[i]
@@ -117,10 +136,6 @@ class PatientEEGData:
                 region = cls.BRAIN_REGION[j]
                 if region in regions:
                     wave[j][i] = regions[region]
-                    
-        start_time = np.min(time)
-        end_time = np.max(time)
-        num_points = (end_time - start_time) * resampling_frequency
                     
         for i in range(len(cls.BRAIN_REGION)):
             current_time = []
@@ -134,7 +149,7 @@ class PatientEEGData:
             if len(current_time) > 0:
                 current_time = np.concatenate(current_time, axis=None, dtype=np.float64)
                 current_wave = np.concatenate(current_wave, axis=None, dtype=np.float64)
-                interpolator = CubicSpline(current_time, current_wave)
+                interpolator = interp1d(current_time, current_wave)
                 output_wave[cls.BRAIN_REGION[i]] = interpolator(np.linspace(start_time, end_time, num_points))
                 
         return PatientEEGData(
@@ -144,7 +159,7 @@ class PatientEEGData:
             eegs[0].get_utility_frequency(),
             start_time,
             end_time,
-            False
+            preprocess
         )
 
     
@@ -175,7 +190,7 @@ class PatientEEGData:
     
     def apply_filter(self) -> None:
         table = self.convert_eeg_to_table()
-        
+                
         if self.LOW_PASS <= self.utility_frequency <= self.HIGH_PASS:
             table = mne.filter.notch_filter(table, self.sampling_frequency, self.utility_frequency, n_jobs=4, verbose="error")
         table = mne.filter.filter_data(table, self.sampling_frequency, self.LOW_PASS, self.HIGH_PASS, n_jobs=4, verbose="error")
@@ -207,6 +222,7 @@ class PatientEEGData:
         
         self.eeg_data = self.convert_table_to_eeg(table)
         self.sampling_frequency = int(resampling_frequency)
+        self.num_points = (self.end_time - self.start_time + 1) * self.sampling_frequency
        
        
     def delete_eeg_data(self) -> None:
