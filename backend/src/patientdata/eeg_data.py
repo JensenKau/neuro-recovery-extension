@@ -6,7 +6,6 @@ import scipy.io
 import numpy as np
 import mne
 from scipy.interpolate import interp1d
-import matplotlib.pyplot as plt
 
 class PatientEEGData:
     LOW_PASS = 0.1
@@ -114,6 +113,26 @@ class PatientEEGData:
             eegs[i] = current_eeg
         
         return cls.merge_eeg_data(eegs)
+    
+    
+    @classmethod
+    def load_processed_eeg(cls, content_file: str) -> PatientEEGData:
+        content = scipy.io.loadmat(content_file)
+        eeg = {}
+        
+        for region in cls.BRAIN_REGION:
+            if region in content:
+                eeg[region] = content[region]
+                
+        return PatientEEGData(
+            eeg_data=eeg,
+            num_points=content["num_points"],
+            sampling_frequency=content["sampling_frequency"],
+            utility_frequency=content["utility_frequency"],
+            start_time=content["start_time"],
+            end_time=content["end_time"],
+            preprocess=False
+        )
         
     
     @classmethod
@@ -161,7 +180,6 @@ class PatientEEGData:
             end_time,
             preprocess
         )
-
     
     
     def convert_eeg_to_table(self) -> NDArray:
@@ -251,8 +269,16 @@ class PatientEEGData:
     
     def get_end_time(self) -> int:
         return self.end_time
-
-
+    
+    
+    def save_eeg(self, filename: str) -> None:
+        content = self.eeg_data.copy()
+        content["num_points"] = self.num_points
+        content["sampling_frequency"] = self.sampling_frequency
+        content["utility_frequency"] = self.utility_frequency
+        content["start_time"] = self.start_time
+        content["end_time"] = self.end_time
+        scipy.io.savemat(filename, content, do_compression=True)
     
 
 if __name__ == "__main__":

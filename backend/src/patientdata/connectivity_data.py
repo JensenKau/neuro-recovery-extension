@@ -45,45 +45,6 @@ class PatientConnectivityData:
         avg_fc, std_fc, static_fc = PatientConnectivityData.gnerate_fc(organized_data, sampling_frequency)
         
         return PatientConnectivityData(avg_fc, std_fc, static_fc)
-      
-      
-    @classmethod
-    def preprocess_data(cls, data: NDArray, sampling_frequency: int, utility_frequency: int, resampling_frequency: int = None) -> Tuple[NDArray, int]:
-        # Define the bandpass frequencies.
-        passband = [0.1, 30.0]
-
-        # Promote the data to double precision because these libraries expect double precision.
-        data = np.asarray(data, dtype=np.float64)
-
-        # If the utility frequency is between bandpass frequencies, then apply a notch filter.
-        if utility_frequency is not None and passband[0] <= utility_frequency <= passband[1]:
-            data = mne.filter.notch_filter(data, sampling_frequency, utility_frequency, n_jobs=4, verbose='error')
-
-        # Apply a bandpass filter.
-        data = mne.filter.filter_data(data, sampling_frequency, passband[0], passband[1], n_jobs=4, verbose='error')
-
-        if resampling_frequency is None:
-            # Resample the data.
-            if sampling_frequency % 2 == 0:
-                resampling_frequency = 128
-            else:
-                resampling_frequency = 125
-            
-        lcm = np.lcm(int(round(sampling_frequency)), int(round(resampling_frequency)))
-        up = int(round(lcm / sampling_frequency))
-        down = int(round(lcm / resampling_frequency))
-        resampling_frequency = sampling_frequency * up / down
-        data = scipy.signal.resample_poly(data, up, down, axis=1)
-
-        # Scale the data to the interval [-1, 1].
-        min_value = np.min(data)
-        max_value = np.max(data)
-        if min_value != max_value:
-            data = 2.0 / (max_value - min_value) * (data - 0.5 * (min_value + max_value))
-        else:
-            data = 0 * data
-
-        return data, resampling_frequency
     
     
     @classmethod
