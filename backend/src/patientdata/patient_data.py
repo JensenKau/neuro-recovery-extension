@@ -24,10 +24,22 @@ class PatientData:
 
 
     @classmethod
-    def load_patient_data(cls, meta_file: str, header_files: List[str], eeg_files: List[str]) -> PatientData:
+    def load_patient_data(cls, meta_file: str, header_files: List[str], eeg_files: List[str], keep_eeg: bool = False, keep_fc: bool = False) -> PatientData:
         return PatientData(
             eeg=PatientEEGData.load_eeg_datas(header_files, eeg_files),
-            meta=PatientMetaData.load_patient_meta_data(meta_file)
+            meta=PatientMetaData.load_patient_meta_data(meta_file),
+            keep_eeg=keep_eeg,
+            keep_fc=keep_fc
+        )
+        
+    
+    @classmethod
+    def load_patient_processed(cls, meta_file: str, merged_eeg_file: str, keep_eeg: bool = False, keep_fc: bool = False) -> PatientData:
+        return PatientData(
+            eeg=PatientEEGData.load_processed_eeg(merged_eeg_file),
+            meta=PatientMetaData.load_patient_meta_data(meta_file),
+            keep_eeg=keep_eeg,
+            keep_fc=keep_fc
         )
 
         
