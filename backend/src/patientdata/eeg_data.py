@@ -6,10 +6,12 @@ import scipy.io
 import numpy as np
 import mne
 from scipy.interpolate import interp1d
+import cupy as cp
 
 class PatientEEGData:
     LOW_PASS = 0.1
     HIGH_PASS = 30.0
+    CUDA_AVAILABLE = cp.cuda.runtime.getDeviceCount() > 0
     BRAIN_REGION = [
         "Fp1", "Fp2", "F7", "F8", "F3", "F4", "T3", "T4", "C3", "C4", 
         "T5", "T6", "P3", "P4", "O1", "O2", "Fz", "Cz", "Pz", "Fpz", 
@@ -92,6 +94,12 @@ class PatientEEGData:
                 
                 if gain is not None and offset is not None and channel is not None:
                     eeg_data[channel] = (raw_eeg[i - 1].astype(np.float64) - offset) / gain
+                    
+            if num_points != (end_time - start_time + 1) * sampling_frequncy:
+                addon = np.zeros(((end_time - start_time + 1) * sampling_frequncy) - num_points, dtype=np.float64)
+                num_points = (end_time - start_time + 1) * sampling_frequncy
+                for key in list(eeg_data.keys()):
+                    eeg_data[key] = np.concatenate((addon, eeg_data[key]), dtype=np.float64)
                             
         return PatientEEGData(
             eeg_data=eeg_data,
@@ -164,7 +172,7 @@ class PatientEEGData:
                 if wave[i][j] is not None:
                     current_time.append(time[j])
                     current_wave.append(wave[i][j])
-
+                    
             if len(current_time) > 0:
                 current_time = np.concatenate(current_time, axis=None, dtype=np.float64)
                 current_wave = np.concatenate(current_wave, axis=None, dtype=np.float64)
@@ -208,10 +216,11 @@ class PatientEEGData:
     
     def apply_filter(self) -> None:
         table = self.convert_eeg_to_table()
+        jobs = "cuda" if self.CUDA_AVAILABLE else 4
                 
         if self.LOW_PASS <= self.utility_frequency <= self.HIGH_PASS:
-            table = mne.filter.notch_filter(table, self.sampling_frequency, self.utility_frequency, n_jobs=4, verbose="error")
-        table = mne.filter.filter_data(table, self.sampling_frequency, self.LOW_PASS, self.HIGH_PASS, n_jobs=4, verbose="error")
+            table = mne.filter.notch_filter(table, self.sampling_frequency, self.utility_frequency, n_jobs=jobs, verbose="error")
+        table = mne.filter.filter_data(table, self.sampling_frequency, self.LOW_PASS, self.HIGH_PASS, n_jobs=jobs, verbose="error")
         
         self.eeg_data = self.convert_table_to_eeg(table)
     

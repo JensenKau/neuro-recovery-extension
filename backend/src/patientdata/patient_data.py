@@ -11,17 +11,22 @@ from src.patientdata.connectivity_data import PatientConnectivityData
 from src.patientdata.data_enum import PatientOutcome, PatientSex
 
 class PatientData:
-    def __init__(self, eeg: PatientEEGData, meta: PatientMetaData) -> None:
+    def __init__(self, eeg: PatientEEGData, meta: PatientMetaData, keep_eeg: bool = False, keep_fc: bool = False) -> None:
         self.eeg = eeg
         self.meta = meta
         self.connectivity = PatientConnectivityData.load_patient_connectivity(eeg)
-        self.eeg.delete_eeg_data()
+        
+        if not keep_eeg:
+            self.eeg.delete_eeg_data()
+        
+        if not keep_fc:
+            self.connectivity.delete_dynamic_fc()
 
 
     @classmethod
-    def load_patient_data(cls, meta_file: str, header_file: str, eeg_file: str) -> PatientData:
+    def load_patient_data(cls, meta_file: str, header_files: List[str], eeg_files: List[str]) -> PatientData:
         return PatientData(
-            eeg=PatientEEGData.load_eeg_data(header_file, eeg_file),
+            eeg=PatientEEGData.load_eeg_datas(header_files, eeg_files),
             meta=PatientMetaData.load_patient_meta_data(meta_file)
         )
 
@@ -124,6 +129,7 @@ class PatientData:
 
     def get_numberised_meta_data(self) -> Dict[str, float]:
         output = self.get_meta_data()
+        
         for key in output.keys():
             if isinstance(output[key], Enum):
                 output[key] = output[key].value
@@ -131,6 +137,7 @@ class PatientData:
                 output[key] = 0
             else:
                 output[key] = float(output[key])
+                
         return output
 
 
