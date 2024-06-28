@@ -152,7 +152,7 @@ class BaseMLModel(ABC):
         return output_x, output_y
 
 
-    def get_data_split(self, dataset_x: List[Any], dataset_y: List[Any]) -> List[DatasetSplit]:
+    def get_nested_data_split(self, dataset_x: List[Any], dataset_y: List[Any]) -> List[DatasetSplit]:
         replaced_x, replaced_y = self.replace_data(dataset_x, dataset_y)
         skf1 = StratifiedKFold(n_splits=BaseMLModel.NUM_SPLIT, shuffle=True, random_state=BaseMLModel.SEED1)
         output = []
@@ -197,9 +197,9 @@ class BaseMLModel(ABC):
         return output
     
     
-    def k_fold(self, dataset: List[PatientData]) -> None:
+    def nested_k_fold(self, dataset: List[PatientData]) -> None:
         dataset_x, dataset_y = self.reshape_input(dataset)
-        data_split = self.get_data_split(dataset_x, dataset_y)
+        data_split = self.get_nested_data_split(dataset_x, dataset_y)
         outer_models = [None] * len(data_split)
         outer_performances = [None] * len(data_split)
         
@@ -241,7 +241,7 @@ class BaseMLModel(ABC):
         }
                             
     
-    def save_k_fold(self, folder: str, save_mode: SAVE_MODE = SAVE_MODE.ALL) -> None:
+    def save_nested_k_fold(self, folder: str, save_mode: SAVE_MODE = SAVE_MODE.ALL) -> None:
         if save_mode != self.SAVE_MODE.NONE:
             csv_header = ["Acc", "Pre", "Rec", "F1", "ROC"]
             csv_content = []
@@ -295,13 +295,13 @@ class BaseMLModel(ABC):
                 
             self.optuna_model_copy = self.__class__()
             self.optuna_model_copy.initialize_model(**formatted_params)
-            self.optuna_model_copy.k_fold(dataset)   
+            self.optuna_model_copy.nested_k_fold(dataset)
             
             return self.optuna_model_copy.get_k_fold_performances()["avg"].get_acc()
         
         def save_best_trial(study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> None:
             if study.best_trial.number == trial.number:
-                self.optuna_model_copy.save_k_fold(f"/root/neuro-recovery-prediction/trained_models/{self.optuna_model_copy.model_name}")
+                self.optuna_model_copy.save_nested_k_fold(f"/root/neuro-recovery-prediction/trained_models/{self.optuna_model_copy.model_name}")
                 
             if self.optuna_model_copy is not None:
                 self.optuna_model_copy.clear_tmp_folder()
