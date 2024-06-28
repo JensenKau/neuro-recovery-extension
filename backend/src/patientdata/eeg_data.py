@@ -100,6 +100,8 @@ class PatientEEGData:
                 num_points = (end_time - start_time + 1) * sampling_frequncy
                 for key in list(eeg_data.keys()):
                     eeg_data[key] = np.concatenate((addon, eeg_data[key]), dtype=np.float64)
+                    
+        print(start_time, end_time, sampling_frequncy, utility_frequency, num_points)
                             
         return PatientEEGData(
             eeg_data=eeg_data,
@@ -130,15 +132,15 @@ class PatientEEGData:
         
         for region in cls.BRAIN_REGION:
             if region in content:
-                eeg[region] = content[region]
+                eeg[region] = content[region][0]
                 
         return PatientEEGData(
             eeg_data=eeg,
-            num_points=content["num_points"],
-            sampling_frequency=content["sampling_frequency"],
-            utility_frequency=content["utility_frequency"],
-            start_time=content["start_time"],
-            end_time=content["end_time"],
+            num_points=content["num_points"][0][0],
+            sampling_frequency=content["sampling_frequency"][0][0],
+            utility_frequency=content["utility_frequency"][0][0],
+            start_time=content["start_time"][0][0],
+            end_time=content["end_time"][0][0],
             preprocess=False
         )
         
@@ -288,6 +290,10 @@ class PatientEEGData:
         content["start_time"] = self.start_time
         content["end_time"] = self.end_time
         scipy.io.savemat(filename, content, do_compression=True)
+        
+    
+    def set_eeg_data(self, region: str, new_data: NDArray) -> None:
+        self.eeg_data[region] = new_data
     
 
 if __name__ == "__main__":
