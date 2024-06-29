@@ -40,7 +40,7 @@ class ModelEvaluator(ABC):
     
     
     @abstractmethod
-    def get_performance(self, **kwargs) -> Dict[str, float]:
+    def get_performance(self, args: str = None) -> Dict[str, Dict[str, float]]:
         pass
     
     

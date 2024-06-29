@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import List, Any, Dict
 
 import sklearn.metrics as metrics
+import numpy as np
 
 class ModelPerformance:
     def __init__(self, acc: float, pre: float, rec: float, f1: float, roc: float) -> None:
@@ -54,6 +55,28 @@ class ModelPerformance:
             rec=metrics.recall_score(y_true, y_pred, average="binary", zero_division=0.0),
             f1=metrics.f1_score(y_true, y_pred, average="binary", zero_division=0.0),
             roc=metrics.roc_auc_score(y_true, y_pred)
+        )
+        
+        
+    @classmethod
+    def avg_performance(cls, performances: List[ModelPerformance]) -> ModelPerformance:
+        return ModelPerformance(
+            acc=float(np.mean(list(map(lambda x: x.get_acc(), performances)), axis=0)),
+            pre=float(np.mean(list(map(lambda x: x.get_pre(), performances)), axis=0)),
+            rec=float(np.mean(list(map(lambda x: x.get_rec(), performances)), axis=0)),
+            f1=float(np.mean(list(map(lambda x: x.get_f1(), performances)), axis=0)),
+            roc=float(np.mean(list(map(lambda x: x.get_roc(), performances)), axis=0))
+        )
+        
+        
+    @classmethod
+    def std_performance(cls, performances: List[ModelPerformance]) -> ModelPerformance:
+        return ModelPerformance(
+            acc=float(np.std(list(map(lambda x: x.get_acc(), performances)), axis=0)),
+            pre=float(np.std(list(map(lambda x: x.get_pre(), performances)), axis=0)),
+            rec=float(np.std(list(map(lambda x: x.get_rec(), performances)), axis=0)),
+            f1=float(np.std(list(map(lambda x: x.get_f1(), performances)), axis=0)),
+            roc=float(np.std(list(map(lambda x: x.get_roc(), performances)), axis=0))
         )
 
 if __name__ == "__main__":
