@@ -81,14 +81,30 @@ class KFold(ModelEvaluator):
         return output
     
     
-    def save_performance(self, file: str, add_extension: bool = True) -> None:
+    def save_performance(self, filename: str, add_extension: bool = True) -> None:
         if self.validation is None or self.test is None:
             raise ValueError("Must evaluate performance first before saving the perfomance result")
         
-        if add_extension and not file.endswith(".csv"):
-            file = f"{file}.csv"
+        if add_extension and not filename.endswith(".csv"):
+            filename = f"{filename}.csv"
             
-        fields = list(self.validation[0].get_performance().keys())
+        fields = ["Label"] + list(self.validation[0].get_performance().keys())
+        rows = []
+        
+        for i in range(len(self.validation)):
+            rows.append([f"Fold {i + 1} Validation"] + list(self.validation[i].get_performance().values()))
+            rows.append([f"Fold {i + 1} Test"] + list(self.test[i].get_performance().values()))
+            
+        rows.append(["Avg Validation"] + list(ModelPerformance.avg_performance(self.validation).get_performance().values()))
+        rows.append(["Avg Test"] + list(ModelPerformance.avg_performance(self.test).get_performance().values()))
+        
+        rows.append(["Std Validation"] + list(ModelPerformance.std_performance(self.validation).get_performance().values()))
+        rows.append(["Std Test"] + list(ModelPerformance.std_performance(self.test).get_performance().values()))
+        
+        with open(filename, "w") as file:
+            csv_writer = csv.writer(file)
+            csv_writer.writerow(fields)
+            csv_writer.writerows(rows)
     
 
 if __name__ == "__main__":
