@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import Dict, List
 import csv
+import os
 
 from sklearn.model_selection import StratifiedKFold
 
@@ -19,6 +20,7 @@ class KFold(ModelEvaluator):
         super().__init__(model)
         self.validation = None
         self.test = None
+        self.models = None
 
 
     def split_data(self, dataset: List[PatientData]) -> List[DatasetSplit]:
@@ -41,6 +43,7 @@ class KFold(ModelEvaluator):
         
         val_performances = []
         test_performances = []
+        models = []
         
         for split in self.split_data(dataset):
             model_copy = self.get_model_copy()
@@ -48,6 +51,7 @@ class KFold(ModelEvaluator):
             val = split.get_test()
             
             model_copy.train_model(train, val)
+            models.append(model_copy)
             
             y_true, y_pred = self.get_true_pred(model_copy, val)
             val_performances.append(ModelPerformance.generate_performance(y_true, y_pred))
@@ -57,6 +61,7 @@ class KFold(ModelEvaluator):
             
         self.validation = val_performances
         self.test = test_performances
+        self.models = models
     
     
     def get_performance(self, args: str = None) -> Dict[str, Dict[str, float]]:
@@ -105,6 +110,14 @@ class KFold(ModelEvaluator):
             csv_writer = csv.writer(file)
             csv_writer.writerow(fields)
             csv_writer.writerows(rows)
+            
+            
+    def save_model(self, folder: str) -> None:
+        if self.models is None:
+            raise ValueError("Must evaluate performance first before saving the model")
+        
+        for model in self.models:
+            model.save_model(os.path.join(folder, f"fold_1.{model.get_save_file_extension()}"))
     
 
 if __name__ == "__main__":

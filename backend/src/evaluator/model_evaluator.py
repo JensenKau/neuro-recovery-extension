@@ -48,6 +48,11 @@ class ModelEvaluator(ABC):
     def save_performance(self, file: str, add_extension: bool = True) -> None:
         pass
     
+    
+    @abstractmethod
+    def save_model(self, folder: str) -> None:
+        pass
+    
 
 if __name__ == "__main__":
     pass

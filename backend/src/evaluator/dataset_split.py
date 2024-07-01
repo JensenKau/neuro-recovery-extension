@@ -4,7 +4,7 @@ from typing import List, Any
 from src.patientdata.patient_data import PatientData
 
 class DatasetSplit:
-    def __init__(self, test: List[PatientData], train: List[PatientData] | DatasetSplit) -> None:
+    def __init__(self, test: List[PatientData], train: List[PatientData] | List[DatasetSplit]) -> None:
         self.test = None
         self.train = None
         
@@ -13,7 +13,7 @@ class DatasetSplit:
         return self.test
     
     
-    def get_train(self) -> List[PatientData] | DatasetSplit:
+    def get_train(self) -> List[PatientData] | List[DatasetSplit]:
         return self.train
 
 
