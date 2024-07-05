@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Dict, List
 
 from sklearn.model_selection import StratifiedKFold
+import numpy as np
 
 from src.mlmodels.base_mlmodel import BaseMLModel
 from src.patientdata.patient_data import PatientData
@@ -16,7 +17,10 @@ class NestedKFold(ModelEvaluator):
     
     def __init__(self, model: BaseMLModel) -> None:
         super().__init__(model)
-        self.performance = None
+        self.inner_perf = None
+        self.outer_perf = None
+        self.inner_models = None
+        self.outer_models = None
         
         
     def split_data(self, dataset: List[PatientData]) -> List[DatasetSplit]:
@@ -42,6 +46,11 @@ class NestedKFold(ModelEvaluator):
     
         
     def evaluate_performance(self, dataset: List[PatientData], testset: List[PatientData] = None) -> None:
+        output_inner = []
+        output_outer = []
+        output_inner_models = []
+        output_outer_models = []
+        
         for split in self.split_data(dataset):
             test = split.get_test()
             inner = split.get_train()
@@ -58,7 +67,18 @@ class NestedKFold(ModelEvaluator):
                 inner_models.append(model_copy)
                 inner_performance.append(ModelPerformance.generate_performance(y_true, y_pred))
                 
+            output_inner.append(inner_performance)
+            output_inner_models.append(inner_models)
             
+            best_model = inner_models[np.argmax(list(map(lambda x: x.get_acc(), inner_performance)))]
+            y_true, y_pred = self.get_true_pred(best_model, test)
+            output_outer.append(ModelPerformance.generate_performance(y_true, y_pred))
+            output_outer_models.append(best_model)
+            
+        self.inner_perf = output_inner
+        self.outer_perf = output_outer
+        self.inner_models = output_inner_models
+        self.outer_models = output_outer_models
     
     
     def get_performance(self, args: str = None) -> Dict[str, Dict[str, float]]:
