@@ -84,11 +84,22 @@ class NestedKFold(ModelEvaluator):
     def get_performance(self, args: str = None) -> Dict[str, Dict[str, float]]:
         if self.performance is None:
             raise ValueError("Must evaluate performance first before getting the perfomance result")
+        
+        if args == "inner" or args is None:
+            pass
+        
+        if args == "outer" or args is None:
+            pass
+    
+        
     
     
     def save_performance(self, file: str, add_extension: bool = True) -> None:
         if self.performance is None:
             raise ValueError("Must evaluate performance first before saving the perfomance result")
+        
+        if add_extension and not filename.endswith(".csv"):
+            filename = f"{filename}.csv"
 
 
 if __name__ == "__main__":
