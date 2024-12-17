@@ -153,6 +153,4 @@ class S3Client:
 
 
 if __name__ == "__main__":
-    client = S3Client("neuro-raw")
-    
-    print(client.list_folders())
+    pass
