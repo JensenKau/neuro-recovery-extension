@@ -4,7 +4,7 @@ import os
 
 from tqdm import tqdm
 
-from s3_access import S3Client
+from neuro_model.neuro_model.s3_access import S3Client
 
 if __name__ == "__main__":
     client = S3Client("neuro-raw")
